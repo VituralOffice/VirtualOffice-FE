@@ -93,11 +93,54 @@ const Item = styled.div`
   }
 `
 
-const ButtonItem = styled(Item)<ButtonProps>`
+const ButtonItem = styled(Item) <ButtonProps>`
   /* Preserve button type and props */
   as='button';
 
   background-color: ${(props) => (props.isActive ? 'rgb(84, 92, 143)' : 'transparent')};
+`
+
+const ButtonItemPrimary = styled.button`
+  display: flex;
+  position: relative;
+  box-sizing: border-box;
+  outline: none;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  justify-content: center;
+  font-family: inherit;
+  font-weight: 700;
+  transition: background-color 200ms ease 0s, border-color 200ms ease 0s;
+  cursor: pointer;
+  opacity: 1;
+  overflow: hidden;
+  background-color: rgb(88, 130, 247);
+  border: 2px solid transparent;
+  padding: 0px 16px;
+  width: auto;
+  min-width: min(85px, 100%);
+  max-width: 100%;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 15px;
+  color: rgb(255, 255, 255) !important;
+
+  > * {
+    margin: 0 6px; /* Set margin based on prop */
+  }
+
+  > *:first-child {
+    margin-left: 0;
+  }
+
+  > *:last-child {
+    margin-right: 0;
+  }
+
+  &:hover {
+    background-color: rgb(121, 155, 249);
+  }
 `
 
 const ButtonItemSecondary = styled.button`
@@ -127,7 +170,7 @@ const ButtonItemSecondary = styled.button`
   color: rgb(40, 45, 78) !important;
 
   > * {
-    margin: 0 6px; /* Set margin based on prop */
+    margin: 0 3px; /* Set margin based on prop */
   }
 
   > *:first-child {
@@ -142,8 +185,6 @@ const ButtonItemSecondary = styled.button`
     background-color: rgb(81, 226, 189);
   }
 `
-
-const DropdownItem = styled.div``
 
 const AvatarContainer = styled.div`
   width: 32px;
@@ -171,15 +212,10 @@ const AvatarImg = styled.img`
   transform: scale(0.75);
   image-rendering: pixelated;
 `
-// font-family: "DM Sans", sans-serif;
-// color: rgb(255, 255, 255);
-//     font-weight: 700;
-//     font-size: 15px;
-//     line-height: 20px;
-//     text-overflow: ellipsis;
-//     overflow: hidden;
-//     white-space: nowrap;
-const Text = styled.div``
+
+const Text = styled.span`
+  white-space: nowrap;
+`
 
 // const Icon = styled.div`
 //     color: white;
@@ -211,8 +247,11 @@ export default function Header() {
           </ButtonItem>
           {isUserMenuShow && <UserMenuPopup />}
         </div>
+        <ButtonItemPrimary>
+          <Text>Sign In</Text>
+        </ButtonItemPrimary>
         <ButtonItemSecondary>
-          <AddCircleRoundedIcon />
+          <AddCircleRoundedIcon style={{ width: '20px' }} />
           <Text>Create Space</Text>
         </ButtonItemSecondary>
       </RightContent>

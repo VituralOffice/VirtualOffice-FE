@@ -143,7 +143,6 @@ export default function UserMenuPopup() {
             <span
               style={{
                 color: 'rgb(224, 224, 224)',
-                // font-family: "DM Sans", sans-serif,
                 fontWeight: '500',
                 fontSize: '14px',
                 lineHeight: '18px',

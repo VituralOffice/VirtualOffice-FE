@@ -40,7 +40,6 @@ width: 100%;
 
     & > span {
         color: rgb(32, 37, 64);
-    font-family: "DM Sans", sans-serif;
     font-weight: 500;
     font-size: 15px;
     line-height: 20px;

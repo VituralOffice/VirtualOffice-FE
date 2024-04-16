@@ -22,7 +22,6 @@ align-items: center;
 
 const SpaceName = styled.span`
 color: rgb(255, 255, 255);
-    font-family: "DM Sans", sans-serif;
     font-weight: 700;
     font-size: 14px;
     line-height: 18px;
@@ -136,7 +135,6 @@ display: flex;
 
 const LastVisitedSpan = styled.span`
 color: rgb(189, 189, 189);
-    font-family: "DM Sans", sans-serif;
     font-weight: 400;
     font-size: 13px;
     line-height: 17px;
