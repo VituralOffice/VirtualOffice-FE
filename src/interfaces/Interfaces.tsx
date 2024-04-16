@@ -1,3 +1,7 @@
 export interface ButtonProps {
-    active?: boolean; // Define active prop
+  isActive?: boolean // Define active prop
+}
+
+export interface PopupProps {
+  onClosePopup: () => void
 }
