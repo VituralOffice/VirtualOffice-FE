@@ -117,7 +117,6 @@ display: flex;
         height: auto;
     }
 `
-// font-family: "DM Sans", sans-serif;
 const Text = styled.span`
     color: rgb(255, 255, 255);
     font-weight: 700;
