@@ -3,6 +3,7 @@ import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import { MutableRefObject, SetStateAction, useEffect, useRef, useState } from "react";
 import SpaceItem from "../components/SpaceItem";
 import { ButtonProps } from "../interfaces/Interfaces";
+import Header from "../components/Header";
 
 const TopBar = styled.div`
 display: flex;
@@ -174,6 +175,7 @@ export default function SpacePage() {
 
     return (
         <>
+            <Header />
             <TopBar>
                 <GroupedButtons />
                 <SearchBarContainer>

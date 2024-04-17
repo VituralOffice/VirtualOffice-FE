@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Header from './components/Header';
 import SpacePage from './pages/SpacePage';
 import LoginPage from './pages/LoginPage';
+import SpaceDashboardPage from './pages/SpaceDashboardPage';
 
 const Backdrop = styled.div`
   position: absolute;
@@ -16,18 +17,17 @@ const Backdrop = styled.div`
 
 function App() {
   // const loggedIn = useAppSelector((state) => state.user.loggedIn); // Assuming state structure
-  const loggedIn = false;
 
   return (
     <Backdrop>
       <Router>
         {/* Wrap Header and Routes in a Fragment since they're both siblings */}
         <React.Fragment>
-          {loggedIn && <Header />}
           <Routes>
             <Route path="/" element={<Navigate to="/app" replace />} />
             <Route path="/app" element={<SpacePage />} />
             <Route path="/signin" element={<LoginPage />} />
+            <Route path="/dashboard" element={<SpaceDashboardPage />} />
           </Routes>
         </React.Fragment>
       </Router>
