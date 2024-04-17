@@ -93,7 +93,7 @@ const Item = styled.div`
   }
 `
 
-const ButtonItem = styled(Item) <ButtonProps>`
+const ButtonItem = styled(Item)<ButtonProps>`
   /* Preserve button type and props */
   as='button';
 
@@ -207,10 +207,13 @@ const AvatarBackground = styled.div`
 const AvatarImg = styled.img`
   object-position: 0px -2px;
   object-fit: contain;
+  object-position: 0px 8px;
   width: 100%;
   height: 150%;
   transform: scale(0.75);
   image-rendering: pixelated;
+  position: relative;
+  top: -10px;
 `
 
 const Text = styled.span`
