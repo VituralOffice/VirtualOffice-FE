@@ -156,44 +156,44 @@ const DropdownIcon = styled.div<ButtonProps>`
   }
 `
 
-export default function SpaceDashboardSidebar({ menuId }) {
+export default function SpaceDashboardSidebar({ menuId, setMenuId }) {
   const [isUserMenuShow, setUserMenuShow] = useState(false)
 
   return (
     <Container>
       <Dashboard>
         <DashboardTitle>Space dashboard</DashboardTitle>
-        <NavMenuItem isActive={menuId == 0}>
+        <NavMenuItem isActive={menuId == 0} onClick={() => setMenuId(0)}>
           <span className="icon">
             <CalendarMonthRoundedIcon />
           </span>
           <div className="title">Plans & Billing</div>
         </NavMenuItem>
-        <NavMenuItem isActive={menuId == 1}>
+        <NavMenuItem isActive={menuId == 1} onClick={() => setMenuId(1)}>
           <span className="icon">
             <SettingsRoundedIcon />
           </span>
           <div className="title">Space Preferences</div>
         </NavMenuItem>
-        <NavMenuItem isActive={menuId == 2}>
+        <NavMenuItem isActive={menuId == 2} onClick={() => setMenuId(2)}>
           <span className="icon">
             <TextSnippetRoundedIcon />
           </span>
           <div className="title">Space Access</div>
         </NavMenuItem>
-        <NavMenuItem isActive={menuId == 3}>
+        <NavMenuItem isActive={menuId == 3} onClick={() => setMenuId(3)}>
           <span className="icon">
             <PeopleAltRoundedIcon />
           </span>
           <div className="title">User Roles</div>
         </NavMenuItem>
-        <NavMenuItem isActive={menuId == 4}>
+        <NavMenuItem isActive={menuId == 4} onClick={() => setMenuId(4)}>
           <span className="icon">
             <NotInterestedRoundedIcon />
           </span>
           <div className="title">Banned Users</div>
         </NavMenuItem>
-        <NavMenuItem isActive={menuId == 5}>
+        <NavMenuItem isActive={menuId == 5} onClick={() => setMenuId(5)}>
           <span className="icon">
             <DeleteRoundedIcon />
           </span>
