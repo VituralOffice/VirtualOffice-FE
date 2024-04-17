@@ -1,11 +1,12 @@
 import { enableMapSet } from 'immer'
 import { configureStore } from '@reduxjs/toolkit'
+import userReducer from './UserStore'
 
 enableMapSet()
 
 const store = configureStore({
   reducer: {
-   
+    user: userReducer,
   },
   // Temporary disable serialize check for redux as we store MediaStream in ComputerStore.
   // https://stackoverflow.com/a/63244831

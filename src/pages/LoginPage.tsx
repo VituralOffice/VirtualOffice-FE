@@ -1,5 +1,10 @@
 import styled from "styled-components"
 import GoogleLoginButton from "../components/GoogleLoginButton"
+import { useContext, useState } from "react"
+import { LoginByEmail } from "../apis/AuthApis"
+import { useNavigate } from "react-router-dom"
+import { isApiSuccess } from "../apis/util"
+import { setLoggedIn } from "../stores/UserStore"
 
 const Container = styled.div`
 height: 100%;
@@ -8,9 +13,10 @@ display: flex;
 align-items: center;
 -webkit-box-pack: center;
 justify-content: center;
-background-image: url(https://cdn.gather.town/v0/b/gather-town.appspot.com/o/images%2Fsignin_bg.png?alt=media&token=be54b54c-34be-4644-a640-7d69507f0941);
+background-image: url(src/../public/assets/background/Summer2.png);
 background-repeat: repeat-x;
 background-size: cover;
+image-rendering: pixelated;
 `
 
 const ContentWindow = styled.div`
@@ -159,6 +165,9 @@ const ButtonSignIn = styled.button`
 `
 
 export default function LoginPage() {
+    const [email, setEmail] = useState('');
+    const navigate = useNavigate();
+
     const handleLoginSuccess = (response: any) => {
         console.log('Login successful:', response);
         // Xử lý việc đăng nhập thành công ở đây
@@ -167,6 +176,32 @@ export default function LoginPage() {
     const handleLoginFailure = (error: any) => {
         console.error('Login failed:', error);
         // Xử lý việc đăng nhập thất bại ở đây
+    };
+
+    const isEmailValid = (email) => {
+        // Biểu thức chính quy để kiểm tra tính hợp lệ của email
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailPattern.test(email);
+    };
+
+    const handleSubmitLoginByEmail = async (event) => {
+        event.preventDefault();
+        if (isEmailValid(email)) {
+            // Gửi yêu cầu API khi địa chỉ email hợp lệ
+            const response = await LoginByEmail(email);
+            if (response && isApiSuccess(response.code)) {
+                // Nếu phản hồi thành công, set giá trị loggedIn thành true
+                setLoggedIn(true);
+                navigate("/");
+            }
+        } else {
+            // Xử lý khi địa chỉ email không hợp lệ
+            console.error('Invalid email address');
+        }
+    }
+
+    const handleEmailChange = (event) => {
+        setEmail(event.target.value);
     };
 
     return (
@@ -191,24 +226,26 @@ export default function LoginPage() {
                                 <span>OR</span>
                             </ORSpan>
 
-                            <div style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                width: '100%'
-                            }}>
-                                <EmailLabel>
-                                    <label>
-                                        <span>Email</span>
-                                    </label>
-                                </EmailLabel>
-                                <EmailInput>
-                                    <input type="email" placeholder="Enter your email address" />
-                                </EmailInput>
-                            </div>
+                            <form onSubmit={handleSubmitLoginByEmail}>
+                                <div style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    width: '100%'
+                                }}>
+                                    <EmailLabel>
+                                        <label>
+                                            <span>Email</span>
+                                        </label>
+                                    </EmailLabel>
+                                    <EmailInput>
+                                        <input type="email" placeholder="Enter your email address" autoComplete="on" onChange={handleEmailChange} />
+                                    </EmailInput>
+                                </div>
 
-                            <ButtonGroupContainer>
-                                <ButtonSignIn>Sign in with email</ButtonSignIn>
-                            </ButtonGroupContainer>
+                                <ButtonGroupContainer>
+                                    <ButtonSignIn>Sign in with email</ButtonSignIn>
+                                </ButtonGroupContainer>
+                            </form>
                         </div>
                     </ContentWindow>
                 </Container>

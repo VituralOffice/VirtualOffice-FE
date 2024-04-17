@@ -5,6 +5,7 @@ import UserMenuPopup from './popups/UserMenuPopup'
 import { useState } from 'react'
 import { ButtonProps } from '../interfaces/Interfaces'
 import EditUserProfilePopup from './popups/EditUserProfilePopup'
+import { useNavigate } from 'react-router-dom'
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -93,7 +94,7 @@ const Item = styled.div`
   }
 `
 
-const ButtonItem = styled(Item)<ButtonProps>`
+const ButtonItem = styled(Item) <ButtonProps>`
   /* Preserve button type and props */
   as='button';
 
@@ -226,7 +227,8 @@ const Text = styled.span`
 // `
 
 export default function Header() {
-  const [isUserMenuShow, setUserMenuShow] = useState(false)
+  const [isUserMenuShow, setUserMenuShow] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <HeaderContainer>
@@ -250,7 +252,7 @@ export default function Header() {
           </ButtonItem>
           {isUserMenuShow && <UserMenuPopup />}
         </div>
-        <ButtonItemPrimary>
+        <ButtonItemPrimary onClick={() => navigate('/signin')}>
           <Text>Sign In</Text>
         </ButtonItemPrimary>
         <ButtonItemSecondary>

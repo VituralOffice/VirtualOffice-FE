@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-// import { useAppSelector } from './hook'; // Assuming this hook retrieves user data
+import { useAppSelector } from './hook'; // Assuming this hook retrieves user data
 
 import Header from './components/Header';
 import SpacePage from './pages/SpacePage';

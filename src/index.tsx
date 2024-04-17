@@ -9,9 +9,14 @@ import './index.scss'
 import muiTheme from './MuiTheme'
 import App from './App'
 import store from './stores'
+import ApiService from './apis/ApiService'
 
+// require('dotenv').config();
+
+ApiService.getInstance();
 const container = document.getElementById('root')
 const root = createRoot(container!)
+
 root.render(
   <React.StrictMode>
     <Provider store={store}>
