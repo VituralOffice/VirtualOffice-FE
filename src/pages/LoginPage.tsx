@@ -4,7 +4,9 @@ import { useContext, useState } from "react"
 import { LoginByEmail } from "../apis/AuthApis"
 import { useNavigate } from "react-router-dom"
 import { isApiSuccess } from "../apis/util"
-import { setLoggedIn } from "../stores/UserStore"
+import { setLoggedIn, setUserInfo } from "../stores/UserStore"
+import { useAppDispatch } from "../hook"
+import CircularIndeterminate, { FacebookCircularProgress, GradientCircularProgress } from "../components/loadings/LoadingIcon"
 
 const Container = styled.div`
 height: 100%;
@@ -13,7 +15,7 @@ display: flex;
 align-items: center;
 -webkit-box-pack: center;
 justify-content: center;
-background-image: url(src/../public/assets/background/Summer2.png);
+background-image: url(assets/background/Summer2.png);
 background-repeat: repeat-x;
 background-size: cover;
 image-rendering: pixelated;
@@ -77,6 +79,7 @@ const ORSpan = styled.span`
 
 const EmailLabel = styled.div`
     display: flex;
+    justify-content: space-between;
     margin-bottom: 4px;
     & > label{
         border: 0;
@@ -90,6 +93,12 @@ const EmailLabel = styled.div`
             font-size: 13px;
             line-height: 17px;
         }
+    }
+    .error-txt {
+        color: rgb(215, 7, 7);
+            font-weight: 500;
+            font-size: 13px;
+            line-height: 17px;
     }
 `
 
@@ -166,7 +175,11 @@ const ButtonSignIn = styled.button`
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
+    const [loadingShow, setLoadingShow] = useState<boolean>(false);
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+
+    const [error, setError] = useState('');
 
     const handleLoginSuccess = (response: any) => {
         console.log('Login successful:', response);
@@ -186,17 +199,23 @@ export default function LoginPage() {
 
     const handleSubmitLoginByEmail = async (event) => {
         event.preventDefault();
+        setError("");
         if (isEmailValid(email)) {
             // Gửi yêu cầu API khi địa chỉ email hợp lệ
+            setLoadingShow(true);
             const response = await LoginByEmail(email);
-            if (response && isApiSuccess(response.code)) {
-                // Nếu phản hồi thành công, set giá trị loggedIn thành true
-                setLoggedIn(true);
+            if (isApiSuccess(response)) {
+                // Lưu thông tin người dùng vào localStorage
+                localStorage.setItem('userData', JSON.stringify(response.result));
+                dispatch(setUserInfo(response.result));
+                dispatch(setLoggedIn(true));
                 navigate("/");
             }
+            setLoadingShow(false);
         } else {
             // Xử lý khi địa chỉ email không hợp lệ
             console.error('Invalid email address');
+            setError("Invalid email address");
         }
     }
 
@@ -236,14 +255,26 @@ export default function LoginPage() {
                                         <label>
                                             <span>Email</span>
                                         </label>
+                                        {
+                                            error && (
+                                                <span className="error-txt">{error}</span>
+                                            )
+                                        }
+
                                     </EmailLabel>
                                     <EmailInput>
-                                        <input type="email" placeholder="Enter your email address" autoComplete="on" onChange={handleEmailChange} />
+                                        <input type="email" placeholder="Enter your email address" autoComplete="email" onChange={handleEmailChange} />
                                     </EmailInput>
                                 </div>
 
                                 <ButtonGroupContainer>
-                                    <ButtonSignIn>Sign in with email</ButtonSignIn>
+                                    <ButtonSignIn>{
+                                        loadingShow ? (
+                                            <CircularIndeterminate size={30} color="inherit" />
+                                        ) : (
+                                            "Sign in with email"
+                                        )
+                                    }</ButtonSignIn>
                                 </ButtonGroupContainer>
                             </form>
                         </div>

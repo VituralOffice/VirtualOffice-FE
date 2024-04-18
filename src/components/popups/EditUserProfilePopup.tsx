@@ -1,6 +1,7 @@
 import styled from 'styled-components'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import { PopupProps } from '../../interfaces/Interfaces'
+import { useAppSelector } from '../../hook'
 
 const Layout = styled.div`
   width: 100%;
@@ -220,6 +221,8 @@ const ButtonFinish = styled.div`
 `
 
 const EditUserProfilePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
+  const user = useAppSelector((state) => state.user);
+
   return (
     <Layout>
       <PopupContainer>
@@ -234,7 +237,7 @@ const EditUserProfilePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
             <UserShadow />
           </UpperContentContainer>
           <UsernameTopDisplay>
-            <span>Tú Nguyễn</span>
+            <span>{user.username}</span>
           </UsernameTopDisplay>
           <LowerContentContainer>
             <div

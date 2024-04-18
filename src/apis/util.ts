@@ -1,5 +1,5 @@
-export function isApiSuccess(responseCode: number): boolean {
-    return responseCode >= 200 && responseCode < 300;
+export function isApiSuccess(response: any): boolean {
+    return response && response.code && response.code >= 200 && response.code < 300;
 }
 
 export const callApi = async (apiFunction: () => Promise<any>) => {

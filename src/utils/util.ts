@@ -7,3 +7,9 @@ export function sanitizeId(id: string) {
 
     return sanitized.replace(/[^0-9a-z]/gi, 'G')
 }
+
+export const avatars = ["src/images/login/Adam_login.png", "src/images/login/Ash_login.png", "src/images/login/Lucy_login.png", "src/images/login/Nancy_login.png"]
+
+export function getAvatarById(id: number) {
+    return avatars[Math.max(0, Math.min(id, avatars.length - 1))];
+}

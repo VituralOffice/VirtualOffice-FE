@@ -4,6 +4,8 @@ import { PopupProps } from '../../interfaces/Interfaces'
 import Slider from 'react-slick'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
+import { avatars } from '../../utils/util'
+import { useAppSelector } from '../../hook'
 
 const Layout = styled.div`
   width: 100%;
@@ -189,12 +191,7 @@ const ButtonFinish = styled.div`
 const SelectSkinContainer = styled.div``
 
 const EditUserCharacterPopup: React.FC<PopupProps> = ({ onClosePopup }) => {
-  const skins = [
-    'src/images/login/Adam_login.png',
-    'src/images/login/Ash_login.png',
-    'src/images/login/Lucy_login.png',
-    'src/images/login/Nancy_login.png',
-  ] // Mảng chứa URL các hình ảnh skins
+  const user = useAppSelector((state) => state.user);
 
   const settings = {
     dots: false,
@@ -220,12 +217,12 @@ const EditUserCharacterPopup: React.FC<PopupProps> = ({ onClosePopup }) => {
             <UserShadow />
           </UpperContentContainer>
           <UsernameTopDisplay>
-            <span>Tú Nguyễn</span>
+            <span>{user.username}</span>
           </UsernameTopDisplay>
           <LowerContentContainer>
             <SelectSkinContainer>
               <Slider {...settings} style={{ maxWidth: '100%' }}>
-                {skins.map((skinUrl, index) => (
+                {avatars.map((skinUrl, index) => (
                   <div key={index}>
                     <img src={skinUrl} alt={`Skin ${index}`} style={{ margin: '0 auto', imageRendering: 'pixelated', width: '96px', height: '144px', objectFit: 'cover' }} />
                   </div>
