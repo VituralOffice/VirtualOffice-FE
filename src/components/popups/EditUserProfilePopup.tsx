@@ -233,7 +233,7 @@ const EditUserProfilePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
         </IconCloseContainer>
         <PopupContent>
           <UpperContentContainer>
-            <img src="src/images/login/Adam_login.png" />
+            <img src="assets/login/Adam_login.png" />
             <UserShadow />
           </UpperContentContainer>
           <UsernameTopDisplay>

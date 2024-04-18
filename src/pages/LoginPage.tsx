@@ -230,10 +230,10 @@ export default function LoginPage() {
                     <ContentWindow>
                         <div>
                             <HeaderDecorationContainer>
-                                <img src="src/images/login/Adam_login.png"></img>
-                                <img src="src/images/login/Ash_login.png"></img>
-                                <img src="src/images/login/Lucy_login.png"></img>
-                                <img src="src/images/login/Nancy_login.png"></img>
+                                <img src="assets/login/Adam_login.png"></img>
+                                <img src="assets/login/Ash_login.png"></img>
+                                <img src="assets/login/Lucy_login.png"></img>
+                                <img src="assets/login/Nancy_login.png"></img>
                             </HeaderDecorationContainer>
                             <HeaderTitle>
                                 <span>Welcome to Virtual Office</span>
