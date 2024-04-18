@@ -51,6 +51,7 @@ function App() {
 
             {/* private */}
             <Route path="/dashboard" element={checkLogin(<SpaceDashboardPage />)} />
+            <Route path="/space" element={checkLogin(<SpaceDashboardPage />)} />
           </Routes>
         </React.Fragment>
       </Backdrop>

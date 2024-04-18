@@ -8,6 +8,8 @@ import EditUserProfilePopup from './popups/EditUserProfilePopup'
 import { useNavigate } from 'react-router-dom'
 import { useAppSelector } from '../hook'
 import { getAvatarById } from '../utils/util'
+import phaserGame from '../PhaserGame'
+import Bootstrap from '../scenes/Bootstrap'
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -233,6 +235,18 @@ export default function Header() {
   const navigate = useNavigate();
   const user = useAppSelector((state) => state.user);
 
+  const lobbyJoined = useAppSelector((state) => state.room.lobbyJoined)
+
+  const testCreateSpace = () => {
+    // create custom room if name and description are not empty
+    if (!lobbyJoined || !user.loggedIn) return;
+    const bootstrap = phaserGame.scene.keys.bootstrap as Bootstrap
+    bootstrap.network
+      .createCustom({ name: 'test', description: 'desc', password: '', autoDispose: false } as any)
+      .then(() => bootstrap.launchGame())
+      .catch((error) => console.error(error))
+  }
+
   return (
     <HeaderContainer>
       <LeftContent>
@@ -262,7 +276,7 @@ export default function Header() {
             </ButtonItemPrimary>
           )
         }
-        <ButtonItemSecondary>
+        <ButtonItemSecondary onClick={testCreateSpace}>
           <AddCircleRoundedIcon style={{ width: '20px' }} />
           <Text>Create Space</Text>
         </ButtonItemSecondary>
