@@ -6,6 +6,8 @@ import { useState } from 'react'
 import { ButtonProps } from '../interfaces/Interfaces'
 import EditUserProfilePopup from './popups/EditUserProfilePopup'
 import { useNavigate } from 'react-router-dom'
+import { useAppSelector } from '../hook'
+import { getAvatarById } from '../utils/util'
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -229,6 +231,7 @@ const Text = styled.span`
 export default function Header() {
   const [isUserMenuShow, setUserMenuShow] = useState(false);
   const navigate = useNavigate();
+  const user = useAppSelector((state) => state.user);
 
   return (
     <HeaderContainer>
@@ -245,16 +248,20 @@ export default function Header() {
           <ButtonItem isActive={isUserMenuShow} onClick={() => setUserMenuShow(!isUserMenuShow)}>
             <AvatarContainer>
               <AvatarBackground>
-                <AvatarImg src="src/images/login/Adam_login.png" />
+                <AvatarImg src={getAvatarById(user.character_id)} />
               </AvatarBackground>
             </AvatarContainer>
-            <Text>Tú Nguyễn</Text>
+            <Text>{user.username}</Text>
           </ButtonItem>
           {isUserMenuShow && <UserMenuPopup />}
         </div>
-        <ButtonItemPrimary onClick={() => navigate('/signin')}>
-          <Text>Sign In</Text>
-        </ButtonItemPrimary>
+        {
+          !user.loggedIn && (
+            <ButtonItemPrimary onClick={() => navigate('/signin')}>
+              <Text>Sign In</Text>
+            </ButtonItemPrimary>
+          )
+        }
         <ButtonItemSecondary>
           <AddCircleRoundedIcon style={{ width: '20px' }} />
           <Text>Create Space</Text>

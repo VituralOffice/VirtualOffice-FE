@@ -9,6 +9,7 @@ import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded'
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded'
 import { useState } from 'react'
 import DashboardUserMenuPopup from '../popups/DashboardUserMenuPopup'
+import { useAppSelector } from '../../hook'
 
 const Container = styled.div`
   display: flex;
@@ -158,6 +159,7 @@ const DropdownIcon = styled.div<ButtonProps>`
 
 export default function SpaceDashboardSidebar({ menuId, setMenuId }) {
   const [isUserMenuShow, setUserMenuShow] = useState(false)
+  const user = useAppSelector((state) => state.user);
 
   return (
     <Container>
@@ -200,7 +202,7 @@ export default function SpaceDashboardSidebar({ menuId, setMenuId }) {
           <div className="title">Shut Down or Delete</div>
         </NavMenuItem>
       </Dashboard>
-      <div style={{position: 'relative'}}>
+      <div style={{ position: 'relative' }}>
         <UserBottomInfo>
           <UserAvatar>
             <div>
@@ -210,7 +212,7 @@ export default function SpaceDashboardSidebar({ menuId, setMenuId }) {
             </div>
           </UserAvatar>
           <Username>
-            <div>Tú Nguyễn</div>
+            <div>{user.username}</div>
           </Username>
           <DropdownIcon isActive={isUserMenuShow} onClick={() => setUserMenuShow(!isUserMenuShow)}>
             <span>

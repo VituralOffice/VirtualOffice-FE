@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 import { BackgroundMode } from '../types/BackgroundMode'
 import { sanitizeId } from '../utils/util'
+import { UserData } from '../types'
 
 export function getInitialBackgroundMode() {
     const currentHour = new Date().getHours()
@@ -17,6 +18,14 @@ export const userSlice = createSlice({
         loggedIn: false,
         playerNameMap: new Map<string, string>(),
         showJoystick: window.innerWidth < 650,
+
+        //user info
+        userId: '',
+        username: 'Anonymous',
+        email: '',
+        role: 'user',
+        character_id: 0,
+        isVerified: false,
     },
     reducers: {
         toggleBackgroundMode: (state) => {
@@ -45,6 +54,49 @@ export const userSlice = createSlice({
         setShowJoystick: (state, action: PayloadAction<boolean>) => {
             state.showJoystick = action.payload
         },
+
+        setUserId: (state, action: PayloadAction<string>) => {
+            state.userId = action.payload
+        },
+        setUsername: (state, action: PayloadAction<string>) => {
+            state.username = action.payload
+        },
+        setEmail: (state, action: PayloadAction<string>) => {
+            state.email = action.payload
+        },
+        setCharacterId: (state, action: PayloadAction<number>) => {
+            state.character_id = action.payload
+        },
+        setIsVerified: (state, action: PayloadAction<boolean>) => {
+            state.isVerified = action.payload
+        },
+
+        setUserInfo: (state, action: PayloadAction<UserData>) => {
+            state.userId = action.payload._id;
+            state.email = action.payload.email;
+            if (!action.payload.fullname)
+                state.username = action.payload.email.split('@')[0]
+            else state.username = action.payload.fullname;
+            state.role = action.payload.role ? action.payload.role : 'user';
+            state.character_id = action.payload.character_id ? action.payload.character_id : 0;
+            state.isVerified = action.payload.isVerified;
+        },
+
+        resetUserState: (state) => {
+            state.backgroundMode = getInitialBackgroundMode();
+            state.sessionId = '';
+            state.videoConnected = false;
+            state.loggedIn = false;
+            state.playerNameMap = new Map<string, string>();
+            state.showJoystick = window.innerWidth < 650;
+
+            state.userId = '';
+            state.username = 'Anonymous';
+            state.email = '';
+            state.role = 'user';
+            state.character_id = 0;
+            state.isVerified = false;
+        },
     },
 })
 
@@ -56,6 +108,13 @@ export const {
     setPlayerNameMap,
     removePlayerNameMap,
     setShowJoystick,
+    setUserId,
+    setUsername,
+    setEmail,
+    setCharacterId,
+    setIsVerified,
+    setUserInfo,
+    resetUserState,
 } = userSlice.actions
 
 export default userSlice.reducer

@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAppSelector } from './hook'; // Assuming this hook retrieves user data
 
-import Header from './components/Header';
 import SpacePage from './pages/SpacePage';
 import LoginPage from './pages/LoginPage';
 import SpaceDashboardPage from './pages/SpaceDashboardPage';
+import { setLoggedIn, setUserInfo } from './stores/UserStore';
+import { useDispatch } from 'react-redux';
 
 const Backdrop = styled.div`
   position: absolute;
@@ -16,7 +17,24 @@ const Backdrop = styled.div`
 `;
 
 function App() {
-  // const loggedIn = useAppSelector((state) => state.user.loggedIn); // Assuming state structure
+  const loggedIn = useAppSelector((state) => state.user.loggedIn); // Assuming state structure
+  const dispatch = useDispatch();
+
+  const checkLogin = (page: any) => {
+    if (!loggedIn) {
+      return <Navigate to="/signin" replace />;
+    }
+    return page;
+  };
+
+  useEffect(() => {
+    const userDataString = localStorage.getItem('userData');
+    if (userDataString) {
+      const userData = JSON.parse(userDataString);
+      dispatch(setUserInfo(userData));
+      dispatch(setLoggedIn(true));
+    }
+  }, []); // Chạy chỉ một lần khi ứng dụng khởi động
 
   return (
     <Backdrop>
@@ -24,10 +42,13 @@ function App() {
         {/* Wrap Header and Routes in a Fragment since they're both siblings */}
         <React.Fragment>
           <Routes>
+            {/* public */}
             <Route path="/" element={<Navigate to="/app" replace />} />
             <Route path="/app" element={<SpacePage />} />
-            <Route path="/signin" element={<LoginPage />} />
-            <Route path="/dashboard" element={<SpaceDashboardPage />} />
+            <Route path="/signin" element={loggedIn ? <Navigate to="/app" replace /> : <LoginPage />} />
+
+            {/* private */}
+            <Route path="/dashboard" element={checkLogin(<SpaceDashboardPage />)} />
           </Routes>
         </React.Fragment>
       </Router>
