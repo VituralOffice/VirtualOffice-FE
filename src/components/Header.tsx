@@ -237,7 +237,7 @@ export default function Header() {
     <HeaderContainer>
       <LeftContent>
         <LogoContainer>
-          <Logo src="../public/logo_transparent.svg" />
+          <Logo src="logo_transparent.svg" />
         </LogoContainer>
         <Item>
           <AutoAwesomeIcon /> <Text>My Spaces</Text>

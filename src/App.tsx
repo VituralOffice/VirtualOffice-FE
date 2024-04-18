@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAppSelector } from './hook'; // Assuming this hook retrieves user data
 
 import SpacePage from './pages/SpacePage';
@@ -8,6 +8,7 @@ import LoginPage from './pages/LoginPage';
 import SpaceDashboardPage from './pages/SpaceDashboardPage';
 import { setLoggedIn, setUserInfo } from './stores/UserStore';
 import { useDispatch } from 'react-redux';
+import LoadingPage from './pages/LoadingPage';
 
 const Backdrop = styled.div`
   position: absolute;
@@ -37,8 +38,9 @@ function App() {
   }, []); // Chạy chỉ một lần khi ứng dụng khởi động
 
   return (
-    <Backdrop>
-      <Router>
+    <Router>
+      <Backdrop>
+        <LoadingPage />
         {/* Wrap Header and Routes in a Fragment since they're both siblings */}
         <React.Fragment>
           <Routes>
@@ -51,8 +53,8 @@ function App() {
             <Route path="/dashboard" element={checkLogin(<SpaceDashboardPage />)} />
           </Routes>
         </React.Fragment>
-      </Router>
-    </Backdrop>
+      </Backdrop>
+    </Router>
   );
 }
 
