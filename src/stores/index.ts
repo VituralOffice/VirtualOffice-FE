@@ -1,14 +1,20 @@
 import { enableMapSet } from 'immer'
 import { configureStore } from '@reduxjs/toolkit'
 import userReducer from './UserStore'
+import meetingReducer from './MeetingStore'
+import chatReducer from './ChatStore'
+import roomReducer from './RoomStore'
 
 enableMapSet()
 
 const store = configureStore({
   reducer: {
     user: userReducer,
+    meeting: meetingReducer,
+    chat: chatReducer,
+    room: roomReducer,
   },
-  // Temporary disable serialize check for redux as we store MediaStream in ComputerStore.
+  // Temporary disable serialize check for redux as we store MediaStream in MeetingStore.
   // https://stackoverflow.com/a/63244831
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
