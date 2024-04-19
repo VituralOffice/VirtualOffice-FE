@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import GoogleLoginButton from '../components/GoogleLoginButton'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { LoginByEmail } from '../apis/AuthApis'
 import { useNavigate } from 'react-router-dom'
 import { isApiSuccess } from '../apis/util'
@@ -201,7 +201,80 @@ const OtpInput = styled.input`
   font-family: inherit;
   text-align: center;
   color: rgb(51, 58, 100);
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  &:focus,
+  &:active,
+  &:focus-within {
+    border-color: rgb(113, 113, 113) !important;
+    outline: none;
+  }
 `
+
+const OtpInputComponent = ({ key, autoFocus, onChange, ...props }) => {
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  // Sử dụng useState để lưu trữ giá trị của input
+  const [value, setValue] = useState('')
+
+  useEffect(() => {
+    if (autoFocus && inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [autoFocus])
+
+  // Xử lý sự kiện khi giá trị của input thay đổi
+  const handleChange = (event) => {
+    let newValue = event.target.value
+
+    if (value !== '' && newValue) {
+      if (inputRef.current && inputRef.current.nextSibling instanceof HTMLInputElement) {
+        inputRef.current.nextSibling.value = value
+      }
+      newValue = newValue[0]
+    }
+
+    if (newValue && inputRef.current && inputRef.current.nextSibling instanceof HTMLInputElement) {
+      inputRef.current.nextSibling.focus()
+    }
+
+    setValue(newValue)
+    onChange(newValue)
+  }
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Backspace') {
+      if (value === '') {
+        event.preventDefault() // Ngăn chặn hành động mặc định của phím backspace
+        if (inputRef.current && inputRef.current.previousSibling instanceof HTMLInputElement) {
+          const prevInput = inputRef.current.previousSibling as HTMLInputElement
+          prevInput.focus() // Focus vào input trước đó
+          prevInput.value = '' // Xóa giá trị của input trước đó
+        }
+      }
+    }
+  }
+
+  return (
+    <OtpInput
+      type="number"
+      inputMode="numeric"
+      pattern="[0-9]*"
+      min="0"
+      max="9"
+      ref={inputRef}
+      value={value}
+      onChange={handleChange}
+      onKeyDown={handleKeyDown}
+      {...props}
+    />
+  )
+}
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -254,12 +327,32 @@ export default function LoginPage() {
     setEmail(event.target.value)
   }
 
+  const [otpValues, setOtpValues] = useState(['', '', '', '', '', '']) // Lưu trữ giá trị của từng input OTP
+
+  // Xử lý khi tất cả các input đều có giá trị
+  const handleSubmitOtp = () => {
+    const isAllFilled = otpValues.every((value) => value !== '')
+    if (isAllFilled) {
+      // Gửi yêu cầu OTP API ở đây
+      console.log('Send OTP API')
+    } else {
+      console.log('Not all OTP inputs are filled')
+    }
+  }
+
+  // Xử lý khi giá trị của một input thay đổi
+  const handleOtpInputChange = (index, value) => {
+    const otpValuesArr = [...otpValues]
+    otpValuesArr[index] = value
+    setOtpValues(otpValuesArr)
+  }
+
   return (
     <div style={{ overflowY: 'hidden', height: '100%', width: '100$' }}>
       <div style={{ width: '100%', height: '100%', overflow: 'auto', position: 'relative' }}>
         <Container>
           <ContentWindow>
-            {otpShow ? (
+            {!otpShow ? (
               <div>
                 <HeaderDecorationContainer>
                   <img src="assets/login/Adam_login.png"></img>
@@ -332,12 +425,14 @@ export default function LoginPage() {
                   .
                 </HeaderDescription>
                 <OtpContainer>
-                    <OtpInput type="number" inputMode="numeric" pattern="[0-9]*" min="0" />
-                    <OtpInput type="number" inputMode="numeric" pattern="[0-9]*" min="0" />
-                    <OtpInput type="number" inputMode="numeric" pattern="[0-9]*" min="0" />
-                    <OtpInput type="number" inputMode="numeric" pattern="[0-9]*" min="0" />
-                    <OtpInput type="number" inputMode="numeric" pattern="[0-9]*" min="0" />
-                    <OtpInput type="number" inputMode="numeric" pattern="[0-9]*" min="0" />
+                  {[...Array(6)].map((_, index) => (
+                    <OtpInputComponent
+                      key={index}
+                      autoFocus={index === 0} // Focus vào input đầu tiên khi mới vào trang
+                      maxLength={1} // Chỉ cho phép nhập một ký tự
+                      onChange={(value) => handleOtpInputChange(index, value)}
+                    />
+                  ))}
                 </OtpContainer>
               </div>
             )}
