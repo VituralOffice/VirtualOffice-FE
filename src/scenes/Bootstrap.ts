@@ -102,6 +102,11 @@ export default class Bootstrap extends Phaser.Scene {
         store.dispatch(setRoomJoined(true))
     }
 
+    stopGame() {
+        this.scene.stop('game')
+        store.dispatch(setRoomJoined(true))
+    }
+
     changeBackgroundMode(backgroundMode: BackgroundMode) {
         this.scene.stop('background')
         this.launchBackground(backgroundMode)

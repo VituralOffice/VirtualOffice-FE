@@ -56,7 +56,7 @@ const Logo = styled.img`
   width: 40px;
 `
 
-const Item = styled.div`
+const Item = styled.div<ButtonProps>`
   display: flex;
   position: relative;
   box-sizing: border-box;
@@ -71,7 +71,7 @@ const Item = styled.div`
   cursor: pointer;
   opacity: 1;
   overflow: hidden;
-  background-color: transparent;
+  background-color: ${(props) => (props.isActive ? 'rgb(76, 83, 129)' : 'transparent')};
   &:hover {
     background-color: rgb(84, 92, 143);
   }
@@ -98,7 +98,7 @@ const Item = styled.div`
   }
 `
 
-const ButtonItem = styled(Item) <ButtonProps>`
+const ButtonItem = styled(Item)<ButtonProps>`
   /* Preserve button type and props */
   as='button';
 
@@ -231,19 +231,22 @@ const Text = styled.span`
 // `
 
 export default function Header() {
-  const [isUserMenuShow, setUserMenuShow] = useState(false);
-  const navigate = useNavigate();
-  const user = useAppSelector((state) => state.user);
+  const [isUserMenuShow, setUserMenuShow] = useState(false)
+  const navigate = useNavigate()
+  const user = useAppSelector((state) => state.user)
+
+  const [activeTab, setActiveTab] = useState(0)
+  const tabs = [0]
 
   const lobbyJoined = useAppSelector((state) => state.room.lobbyJoined)
 
   const testCreateSpace = () => {
     // create custom room if name and description are not empty
-    if (!lobbyJoined || !user.loggedIn) return;
+    if (!lobbyJoined || !user.loggedIn) return
     const bootstrap = phaserGame.scene.keys.bootstrap as Bootstrap
     bootstrap.network
       .createCustom({ name: 'test', description: 'desc', password: '', autoDispose: false } as any)
-      .then(() => bootstrap.launchGame())
+      .then(() => navigate('/test-space'))
       .catch((error) => console.error(error))
   }
 
@@ -253,7 +256,7 @@ export default function Header() {
         <LogoContainer>
           <Logo src="logo_transparent.svg" />
         </LogoContainer>
-        <Item>
+        <Item isActive={activeTab == 0} onClick={() => setActiveTab(0)}>
           <AutoAwesomeIcon /> <Text>My Spaces</Text>
         </Item>
       </LeftContent>
@@ -269,13 +272,11 @@ export default function Header() {
           </ButtonItem>
           {isUserMenuShow && <UserMenuPopup />}
         </div>
-        {
-          !user.loggedIn && (
-            <ButtonItemPrimary onClick={() => navigate('/signin')}>
-              <Text>Sign In</Text>
-            </ButtonItemPrimary>
-          )
-        }
+        {!user.loggedIn && (
+          <ButtonItemPrimary onClick={() => navigate('/signin')}>
+            <Text>Sign In</Text>
+          </ButtonItemPrimary>
+        )}
         <ButtonItemSecondary onClick={testCreateSpace}>
           <AddCircleRoundedIcon style={{ width: '20px' }} />
           <Text>Create Space</Text>
