@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import styled, { keyframes } from "styled-components"
+import { spinAnimation } from "../anims/CssAnims";
 
 const Container = styled.div`
     display: flex;
@@ -30,15 +31,6 @@ const Container = styled.div`
         }
     }
 `
-
-const spinAnimation = keyframes`
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-`;
 
 const Spinner = styled.img`
     width: 70px;

@@ -13,3 +13,7 @@ export const avatars = ["assets/login/Adam_login.png", "assets/login/Ash_login.p
 export function getAvatarById(id: number) {
     return avatars[Math.max(0, Math.min(id, avatars.length - 1))];
 }
+
+export function setTokenToCookie(tokenName, tokenValue) {
+    document.cookie = `${tokenName}=${tokenValue}; path=/`;
+}
