@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import GoogleLoginButton from '../components/GoogleLoginButton'
-import { useContext, useState } from 'react'
-import { LoginByEmail } from '../apis/AuthApis'
+import { useEffect, useRef, useState } from 'react'
+import { LoginByEmail, VerifyOtpLogin } from '../apis/AuthApis'
 import { useNavigate } from 'react-router-dom'
 import { isApiSuccess } from '../apis/util'
 import { setLoggedIn, setUserInfo } from '../stores/UserStore'
@@ -10,6 +10,10 @@ import CircularIndeterminate, {
   FacebookCircularProgress,
   GradientCircularProgress,
 } from '../components/loadings/LoadingIcon'
+import React from 'react'
+import { spinAnimation } from '../anims/CssAnims'
+import AutorenewRoundedIcon from '@mui/icons-material/AutorenewRounded';
+import { setTokenToCookie } from '../utils/util'
 
 const Container = styled.div`
   height: 100%;
@@ -201,16 +205,89 @@ const OtpInput = styled.input`
   font-family: inherit;
   text-align: center;
   color: rgb(51, 58, 100);
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  &:focus,
+  &:active,
+  &:focus-within {
+    border-color: rgb(113, 113, 113) !important;
+    outline: none;
+  }
+`
+
+const OtpLoading = styled.div`
+display: flex;
+flex-direction: row;
+justify-content: center;
+
+.icon-loading {
+  display: flex;
+  animation: 1.5s linear 0s infinite normal none running ${spinAnimation};
+  &>span {
+    display: flex;
+    width: 16px;
+    color: rgb(113, 113, 113);
+    flex-shrink: 0;
+    &>svg {
+      width: 100%;
+      height: auto;
+    }
+  }
+}
+
+.loading-text {
+  color: rgb(113, 113, 113);
+  font-weight: 500;
+  font-size: 13px;
+  margin: 0px 8px;
+  text-align: center;
+}
+`
+
+const NavButtonsContainer = styled.div`
+display: flex;
+    margin-top: 16px;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 16px;
+`
+
+const CancelNav = styled.span`
+color: rgb(17, 17, 17);
+font-family: "DM Sans", sans-serif;
+font-weight: 500;
+font-size: 15px;
+line-height: 20px;
+text-align: center;
+width: 100%;
+&>a{
+  color: rgb(113, 113, 113);
+  text-decoration: underline;
+  cursor: pointer;
+  &:hover{
+    opacity: 0.8;
+  }
+}
 `
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [loadingShow, setLoadingShow] = useState<boolean>(false)
-  const [otpShow, setOtpShow] = useState(true)
+  const [otpShow, setOtpShow] = useState(false)
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
 
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    setError('')
+  }, [otpShow])
 
   const handleLoginSuccess = (response: any) => {
     console.log('Login successful:', response)
@@ -233,20 +310,22 @@ export default function LoginPage() {
     setError('')
     if (isEmailValid(email)) {
       // Gửi yêu cầu API khi địa chỉ email hợp lệ
-      setLoadingShow(true)
-      const response = await LoginByEmail(email)
-      if (isApiSuccess(response)) {
-        // Lưu thông tin người dùng vào localStorage
-        localStorage.setItem('userData', JSON.stringify(response.result))
-        dispatch(setUserInfo(response.result))
-        dispatch(setLoggedIn(true))
-        navigate('/')
+      setLoadingShow(true);
+      try {
+        const response = await LoginByEmail(email);
+        setLoadingShow(false);
+        if (isApiSuccess(response)) {
+          setOtpShow(true);
+        }
+      } catch (error) {
+        console.error('Error occurred during API call:', error);
+        setLoadingShow(false);
+        setError('An error occurred during the login process. Please try again later.');
       }
-      setLoadingShow(false)
     } else {
       // Xử lý khi địa chỉ email không hợp lệ
-      console.error('Invalid email address')
-      setError('Invalid email address')
+      console.error('Invalid email address');
+      setError('Invalid email address');
     }
   }
 
@@ -254,12 +333,94 @@ export default function LoginPage() {
     setEmail(event.target.value)
   }
 
+  const otpInputRefs = useRef<Array<HTMLInputElement | null>>([...Array(6)].map(() => null));
+
+  const handleOtpInputChange = (index) => {
+    if (otpInputRefs.current[index]!.value !== '') {
+      otpInputRefs.current[index]!.value = otpInputRefs.current[index]!.value.slice(-1);
+      if (index < 5) {
+        if (otpInputRefs.current[index] && otpInputRefs.current[index]!.nextSibling instanceof HTMLInputElement) {
+          otpInputRefs.current[index + 1]!.focus();
+        }
+      }
+    }
+
+    checkOtpInputs()
+  }
+
+  const handleInputKeydown = (index, event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Backspace') {
+      if (otpInputRefs.current[index]!.value !== '') {
+        otpInputRefs.current[index]!.value = '';
+      }
+      if (index > 0) {
+        otpInputRefs.current[index - 1]!.focus();
+      }
+      event.preventDefault();
+    }
+  }
+
+  const handlePasteOtp = (event: React.ClipboardEvent<HTMLInputElement>) => {
+    event.preventDefault();
+    const clipboardData = event.clipboardData.getData('text');
+    const otpSlice = clipboardData.slice(0, 6).split(''); // Slice chuỗi từ index 0 đến 6
+    if (!(/^[0-9]$/.test(otpSlice[0]))) return;
+    let index = 0;
+    otpInputRefs.current.forEach((input, idx) => {
+      if (input!.value.length == 0 && otpSlice) {
+        input!.value = otpSlice[index];
+        if (idx < 5) {
+          otpInputRefs.current[idx + 1]!.focus();
+        }
+        index++;
+      }
+    })
+    checkOtpInputs()
+  };
+
+  const checkOtpInputs = () => {
+    let otp = ''
+    for (let i = 0; i < otpInputRefs.current.length; i++) {
+      otp += otpInputRefs.current[i]!.value;
+    }
+    if (otp.length == 6) handleSendOtpApi(otp);
+  };
+
+  const handleSendOtpApi = async (otp: string) => {
+    setError('')
+    if (isEmailValid(email)) {
+      setLoadingShow(true)
+      try {
+        const response = await VerifyOtpLogin(email, otp);
+        setLoadingShow(false);
+        if (isApiSuccess(response)) {
+          // Lưu thông tin người dùng vào localStorage
+          localStorage.setItem('userData', JSON.stringify(response.result.user))
+          setTokenToCookie('accessToken', response.result.accessToken)
+          setTokenToCookie('refreshToken', response.result.refreshToken)
+          dispatch(setUserInfo(response.result.user))
+          dispatch(setLoggedIn(true))
+          navigate('/')
+        }
+        else setError('That code is invalid or has expired, please try again.1')
+      } catch (error) {
+        setLoadingShow(false);
+        console.log(error)
+        setError('That code is invalid or has expired, please try again.2')
+      }
+    } else {
+      // Xử lý khi địa chỉ email không hợp lệ
+      console.error('Invalid Email')
+      setError('Invalid Email')
+    }
+  }
+
   return (
     <div style={{ overflowY: 'hidden', height: '100%', width: '100$' }}>
       <div style={{ width: '100%', height: '100%', overflow: 'auto', position: 'relative' }}>
         <Container>
           <ContentWindow>
-            {otpShow ? (
+            {!otpShow ? (
               <div>
                 <HeaderDecorationContainer>
                   <img src="assets/login/Adam_login.png"></img>
@@ -324,7 +485,7 @@ export default function LoginPage() {
                   <span>Enter your code</span>
                 </HeaderTitle>
                 <HeaderDescription>
-                  We just emailed ${email} with a 6-digit code. If you don't see it, please check
+                  We just emailed {email} with a 6-digit code. If you don't see it, please check
                   your spam folder or
                   <a style={{ color: 'rgb(0, 0, 0', textDecoration: 'none', cursor: 'pointer' }}>
                     resend code
@@ -332,13 +493,53 @@ export default function LoginPage() {
                   .
                 </HeaderDescription>
                 <OtpContainer>
-                    <OtpInput type="number" inputMode="numeric" pattern="[0-9]*" min="0" />
-                    <OtpInput type="number" inputMode="numeric" pattern="[0-9]*" min="0" />
-                    <OtpInput type="number" inputMode="numeric" pattern="[0-9]*" min="0" />
-                    <OtpInput type="number" inputMode="numeric" pattern="[0-9]*" min="0" />
-                    <OtpInput type="number" inputMode="numeric" pattern="[0-9]*" min="0" />
-                    <OtpInput type="number" inputMode="numeric" pattern="[0-9]*" min="0" />
+                  {[...Array(6)].map((_, index) => (
+                    <OtpInput
+                      key={index}
+                      autoFocus={index === 0} // Focus vào input đầu tiên khi mới vào trang
+                      type="number"
+                      inputMode="numeric"
+                      pattern="[0-9]"
+                      min="0"
+                      max="9"
+                      maxLength={1} // Chỉ cho phép nhập một ký tự
+                      onChange={() => handleOtpInputChange(index)}
+                      onKeyDown={(event) => handleInputKeydown(index, event)}
+                      onPaste={handlePasteOtp}
+                      ref={(ref) => (otpInputRefs.current[index] = ref)}
+                    />
+                  ))}
                 </OtpContainer>
+
+                {
+                  error && (
+                    <p style={{
+                      color: 'rgb(221, 41, 63)',
+                      fontWeight: '500',
+                      fontSize: '13px',
+                      margin: '0px',
+                      textAlign: 'center'
+                    }}>
+                      {error}
+                    </p>
+                  )
+                }
+
+                {
+                  loadingShow && (
+                    <OtpLoading>
+                      <div className='icon-loading'>
+                        <span><AutorenewRoundedIcon /></span>
+                      </div>
+                      <p className='loading-text'>Checking code</p>
+                    </OtpLoading>
+                  )
+                }
+
+                <NavButtonsContainer>
+                  <CancelNav onClick={() => setOtpShow(false)}><a>Cancel</a></CancelNav>
+                </NavButtonsContainer>
+
               </div>
             )}
           </ContentWindow>
