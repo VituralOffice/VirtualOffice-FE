@@ -394,10 +394,6 @@ export default function LoginPage() {
         const response = await VerifyOtpLogin(email, otp);
         setLoadingShow(false);
         if (isApiSuccess(response)) {
-          // Lưu thông tin người dùng vào localStorage
-          localStorage.setItem('userData', JSON.stringify(response.result.user))
-          setTokenToCookie('accessToken', response.result.accessToken)
-          setTokenToCookie('refreshToken', response.result.refreshToken)
           dispatch(setUserInfo(response.result.user))
           dispatch(setLoggedIn(true))
           navigate('/')

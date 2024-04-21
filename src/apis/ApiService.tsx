@@ -1,4 +1,5 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import { onRequestSuccess, onResponseError, onResponseSuccess } from './AxiosIntercepter';
 
 
 class ApiService {
@@ -9,6 +10,8 @@ class ApiService {
         this.axiosInstance = axios.create({
             baseURL: baseUrl,
         });
+        this.axiosInstance.interceptors.request.use(onRequestSuccess);
+        this.axiosInstance.interceptors.response.use(onResponseSuccess, onResponseError);
     }
 
     // Hàm static để truy cập instance của ApiService
@@ -53,6 +56,15 @@ class ApiService {
     async delete(endpoint: string) {
         try {
             const response = await this.axiosInstance.delete(endpoint);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+    
+    async sendRequest(config: AxiosRequestConfig) {
+        try {
+            const response = await this.axiosInstance(config);
             return response.data;
         } catch (error) {
             throw error;
