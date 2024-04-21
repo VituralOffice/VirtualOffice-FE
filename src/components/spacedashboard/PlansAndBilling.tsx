@@ -209,7 +209,7 @@ export default function PlansAndBilling() {
                 <BillOptionsBlock>
                     <div className='title'><span>Billed annually</span></div>
                     <div className='discount-text'>-15%</div>
-                    <AntSwitch />
+                    {/* <AntSwitch /> */}
                     <div className='desc'>Monthly</div>
                 </BillOptionsBlock>
             </div>

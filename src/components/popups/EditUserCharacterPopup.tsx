@@ -222,9 +222,9 @@ const EditUserCharacterPopup: React.FC<PopupProps> = ({ onClosePopup }) => {
           <LowerContentContainer>
             <SelectSkinContainer>
               <Slider {...settings} style={{ maxWidth: '100%' }}>
-                {avatars.map((skinUrl, index) => (
+                {avatars.map((avatar, index) => (
                   <div key={index}>
-                    <img src={skinUrl} alt={`Skin ${index}`} style={{ margin: '0 auto', imageRendering: 'pixelated', width: '96px', height: '144px', objectFit: 'cover' }} />
+                    <img src={avatar.img} alt={`Skin ${index}`} style={{ margin: '0 auto', imageRendering: 'pixelated', width: '96px', height: '144px', objectFit: 'cover' }} />
                   </div>
                 ))}
               </Slider>

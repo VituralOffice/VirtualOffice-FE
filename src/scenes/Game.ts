@@ -18,6 +18,8 @@ import Item from '../items/Item'
 import { PlayerBehavior } from '../types/PlayerBehaviour'
 import { IPlayer } from '../types/ISpaceState'
 import { ItemType } from '../types/Items'
+import { useAppSelector } from '../hook'
+import { avatars } from '../utils/util'
 
 export default class Game extends Phaser.Scene {
   network!: Network
@@ -78,7 +80,7 @@ export default class Game extends Phaser.Scene {
     groundLayer!.setCollisionByProperty({ collides: true })
 
     // debugDraw(groundLayer, this)
-
+    
     this.myPlayer = this.add.myPlayer(705, 500, 'adam', this.network.mySessionId)
     this.playerSelector = new PlayerSelector(this, 0, 0, 16, 16)
 

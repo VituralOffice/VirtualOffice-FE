@@ -238,18 +238,6 @@ export default function Header() {
   const [activeTab, setActiveTab] = useState(0)
   const tabs = [0]
 
-  const lobbyJoined = useAppSelector((state) => state.room.lobbyJoined)
-
-  const testCreateSpace = () => {
-    // create custom room if name and description are not empty
-    if (!lobbyJoined || !user.loggedIn) return
-    const bootstrap = phaserGame.scene.keys.bootstrap as Bootstrap
-    bootstrap.network
-      .createCustom({ name: 'test', description: 'desc', password: '', autoDispose: false } as any)
-      .then(() => navigate('/test-space'))
-      .catch((error) => console.error(error))
-  }
-
   return (
     <HeaderContainer>
       <LeftContent>
@@ -265,7 +253,7 @@ export default function Header() {
           <ButtonItem isActive={isUserMenuShow} onClick={() => setUserMenuShow(!isUserMenuShow)}>
             <AvatarContainer>
               <AvatarBackground>
-                <AvatarImg src={getAvatarById(user.character_id)} />
+                <AvatarImg src={getAvatarById(user.character_id).img} />
               </AvatarBackground>
             </AvatarContainer>
             <Text>{user.username}</Text>
@@ -277,7 +265,7 @@ export default function Header() {
             <Text>Sign In</Text>
           </ButtonItemPrimary>
         )}
-        <ButtonItemSecondary onClick={testCreateSpace}>
+        <ButtonItemSecondary onClick={() => navigate('/test-space')}>
           <AddCircleRoundedIcon style={{ width: '20px' }} />
           <Text>Create Space</Text>
         </ButtonItemSecondary>
