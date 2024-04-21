@@ -1,8 +1,27 @@
 import ApiService from "./ApiService"
-import { callApi } from "./util";
+import { callApi, isApiSuccess, setCookie, setLocalStorage } from "./util";
 
-export const LoginByEmail = async (email: string) => callApi(async () => {
+export const Logout = () => {
+    localStorage.removeItem('userData');
+}
+
+export const LoginByEmail = async (email: string) => {
     // Gọi API đăng nhập
     const response = await ApiService.getInstance().post('/auth/login', { email });
     return response;
-});
+}
+
+export const VerifyOtpLogin = async (email: string, otp: string) => {
+    const response = await ApiService.getInstance().post('/auth/verify', { email, otp });
+    if (isApiSuccess(response)) {
+        setLocalStorage('userData', response.result.user)
+        setCookie('accessToken', response.result.accessToken, 7)
+        setLocalStorage('refreshToken', response.result.refreshToken)
+    }
+    return response;
+}
+
+export const RefreshToken = async (refreshToken) => {
+    let result: any;
+    return result
+}

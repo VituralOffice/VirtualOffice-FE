@@ -10,6 +10,8 @@ import { setLoggedIn, setUserInfo } from './stores/UserStore'
 import { useDispatch } from 'react-redux'
 import LoadingPage from './pages/LoadingPage'
 import TestSpace from './pages/TestSpace'
+import Cookies from 'js-cookie';
+import { getLocalStorage } from './apis/util'
 
 const Backdrop = styled.div`
   position: absolute;
@@ -31,13 +33,13 @@ function App() {
   }
 
   useEffect(() => {
-    const userDataString = localStorage.getItem('userData')
-    if (userDataString) {
-      const userData = JSON.parse(userDataString)
-      dispatch(setUserInfo(userData))
-      dispatch(setLoggedIn(true))
+    const userData = getLocalStorage('userData')
+    // const userData = Cookies.get('userData'); // Get user data from cookie
+    if (userData) {
+      dispatch(setUserInfo(userData));
+      dispatch(setLoggedIn(true));
     }
-  }, []) // Chạy chỉ một lần khi ứng dụng khởi động
+  }, []); // Run only once when the application starts
 
   return (
     <Router>
