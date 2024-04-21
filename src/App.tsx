@@ -11,6 +11,7 @@ import { useDispatch } from 'react-redux'
 import LoadingPage from './pages/LoadingPage'
 import TestSpace from './pages/TestSpace'
 import Cookies from 'js-cookie';
+import { getLocalStorage } from './apis/util'
 
 const Backdrop = styled.div`
   position: absolute;
@@ -32,10 +33,9 @@ function App() {
   }
 
   useEffect(() => {
-    const userDataString = localStorage.getItem('userData')
-    // const userDataString = Cookies.get('userData'); // Get user data from cookie
-    if (userDataString) {
-      const userData = JSON.parse(userDataString);
+    const userData = getLocalStorage('userData')
+    // const userData = Cookies.get('userData'); // Get user data from cookie
+    if (userData) {
       dispatch(setUserInfo(userData));
       dispatch(setLoggedIn(true));
     }
