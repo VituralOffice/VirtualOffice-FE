@@ -47,7 +47,7 @@ const refreshToken = async (error: AxiosError, logout: Function) => {
             ...newConfig.headers,
             Authorization: "Bearer " + result.accessToken,
         };
-        return ApiService.getInstance().sendRequest(newConfig);
+        // return ApiService.getInstance().sendRequest(newConfig);
     } catch (error) {
         logout();
         return;
