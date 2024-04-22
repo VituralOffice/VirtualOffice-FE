@@ -26,10 +26,11 @@ export default class Network {
 
   constructor() {
     const protocol = window.location.protocol.replace('http', 'ws')
-    const endpoint =
-      process.env.NODE_ENV === 'production'
-        ? import.meta.env.VITE_SERVER_URL
-        : `${protocol}//${window.location.hostname}:2567`
+    // const endpoint =
+    //   process.env.NODE_ENV === 'production'
+    //     ? import.meta.env.VITE_SERVER_URL
+    //     : `${protocol}//${window.location.hostname}:2567`
+    const endpoint = `${protocol}//api.voffice.space`
     this.client = new Client(endpoint)
     this.joinLobbyRoom().then(() => {
       store.dispatch(setLobbyJoined(true))

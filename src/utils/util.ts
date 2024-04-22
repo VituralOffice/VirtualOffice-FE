@@ -9,10 +9,10 @@ export function sanitizeId(id: string) {
 }
 
 export const avatars = [
-  { name: 'Adam', img: 'assets/login/Adam_login.png' },
-  { name: 'Ash', img: 'assets/login/Ash_login.png' },
-  { name: 'Lucy', img: 'assets/login/Lucy_login.png' },
-  { name: 'Nancy', img: 'assets/login/Nancy_login.png' },
+  { name: 'adam', img: 'assets/login/Adam_login.png' },
+  { name: 'ash', img: 'assets/login/Ash_login.png' },
+  { name: 'lucy', img: 'assets/login/Lucy_login.png' },
+  { name: 'nancy', img: 'assets/login/Nancy_login.png' },
 ]
 
 export function getAvatarById(id: number) {

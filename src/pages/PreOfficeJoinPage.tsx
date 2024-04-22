@@ -6,7 +6,10 @@ import { useState } from 'react'
 import { MenuPopupContainer, MenuPopupItem } from '../components/popups/DashboardUserMenuPopup'
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
 import { avatars } from '../utils/util'
+import { useNavigate } from 'react-router-dom'
+import { useSignOut } from '../apis/AuthApis'
 
+//#region 
 const Background = styled.div`
   width: 100%;
   height: 100%;
@@ -103,7 +106,8 @@ const BodyContent = styled.div`
   display: grid;
   gap: 80px;
   grid-template-columns: 1fr 1fr;
-  margin: auto 0px;
+    //   margin: auto 0px;
+    margin-top: 150px;
   width: 100%;
   padding: 12px 0px;
   & > div {
@@ -330,108 +334,117 @@ const OptionButton = styled.div`
   position: relative;
 `
 
+//#endregion
+
 function EmailMenu() {
-  return (
-    <MenuPopupContainer style={{ bottom: '-170%', right: '0' }}>
-      <MenuPopupItem>
-        <span className="icon">
-          <span>
-            <LogoutRoundedIcon />
-          </span>
-        </span>
-        Sign out
-      </MenuPopupItem>
-    </MenuPopupContainer>
-  )
+    const handleSignOut = useSignOut();
+    return (
+        <MenuPopupContainer style={{ bottom: '-170%', right: '0' }}>
+            <MenuPopupItem onClick={() => handleSignOut()}>
+                <span className="icon">
+                    <span>
+                        <LogoutRoundedIcon />
+                    </span>
+                </span>
+                Sign out
+            </MenuPopupItem>
+        </MenuPopupContainer>
+    )
 }
 
-function CustomButton() {}
+function CustomButton() { }
 
-export function PreOfficeJoinPage({onSubmit}) {
-  const user = useAppSelector((state) => state.user)
-  const [menuShow, setMenuShow] = useState(false)
+export function PreOfficeJoinPage({ onSubmit }) {
+    const user = useAppSelector((state) => state.user)
+    const [menuShow, setMenuShow] = useState(false)
+    const navigate = useNavigate();
 
-  return (
-    <div
-      style={{
-        display: 'flex',
-        height: '100%',
-      }}
-    >
-      <Background>
-        <div>
-          <TopContent>
-            <LogoButton>
-              <img
-                src="LogoWithText.svg"
-                style={{
-                  width: 'auto',
-                  height: '100%',
-                }}
-              />
-            </LogoButton>
-            <EmailButton isActive={menuShow}>
-              <div>
-                <div onClick={() => setMenuShow(!menuShow)}>
-                  <span className="email">{user.email}</span>
-                  <span className="icon">
-                    <KeyboardArrowDownRoundedIcon />
-                  </span>
-                </div>
-              </div>
-              {menuShow && <EmailMenu />}
-            </EmailButton>
-          </TopContent>
-          <WelcomeTitle>
-            Welcome to <span>test space</span>
-          </WelcomeTitle>
-          <BodyContent>
-            <div>
-              <BodyLeftContent>
-                <CameraDisplay>
-                  <div className="video-display">
-                    <div>
-                      <video playsInline webkit-playsinline="" preload="auto" autoPlay></video>
-                    </div>
-                  </div>
-                  <div className="camera-status-text">
-                    <div>
-                      <div>Your camera is off</div>
-                    </div>
-                  </div>
-                </CameraDisplay>
-              </BodyLeftContent>
-            </div>
-            <div>
-              <BodyRightContent>
-                <form action="" className="form-join-room">
-                  <div>
-                    <div className="form-body">
-                      <EditAvatarButton>
-                        <div className="avatar-block">
-                          <div className="shadow"></div>
-                          <img src={avatars[0].img} alt="" />
-                        </div>
-                        <div className="edit-button">
-                          <span>Edit</span>
-                        </div>
-                      </EditAvatarButton>
-                      <PlayerNameInput>
+    const handleJoin = (event) => {
+        event.preventDefault();
+        onSubmit();
+    }
+
+    return (
+        <div
+            style={{
+                display: 'flex',
+                height: '100%',
+            }}
+        >
+            <Background>
+                <div>
+                    <TopContent>
+                        <LogoButton onClick={() => navigate("/app")}>
+                            <img
+                                src="LogoWithText.svg"
+                                style={{
+                                    width: 'auto',
+                                    height: '100%',
+                                }}
+                            />
+                        </LogoButton>
+                        <EmailButton isActive={menuShow}>
+                            <div>
+                                <div onClick={() => setMenuShow(!menuShow)}>
+                                    <span className="email">{user.email}</span>
+                                    <span className="icon">
+                                        <KeyboardArrowDownRoundedIcon />
+                                    </span>
+                                </div>
+                            </div>
+                            {menuShow && <EmailMenu />}
+                        </EmailButton>
+                    </TopContent>
+                    <WelcomeTitle>
+                        Welcome to <span>test space</span>
+                    </WelcomeTitle>
+                    <BodyContent>
                         <div>
-                          <div>
-                            <input type="text" maxLength={50} placeholder="What's your name?" />
-                          </div>
+                            <BodyLeftContent>
+                                <CameraDisplay>
+                                    <div className="video-display">
+                                        <div>
+                                            <video playsInline webkit-playsinline="" preload="auto" autoPlay></video>
+                                        </div>
+                                    </div>
+                                    <div className="camera-status-text">
+                                        <div>
+                                            <div>Your camera is off</div>
+                                        </div>
+                                    </div>
+                                </CameraDisplay>
+                            </BodyLeftContent>
                         </div>
-                      </PlayerNameInput>
-                    </div>
-                    <JoinButton>Join</JoinButton>
-                  </div>
-                </form>
-              </BodyRightContent>
-            </div>
-          </BodyContent>
+                        <div>
+                            <BodyRightContent>
+                                <form action="" className="form-join-room">
+                                    <div>
+                                        <div className="form-body">
+                                            <EditAvatarButton>
+                                                <div className="avatar-block">
+                                                    <div className="shadow"></div>
+                                                    <img src={avatars[0].img} alt="" />
+                                                </div>
+                                                <div className="edit-button">
+                                                    <span>Edit</span>
+                                                </div>
+                                            </EditAvatarButton>
+                                            <PlayerNameInput>
+                                                <div>
+                                                    <div>
+                                                        <input type="text" maxLength={50} placeholder="What's your name?" />
+                                                    </div>
+                                                </div>
+                                            </PlayerNameInput>
+                                        </div>
+                                        <JoinButton onClick={handleJoin}>Join</JoinButton>
+                                    </div>
+                                </form>
+                            </BodyRightContent>
+                        </div>
+                    </BodyContent>
+                </div>
+            </Background>
         </div>
-      </Background>
-    </div>
-  )
+    )
 }

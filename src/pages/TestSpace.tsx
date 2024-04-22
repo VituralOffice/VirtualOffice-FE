@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import phaserGame from '../PhaserGame'
 import Bootstrap from '../scenes/Bootstrap'
 import Game from '../scenes/Game'
@@ -8,6 +8,7 @@ import { avatars } from '../utils/util'
 import { PreOfficeJoinPage } from './PreOfficeJoinPage'
 
 export default function TestSpace() {
+  const [preJoinPageShow, setPreJoinPageShow] = useState(true);
   const user = useAppSelector((state) => state.user)
   const lobbyJoined = useAppSelector((state) => state.room.lobbyJoined)
   const game = phaserGame.scene.keys.game as Game
@@ -18,6 +19,7 @@ export default function TestSpace() {
     game.myPlayer.setPlayerName(avatars[0].name)
     game.myPlayer.setPlayerTexture(avatars[0].name)
     game.network.readyToConnect()
+    setPreJoinPageShow(false);
   }
 
   useEffect(() => {
@@ -38,5 +40,7 @@ export default function TestSpace() {
 
     return () => bootstrap.stopGame()
   }, []) // Chạy chỉ một lần khi ứng dụng khởi động
-  return <PreOfficeJoinPage onSubmit={JoinOffice} />
+  return (
+    preJoinPageShow && <PreOfficeJoinPage onSubmit={JoinOffice} />
+  )
 }

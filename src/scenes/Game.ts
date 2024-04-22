@@ -72,6 +72,7 @@ export default class Game extends Phaser.Scene {
     }
 
     createCharacterAnims(this.anims)
+    console.log("create character anims")
 
     this.map = this.make.tilemap({ key: 'tilemap' })
     const FloorAndGround = this.map.addTilesetImage('FloorAndGround', 'tiles_wall')

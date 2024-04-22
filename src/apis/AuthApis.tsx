@@ -1,3 +1,4 @@
+import { resetUserState } from "../stores/UserStore";
 import ApiService from "./ApiService"
 import { callApi, isApiSuccess, setCookie, setLocalStorage } from "./util";
 
@@ -25,3 +26,19 @@ export const RefreshToken = async (refreshToken) => {
     let result: any;
     return result
 }
+
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+
+export const useSignOut = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const signOut = () => {
+    localStorage.removeItem('userData');
+    dispatch(resetUserState());
+    navigate('/');
+  };
+
+  return signOut;
+};
