@@ -11,6 +11,7 @@ import { useAppSelector } from '../../hook'
 import { useNavigate } from 'react-router-dom'
 import { resetUserState } from '../../stores/UserStore'
 import { useDispatch } from 'react-redux'
+import { useSignOut } from '../../apis/AuthApis'
 
 const Container = styled.div`
   display: flex;
@@ -103,15 +104,9 @@ const UserEditButton = styled.button<ButtonProps>`
 export default function UserMenuPopup() {
   const [isEditUserProfilePopupShow, setEditUserProfilePopupShow] = useState(false)
   const [isEditUserCharacterPopupShow, setEditUserCharacterPopupShow] = useState(false)
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
   const user = useAppSelector((state) => state.user);
-
-  const SignOut = () => {
-    localStorage.removeItem('userData');
-    dispatch(resetUserState());
-    navigate('/');
-  }
+  const navigate = useNavigate();
+  const handleSignOut = useSignOut();
 
   return (
     <>
@@ -203,7 +198,7 @@ export default function UserMenuPopup() {
 
         {
           user.loggedIn ? (
-            <NavItem onClick={SignOut}>
+            <NavItem onClick={() => handleSignOut()}>
               <span
                 style={{
                   flex: '0 1 0%',

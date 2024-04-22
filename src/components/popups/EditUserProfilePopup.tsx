@@ -2,6 +2,10 @@ import styled from 'styled-components'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import { PopupProps } from '../../interfaces/Interfaces'
 import { useAppSelector } from '../../hook'
+import { avatars } from '../../utils/util'
+import { useDispatch } from 'react-redux'
+import { setUsername } from '../../stores/UserStore'
+import { useState } from 'react'
 
 const Layout = styled.div`
   width: 100%;
@@ -222,6 +226,13 @@ const ButtonFinish = styled.div`
 
 const EditUserProfilePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
   const user = useAppSelector((state) => state.user);
+  const [username, setUserName] = useState(user.username);
+  const dispatch = useDispatch();
+
+  const handleFinish = () => {
+    dispatch(setUsername(username))
+    onClosePopup();
+  }
 
   return (
     <Layout>
@@ -233,7 +244,7 @@ const EditUserProfilePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
         </IconCloseContainer>
         <PopupContent>
           <UpperContentContainer>
-            <img src="assets/login/Adam_login.png" />
+            <img src={avatars[user.character_id].img} />
             <UserShadow />
           </UpperContentContainer>
           <UsernameTopDisplay>
@@ -285,7 +296,7 @@ const EditUserProfilePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
             >
               <UserInputBar>
                 <div>
-                  <input type="text" maxLength={50} placeholder="Enter your name"></input>
+                  <input type="text" maxLength={50} placeholder="Enter your name" onChange={(event) => setUserName(event.target.value)} value={username}></input>
                 </div>
               </UserInputBar>
             </div>
@@ -301,7 +312,7 @@ const EditUserProfilePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
                 <button onClick={onClosePopup}>Back</button>
               </ButtonBack>
               <ButtonFinish>
-                <button onClick={onClosePopup}>Finish</button>
+                <button onClick={handleFinish}>Finish</button>
               </ButtonFinish>
             </div>
           </LowerContentContainer>

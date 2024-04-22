@@ -18,11 +18,11 @@ const container = document.getElementById('root')
 const root = createRoot(container!)
 
 root.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <ThemeProvider theme={muiTheme}>
-        <App />
-      </ThemeProvider>
-    </Provider>
-  </React.StrictMode>
+  // <React.StrictMode>
+  <Provider store={store}>
+    <ThemeProvider theme={muiTheme}>
+      <App />
+    </ThemeProvider>
+  </Provider>
+  // </React.StrictMode>
 )

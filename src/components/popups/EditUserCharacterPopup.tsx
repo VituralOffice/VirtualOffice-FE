@@ -6,6 +6,9 @@ import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
 import { avatars } from '../../utils/util'
 import { useAppSelector } from '../../hook'
+import { useState } from 'react'
+import { setCharacterId } from '../../stores/UserStore'
+import { useDispatch } from 'react-redux'
 
 const Layout = styled.div`
   width: 100%;
@@ -108,9 +111,10 @@ const UsernameTopDisplay = styled.div`
 `
 const LowerContentContainer = styled.div`
   display: flex;
-  padding-top: 20px;
+  padding-top: 40px;
   width: 372px;
   flex-direction: column;
+  gap: 40px;
 
   & > div {
     display: flex;
@@ -188,19 +192,44 @@ const ButtonFinish = styled.div`
   }
 `
 
+const StyledSlider = styled(Slider)`
+  .slick-prev {
+    left: 0;
+    z-index: 1;
+  }
+  .slick-next {
+    right: 0;
+    z-index: 1;
+  }
+  .slick-prev:before, .slick-next:before {
+    font-size: 40px;
+  }
+`;
+
 const SelectSkinContainer = styled.div``
 
 const EditUserCharacterPopup: React.FC<PopupProps> = ({ onClosePopup }) => {
   const user = useAppSelector((state) => state.user);
+  const [avatarIdx, setAvatarIdx] = useState(user.character_id);
+  const dispatch = useDispatch();
 
   const settings = {
     dots: false,
     infinite: true,
-    speed: 500,
+    speed: 0,
     slidesToShow: 1,
     slidesToScroll: 1,
     arrows: true,
-    fade: true,
+    // fade: true,
+    initialSlide: avatarIdx,
+    afterChange: (currentIdx: number) => {
+      setAvatarIdx(currentIdx);
+    },
+  }
+
+  const handleFinish = () => {
+    dispatch(setCharacterId(avatarIdx));
+    onClosePopup();
   }
 
   return (
@@ -213,7 +242,7 @@ const EditUserCharacterPopup: React.FC<PopupProps> = ({ onClosePopup }) => {
         </IconCloseContainer>
         <PopupContent>
           <UpperContentContainer>
-            <img src="assets/login/Adam_login.png" />
+            <img src={avatars[avatarIdx].img} />
             <UserShadow />
           </UpperContentContainer>
           <UsernameTopDisplay>
@@ -221,13 +250,13 @@ const EditUserCharacterPopup: React.FC<PopupProps> = ({ onClosePopup }) => {
           </UsernameTopDisplay>
           <LowerContentContainer>
             <SelectSkinContainer>
-              <Slider {...settings} style={{ maxWidth: '100%' }}>
-                {avatars.map((skinUrl, index) => (
+              <StyledSlider {...settings} style={{ maxWidth: '100%' }}>
+                {avatars.map((avatar, index) => (
                   <div key={index}>
-                    <img src={skinUrl} alt={`Skin ${index}`} style={{ margin: '0 auto', imageRendering: 'pixelated', width: '96px', height: '144px', objectFit: 'cover' }} />
+                    <img src={avatar.img} alt={`Skin ${index}`} style={{ margin: '0 auto', imageRendering: 'pixelated', width: '96px', height: '144px', objectFit: 'cover' }} />
                   </div>
                 ))}
-              </Slider>
+              </StyledSlider>
             </SelectSkinContainer>
             <div
               style={{
@@ -241,7 +270,7 @@ const EditUserCharacterPopup: React.FC<PopupProps> = ({ onClosePopup }) => {
                 <button onClick={onClosePopup}>Back</button>
               </ButtonBack>
               <ButtonFinish>
-                <button onClick={onClosePopup}>Finish</button>
+                <button onClick={handleFinish}>Finish</button>
               </ButtonFinish>
             </div>
           </LowerContentContainer>

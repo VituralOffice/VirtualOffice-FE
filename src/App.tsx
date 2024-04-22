@@ -21,16 +21,9 @@ const Backdrop = styled.div`
 `
 
 function App() {
-  const loggedIn = useAppSelector((state) => state.user.loggedIn)
+  const user = useAppSelector((state) => state.user)
   const lobbyJoined = useAppSelector((state) => state.room.lobbyJoined)
   const dispatch = useDispatch()
-
-  const checkLogin = (page: any) => {
-    if (!loggedIn) {
-      return <Navigate to="/signin" replace />
-    }
-    return page
-  }
 
   useEffect(() => {
     const userData = getLocalStorage('userData')
@@ -53,12 +46,12 @@ function App() {
             <Route path="/app" element={<SpacePage />} />
             <Route
               path="/signin"
-              element={loggedIn ? <Navigate to="/app" replace /> : <LoginPage />}
+              element={user.loggedIn ? <Navigate to="/app" replace /> : <LoginPage />}
             />
 
             {/* private */}
-            <Route path="/dashboard" element={checkLogin(<SpaceDashboardPage />)} />
-            <Route path="/spaces" element={checkLogin(<SpaceDashboardPage />)} />
+            <Route path="/dashboard" element={<SpaceDashboardPage />} />
+            {/* <Route path="/dashboard" element={user.loggedIn ? <Navigate to="/app" replace /> : <SpaceDashboardPage />} /> */}
             <Route path="/test-space" element={<TestSpace />} />
           </Routes>
         </React.Fragment>

@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-const Container = styled.div`
+export const MenuPopupContainer = styled.div`
   display: flex;
   background-color: rgb(69, 77, 123);
   flex-direction: column;
@@ -17,7 +17,7 @@ const Container = styled.div`
   border: 1px solid rgb(32, 37, 70);
 `
 
-const NavItem = styled.button`
+export const MenuPopupItem = styled.button`
   display: flex;
   position: relative;
   box-sizing: border-box;
@@ -46,16 +46,31 @@ const NavItem = styled.button`
   &:hover {
     background: rgb(88, 130, 247);
   }
+
+  .icon {
+    flex: 0 1 0%;
+    paddingRight: 8px;
+    textDecoration: none;
+    &>span{
+      display: flex;
+      width: 20px;
+      color: rgb(255, 255, 255);
+      &>svg{
+        width: 100%;
+        height: auto;
+      }
+    }
+  }
 `
 
 export default function DashboardUserMenuPopup() {
   return (
-    <Container>
-      <NavItem>Home</NavItem>
+    <MenuPopupContainer>
+      <MenuPopupItem>Home</MenuPopupItem>
 
-      <NavItem>Terms of Service</NavItem>
+      <MenuPopupItem>Terms of Service</MenuPopupItem>
 
-      <NavItem>Sign Out</NavItem>
-    </Container>
+      <MenuPopupItem>Sign Out</MenuPopupItem>
+    </MenuPopupContainer>
   )
 }
