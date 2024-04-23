@@ -12,7 +12,7 @@ import CircularIndeterminate, {
 } from '../components/loadings/LoadingIcon'
 import React from 'react'
 import { spinAnimation } from '../anims/CssAnims'
-import AutorenewRoundedIcon from '@mui/icons-material/AutorenewRounded';
+import AutorenewRoundedIcon from '@mui/icons-material/AutorenewRounded'
 import { setTokenToCookie } from '../utils/util'
 
 const Container = styled.div`
@@ -221,59 +221,59 @@ const OtpInput = styled.input`
 `
 
 const OtpLoading = styled.div`
-display: flex;
-flex-direction: row;
-justify-content: center;
-
-.icon-loading {
   display: flex;
-  animation: 1.5s linear 0s infinite normal none running ${spinAnimation};
-  &>span {
+  flex-direction: row;
+  justify-content: center;
+
+  .icon-loading {
     display: flex;
-    width: 16px;
-    color: rgb(113, 113, 113);
-    flex-shrink: 0;
-    &>svg {
-      width: 100%;
-      height: auto;
+    animation: 1.5s linear 0s infinite normal none running ${spinAnimation};
+    & > span {
+      display: flex;
+      width: 16px;
+      color: rgb(113, 113, 113);
+      flex-shrink: 0;
+      & > svg {
+        width: 100%;
+        height: auto;
+      }
     }
   }
-}
 
-.loading-text {
-  color: rgb(113, 113, 113);
-  font-weight: 500;
-  font-size: 13px;
-  margin: 0px 8px;
-  text-align: center;
-}
+  .loading-text {
+    color: rgb(113, 113, 113);
+    font-weight: 500;
+    font-size: 13px;
+    margin: 0px 8px;
+    text-align: center;
+  }
 `
 
 const NavButtonsContainer = styled.div`
-display: flex;
-    margin-top: 16px;
-    flex-direction: column;
-    gap: 8px;
-    justify-content: center;
-    margin-bottom: 16px;
+  display: flex;
+  margin-top: 16px;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 16px;
 `
 
 const CancelNav = styled.span`
-color: rgb(17, 17, 17);
-font-family: "DM Sans", sans-serif;
-font-weight: 500;
-font-size: 15px;
-line-height: 20px;
-text-align: center;
-width: 100%;
-&>a{
-  color: rgb(113, 113, 113);
-  text-decoration: underline;
-  cursor: pointer;
-  &:hover{
-    opacity: 0.8;
+  color: rgb(17, 17, 17);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 20px;
+  text-align: center;
+  width: 100%;
+  & > a {
+    color: rgb(113, 113, 113);
+    text-decoration: underline;
+    cursor: pointer;
+    &:hover {
+      opacity: 0.8;
+    }
   }
-}
 `
 
 export default function LoginPage() {
@@ -310,22 +310,22 @@ export default function LoginPage() {
     setError('')
     if (isEmailValid(email)) {
       // Gửi yêu cầu API khi địa chỉ email hợp lệ
-      setLoadingShow(true);
+      setLoadingShow(true)
       try {
-        const response = await LoginByEmail(email);
-        setLoadingShow(false);
+        const response = await LoginByEmail(email)
+        setLoadingShow(false)
         if (isApiSuccess(response)) {
-          setOtpShow(true);
+          setOtpShow(true)
         }
       } catch (error) {
-        console.error('Error occurred during API call:', error);
-        setLoadingShow(false);
-        setError('An error occurred during the login process. Please try again later.');
+        console.error('Error occurred during API call:', error)
+        setLoadingShow(false)
+        setError('An error occurred during the login process. Please try again later.')
       }
     } else {
       // Xử lý khi địa chỉ email không hợp lệ
-      console.error('Invalid email address');
-      setError('Invalid email address');
+      console.error('Invalid email address')
+      setError('Invalid email address')
     }
   }
 
@@ -333,14 +333,17 @@ export default function LoginPage() {
     setEmail(event.target.value)
   }
 
-  const otpInputRefs = useRef<Array<HTMLInputElement | null>>([...Array(6)].map(() => null));
+  const otpInputRefs = useRef<Array<HTMLInputElement | null>>([...Array(6)].map(() => null))
 
   const handleOtpInputChange = (index) => {
     if (otpInputRefs.current[index]!.value !== '') {
-      otpInputRefs.current[index]!.value = otpInputRefs.current[index]!.value.slice(-1);
+      otpInputRefs.current[index]!.value = otpInputRefs.current[index]!.value.slice(-1)
       if (index < 5) {
-        if (otpInputRefs.current[index] && otpInputRefs.current[index]!.nextSibling instanceof HTMLInputElement) {
-          otpInputRefs.current[index + 1]!.focus();
+        if (
+          otpInputRefs.current[index] &&
+          otpInputRefs.current[index]!.nextSibling instanceof HTMLInputElement
+        ) {
+          otpInputRefs.current[index + 1]!.focus()
         }
       }
     }
@@ -351,56 +354,64 @@ export default function LoginPage() {
   const handleInputKeydown = (index, event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Backspace') {
       if (otpInputRefs.current[index]!.value !== '') {
-        otpInputRefs.current[index]!.value = '';
+        otpInputRefs.current[index]!.value = ''
       }
       if (index > 0) {
-        otpInputRefs.current[index - 1]!.focus();
+        otpInputRefs.current[index - 1]!.focus()
       }
-      event.preventDefault();
+      event.preventDefault()
     }
   }
 
   const handlePasteOtp = (event: React.ClipboardEvent<HTMLInputElement>) => {
-    event.preventDefault();
-    const clipboardData = event.clipboardData.getData('text');
-    const otpSlice = clipboardData.slice(0, 6).split(''); // Slice chuỗi từ index 0 đến 6
-    if (!(/^[0-9]$/.test(otpSlice[0]))) return;
-    let index = 0;
+    event.preventDefault()
+    const clipboardData = event.clipboardData.getData('text')
+    const otpSlice = clipboardData.slice(0, 6).split('') // Slice chuỗi từ index 0 đến 6
+    if (!/^[0-9]$/.test(otpSlice[0])) return
+    let index = 0
     otpInputRefs.current.forEach((input, idx) => {
       if (input!.value.length == 0 && otpSlice) {
-        input!.value = otpSlice[index];
+        input!.value = otpSlice[index]
         if (idx < 5) {
-          otpInputRefs.current[idx + 1]!.focus();
+          otpInputRefs.current[idx + 1]!.focus()
         }
-        index++;
+        index++
       }
     })
     checkOtpInputs()
-  };
-
+  }
+  const validateOtp = (evt: any) => {
+    let theEvent = evt || window.event
+    let key = theEvent.keyCode || theEvent.which
+    key = String.fromCharCode(key)
+    const regex = /[0-9]|\./
+    if (!regex.test(key)) {
+      theEvent.returnValue = false
+      if (theEvent.preventDefault) theEvent.preventDefault()
+    }
+  }
   const checkOtpInputs = () => {
     let otp = ''
     for (let i = 0; i < otpInputRefs.current.length; i++) {
-      otp += otpInputRefs.current[i]!.value;
+      otp += otpInputRefs.current[i]!.value
     }
-    if (otp.length == 6) handleSendOtpApi(otp);
-  };
+    if (otp.length == 6) handleSendOtpApi(otp)
+  }
 
   const handleSendOtpApi = async (otp: string) => {
     setError('')
     if (isEmailValid(email)) {
       setLoadingShow(true)
       try {
-        const response = await VerifyOtpLogin(email, otp);
-        setLoadingShow(false);
+        const response = await VerifyOtpLogin(email, otp)
+        setLoadingShow(false)
         if (isApiSuccess(response)) {
           dispatch(setUserInfo(response.result.user))
           dispatch(setLoggedIn(true))
           navigate('/')
-        }
-        else setError('That code is invalid or has expired, please try again.1')
+        } else setError('That code is invalid or has expired, please try again.1')
       } catch (error) {
-        setLoadingShow(false);
+        setLoadingShow(false)
         console.log(error)
         setError('That code is invalid or has expired, please try again.2')
       }
@@ -491,9 +502,10 @@ export default function LoginPage() {
                 <OtpContainer>
                   {[...Array(6)].map((_, index) => (
                     <OtpInput
+                      onKeyPress={validateOtp}
                       key={index}
+                      type="text"
                       autoFocus={index === 0} // Focus vào input đầu tiên khi mới vào trang
-                      type="number"
                       inputMode="numeric"
                       pattern="[0-9]"
                       min="0"
@@ -507,35 +519,36 @@ export default function LoginPage() {
                   ))}
                 </OtpContainer>
 
-                {
-                  error && (
-                    <p style={{
+                {error && (
+                  <p
+                    style={{
                       color: 'rgb(221, 41, 63)',
                       fontWeight: '500',
                       fontSize: '13px',
                       margin: '0px',
-                      textAlign: 'center'
-                    }}>
-                      {error}
-                    </p>
-                  )
-                }
+                      textAlign: 'center',
+                    }}
+                  >
+                    {error}
+                  </p>
+                )}
 
-                {
-                  loadingShow && (
-                    <OtpLoading>
-                      <div className='icon-loading'>
-                        <span><AutorenewRoundedIcon /></span>
-                      </div>
-                      <p className='loading-text'>Checking code</p>
-                    </OtpLoading>
-                  )
-                }
+                {loadingShow && (
+                  <OtpLoading>
+                    <div className="icon-loading">
+                      <span>
+                        <AutorenewRoundedIcon />
+                      </span>
+                    </div>
+                    <p className="loading-text">Checking code</p>
+                  </OtpLoading>
+                )}
 
                 <NavButtonsContainer>
-                  <CancelNav onClick={() => setOtpShow(false)}><a>Cancel</a></CancelNav>
+                  <CancelNav onClick={() => setOtpShow(false)}>
+                    <a>Cancel</a>
+                  </CancelNav>
                 </NavButtonsContainer>
-
               </div>
             )}
           </ContentWindow>
