@@ -9,8 +9,6 @@ import { ButtonProps } from '../../interfaces/Interfaces'
 import EditUserCharacterPopup from './EditUserCharacterPopup'
 import { useAppSelector } from '../../hook'
 import { useNavigate } from 'react-router-dom'
-import { resetUserState } from '../../stores/UserStore'
-import { useDispatch } from 'react-redux'
 import { useSignOut } from '../../apis/AuthApis'
 
 const Container = styled.div`

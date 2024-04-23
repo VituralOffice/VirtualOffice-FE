@@ -14,10 +14,10 @@ export default function TestSpace() {
   const game = phaserGame.scene.keys.game as Game
   const navigate = useNavigate()
 
-  const JoinOffice = () => {
+  const JoinOffice = (playerName: string) => {
     game.registerKeys()
-    game.myPlayer.setPlayerName(avatars[0].name)
-    game.myPlayer.setPlayerTexture(avatars[0].name)
+    game.myPlayer.setPlayerName(playerName)
+    game.myPlayer.setPlayerTexture(avatars[user.character_id].name)
     game.network.readyToConnect()
     setPreJoinPageShow(false);
   }
