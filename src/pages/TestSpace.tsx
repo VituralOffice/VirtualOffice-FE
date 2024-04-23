@@ -8,7 +8,7 @@ import { avatars } from '../utils/util'
 import { PreOfficeJoinPage } from './PreOfficeJoinPage'
 
 export default function TestSpace() {
-  const [preJoinPageShow, setPreJoinPageShow] = useState(true);
+  const [preJoinPageShow, setPreJoinPageShow] = useState(true)
   const user = useAppSelector((state) => state.user)
   const lobbyJoined = useAppSelector((state) => state.room.lobbyJoined)
   const game = phaserGame.scene.keys.game as Game
@@ -19,7 +19,7 @@ export default function TestSpace() {
     game.myPlayer.setPlayerName(playerName)
     game.myPlayer.setPlayerTexture(avatars[user.character_id].name)
     game.network.readyToConnect()
-    setPreJoinPageShow(false);
+    setPreJoinPageShow(false)
   }
 
   useEffect(() => {
@@ -40,7 +40,5 @@ export default function TestSpace() {
 
     return () => bootstrap.stopGame()
   }, []) // Chạy chỉ một lần khi ứng dụng khởi động
-  return (
-    preJoinPageShow && <PreOfficeJoinPage onSubmit={JoinOffice} />
-  )
+  return preJoinPageShow ? <PreOfficeJoinPage onSubmit={JoinOffice} /> : <></>
 }
