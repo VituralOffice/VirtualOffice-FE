@@ -87,7 +87,7 @@ const UserEditButton = styled.button<ButtonProps>`
   cursor: pointer;
   opacity: 1;
   overflow: hidden;
-  background-color: ${(props) => (props.isActive ? 'rgb(118, 125, 165)' : 'rgb(84, 92, 143)')};
+  background-color: ${(props) => (props.isEnabled ? 'rgb(118, 125, 165)' : 'rgb(84, 92, 143)')};
   border: 2px solid transparent;
   padding: 0px;
   max-width: 100%;
@@ -132,7 +132,7 @@ export default function UserMenuPopup() {
                   }}
                 ></div>
                 <UserEditButton
-                  isActive={isEditUserProfilePopupShow}
+                  isEnabled={isEditUserProfilePopupShow}
                   onClick={() => setEditUserProfilePopupShow(!isEditUserProfilePopupShow)}
                 >
                   <span

@@ -1,5 +1,6 @@
 export interface ButtonProps {
-  isActive?: boolean // Define active prop
+  isEnabled?: boolean // Define active prop
+  isActive?: boolean
 }
 
 export interface PopupProps {

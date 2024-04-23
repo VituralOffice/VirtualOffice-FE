@@ -168,7 +168,7 @@ width: auto;
     border-radius: 12px;
     font-size: 15px;
     color: rgb(255, 255, 255) !important;
-    background-color: ${props => (props.isActive ? 'rgb(84, 92, 143)' : 'transparent')};
+    background-color: ${props => (props.isEnabled ? 'rgb(84, 92, 143)' : 'transparent')};
 
     &:hover{
         background: rgb(84, 92, 143);
@@ -223,7 +223,7 @@ export default function SpaceItem({ id, isOptionPopupShow, setOptionPopupShow })
                         display: 'flex',
                         marginLeft: '4px'
                     }}>
-                        <DetailsOptionButton isActive={isOptionPopupShow} onClick={handleButtonClick}><span><MoreVertRoundedIcon /></span></DetailsOptionButton>
+                        <DetailsOptionButton isEnabled={isOptionPopupShow} onClick={handleButtonClick}><span><MoreVertRoundedIcon /></span></DetailsOptionButton>
                     </div>
                 </div>
                 {
