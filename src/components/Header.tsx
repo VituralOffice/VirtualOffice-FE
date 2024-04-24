@@ -71,7 +71,7 @@ const Item = styled.div<ButtonProps>`
   cursor: pointer;
   opacity: 1;
   overflow: hidden;
-  background-color: ${(props) => (props.isActive ? 'rgb(76, 83, 129)' : 'transparent')};
+  background-color: ${(props) => (props.isEnabled ? 'rgb(76, 83, 129)' : 'transparent')};
   &:hover {
     background-color: rgb(84, 92, 143);
   }
@@ -102,7 +102,7 @@ const ButtonItem = styled(Item)<ButtonProps>`
   /* Preserve button type and props */
   as='button';
 
-  background-color: ${(props) => (props.isActive ? 'rgb(84, 92, 143)' : 'transparent')};
+  background-color: ${(props) => (props.isEnabled ? 'rgb(84, 92, 143)' : 'transparent')};
 `
 
 const ButtonItemPrimary = styled.button`
@@ -244,13 +244,13 @@ export default function Header() {
         <LogoContainer>
           <Logo src="logo_transparent.svg" />
         </LogoContainer>
-        <Item isActive={activeTab == 0} onClick={() => setActiveTab(0)}>
+        <Item isEnabled={activeTab == 0} onClick={() => setActiveTab(0)}>
           <AutoAwesomeIcon /> <Text>My Spaces</Text>
         </Item>
       </LeftContent>
       <RightContent>
         <div>
-          <ButtonItem isActive={isUserMenuShow} onClick={() => setUserMenuShow(!isUserMenuShow)}>
+          <ButtonItem isEnabled={isUserMenuShow} onClick={() => setUserMenuShow(!isUserMenuShow)}>
             <AvatarContainer>
               <AvatarBackground>
                 <AvatarImg src={getAvatarById(user.character_id).img} />

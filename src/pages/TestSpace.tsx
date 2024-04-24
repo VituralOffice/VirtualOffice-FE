@@ -5,7 +5,7 @@ import Game from '../scenes/Game'
 import { useAppSelector } from '../hook'
 import { useNavigate } from 'react-router-dom'
 import { avatars } from '../utils/util'
-import { PreOfficeJoinPage } from './PreOfficeJoinPage'
+import { JoinOfficePage } from './JoinOfficePage'
 
 export default function TestSpace() {
   const [preJoinPageShow, setPreJoinPageShow] = useState(true)
@@ -14,10 +14,10 @@ export default function TestSpace() {
   const game = phaserGame.scene.keys.game as Game
   const navigate = useNavigate()
 
-  const JoinOffice = () => {
+  const JoinOffice = (playerName: string) => {
     game.registerKeys()
-    game.myPlayer.setPlayerName(avatars[0].name)
-    game.myPlayer.setPlayerTexture(avatars[0].name)
+    game.myPlayer.setPlayerName(playerName)
+    game.myPlayer.setPlayerTexture(avatars[user.character_id].name)
     game.network.readyToConnect()
     setPreJoinPageShow(false)
   }
@@ -40,5 +40,5 @@ export default function TestSpace() {
 
     return () => bootstrap.stopGame()
   }, []) // Chạy chỉ một lần khi ứng dụng khởi động
-  return preJoinPageShow ? <PreOfficeJoinPage onSubmit={JoinOffice} /> : <></>
+  return preJoinPageShow ? <JoinOfficePage onSubmit={JoinOffice} /> : <></>
 }

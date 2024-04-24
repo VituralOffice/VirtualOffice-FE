@@ -34,8 +34,8 @@ const CustomButton = styled.button<ButtonProps>` // Pass ButtonProps to styled.b
     cursor: pointer;
     padding: 0px 12px;
     opacity: 1;
-    background-color: ${props => (props.isActive ? 'rgb(84, 92, 143)' : 'transparent')};
-    filter: brightness(${props => (props.isActive ? '100%' : '80%')});
+    background-color: ${props => (props.isEnabled ? 'rgb(84, 92, 143)' : 'transparent')};
+    filter: brightness(${props => (props.isEnabled ? '100%' : '80%')});
 
     &:hover {
         background-color: rgb(84, 92, 143);
@@ -51,8 +51,8 @@ const GroupedButtons = () => {
 
     return (
         <>
-            <CustomButton isActive={activeButton === 1} onClick={() => handleClick(1)}><Text>Last Visited</Text></CustomButton>
-            <CustomButton isActive={activeButton === 2} onClick={() => handleClick(2)}><Text>Created Space</Text></CustomButton>
+            <CustomButton isEnabled={activeButton === 1} onClick={() => handleClick(1)}><Text>Last Visited</Text></CustomButton>
+            <CustomButton isEnabled={activeButton === 2} onClick={() => handleClick(2)}><Text>Created Space</Text></CustomButton>
         </>
     );
 };

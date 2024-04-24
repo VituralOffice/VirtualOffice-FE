@@ -39,7 +39,7 @@ const DashboardTitle = styled.div`
 const NavMenuItem = styled.a<ButtonProps>`
   padding: 10px;
   margin-bottom: 8px;
-  color: ${(props) => (props.isActive ? 'rgb(255, 255, 255)' : 'rgb(224, 224, 224)')};
+  color: ${(props) => (props.isEnabled ? 'rgb(255, 255, 255)' : 'rgb(224, 224, 224)')};
   border-radius: 8px;
   font-size: 15px;
   font-weight: 500;
@@ -48,7 +48,7 @@ const NavMenuItem = styled.a<ButtonProps>`
   -webkit-box-align: center;
   align-items: center;
   cursor: pointer;
-  background-color: ${(props) => (props.isActive ? 'rgb(84, 92, 143)' : 'rgba(84, 92, 143, 0)')};
+  background-color: ${(props) => (props.isEnabled ? 'rgb(84, 92, 143)' : 'rgba(84, 92, 143, 0)')};
   text-decoration: none;
 
   &:hover {
@@ -140,7 +140,7 @@ const Username = styled.div`
 const DropdownIcon = styled.div<ButtonProps>`
   border-radius: 8px;
   cursor: pointer;
-  background-color: ${(props) => (props.isActive ? 'rgba(255, 255, 255, 0.2)' : 'transparent')};
+  background-color: ${(props) => (props.isEnabled ? 'rgba(255, 255, 255, 0.2)' : 'transparent')};
   &:hover {
     background-color: rgba(255, 255, 255, 0.2);
     transition: background-color 200ms ease 0s;
@@ -152,7 +152,7 @@ const DropdownIcon = styled.div<ButtonProps>`
     & > svg {
       width: 100%;
       height: auto;
-      transform: ${(props) => (props.isActive ? 'rotate(180deg)' : 'rotate(0deg)')};
+      transform: ${(props) => (props.isEnabled ? 'rotate(180deg)' : 'rotate(0deg)')};
     }
   }
 `
@@ -165,37 +165,37 @@ export default function SpaceDashboardSidebar({ menuId, setMenuId }) {
     <Container>
       <Dashboard>
         <DashboardTitle>Space dashboard</DashboardTitle>
-        <NavMenuItem isActive={menuId == 0} onClick={() => setMenuId(0)}>
+        <NavMenuItem isEnabled={menuId == 0} onClick={() => setMenuId(0)}>
           <span className="icon">
             <CalendarMonthRoundedIcon />
           </span>
           <div className="title">Plans & Billing</div>
         </NavMenuItem>
-        <NavMenuItem isActive={menuId == 1} onClick={() => setMenuId(1)}>
+        <NavMenuItem isEnabled={menuId == 1} onClick={() => setMenuId(1)}>
           <span className="icon">
             <SettingsRoundedIcon />
           </span>
           <div className="title">Space Preferences</div>
         </NavMenuItem>
-        <NavMenuItem isActive={menuId == 2} onClick={() => setMenuId(2)}>
+        <NavMenuItem isEnabled={menuId == 2} onClick={() => setMenuId(2)}>
           <span className="icon">
             <TextSnippetRoundedIcon />
           </span>
           <div className="title">Space Access</div>
         </NavMenuItem>
-        <NavMenuItem isActive={menuId == 3} onClick={() => setMenuId(3)}>
+        <NavMenuItem isEnabled={menuId == 3} onClick={() => setMenuId(3)}>
           <span className="icon">
             <PeopleAltRoundedIcon />
           </span>
           <div className="title">User Roles</div>
         </NavMenuItem>
-        <NavMenuItem isActive={menuId == 4} onClick={() => setMenuId(4)}>
+        <NavMenuItem isEnabled={menuId == 4} onClick={() => setMenuId(4)}>
           <span className="icon">
             <NotInterestedRoundedIcon />
           </span>
           <div className="title">Banned Users</div>
         </NavMenuItem>
-        <NavMenuItem isActive={menuId == 5} onClick={() => setMenuId(5)}>
+        <NavMenuItem isEnabled={menuId == 5} onClick={() => setMenuId(5)}>
           <span className="icon">
             <DeleteRoundedIcon />
           </span>
@@ -214,7 +214,7 @@ export default function SpaceDashboardSidebar({ menuId, setMenuId }) {
           <Username>
             <div>{user.username}</div>
           </Username>
-          <DropdownIcon isActive={isUserMenuShow} onClick={() => setUserMenuShow(!isUserMenuShow)}>
+          <DropdownIcon isEnabled={isUserMenuShow} onClick={() => setUserMenuShow(!isUserMenuShow)}>
             <span>
               <KeyboardArrowDownRoundedIcon />
             </span>
