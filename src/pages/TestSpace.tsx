@@ -5,7 +5,7 @@ import Game from '../scenes/Game'
 import { useAppSelector } from '../hook'
 import { useNavigate } from 'react-router-dom'
 import { avatars } from '../utils/util'
-import { JoinOfficePage } from './OfficeJoinPage'
+import { JoinOfficePage } from './JoinOfficePage'
 
 export default function TestSpace() {
   const [preJoinPageShow, setPreJoinPageShow] = useState(true)
