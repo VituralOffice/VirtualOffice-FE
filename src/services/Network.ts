@@ -12,9 +12,16 @@ import { IMeeting, IOfficeState, IPlayer } from '../types/ISpaceState'
 import WebRTC from '../web/WebRTC'
 import { GameEvent, phaserEvents } from '../events/EventCenter'
 import { IRoomData, RoomType } from '../types/Rooms'
-import { pushChatMessage, pushPlayerJoinedMessage, pushPlayerLeftMessage } from '../stores/ChatStore'
+import {
+  pushChatMessage,
+  pushPlayerJoinedMessage,
+  pushPlayerLeftMessage,
+} from '../stores/ChatStore'
 import { ItemType } from '../types/Items'
 import { Message } from '../types/Messages'
+import { getCookie } from '../apis/util'
+import { ACCESS_TOKEN_KEY } from '../utils/util'
+import { API_URL } from '../constant'
 
 export default class Network {
   private client: Client
@@ -25,13 +32,14 @@ export default class Network {
   mySessionId!: string
 
   constructor() {
-    const protocol = window.location.protocol.replace('http', 'ws')
+    //const protocol = window.location.protocol.replace('http', 'ws')
     // const endpoint =
     //   process.env.NODE_ENV === 'production'
     //     ? import.meta.env.VITE_SERVER_URL
     //     : `${protocol}//${window.location.hostname}:2567`
-    const endpoint = `${protocol}//api.voffice.space`
+    const endpoint = API_URL.replace(`https`, `wss`)
     this.client = new Client(endpoint)
+    this.client.auth.token = getCookie(ACCESS_TOKEN_KEY) as string
     this.joinLobbyRoom().then(() => {
       store.dispatch(setLobbyJoined(true))
     })
@@ -75,13 +83,7 @@ export default class Network {
 
   // method to create a custom room
   async createCustom(roomData: IRoomData) {
-    const { name, description, password, autoDispose } = roomData
-    this.room = await this.client.create(RoomType.CUSTOM, {
-      name,
-      description,
-      password,
-      autoDispose,
-    })
+    this.room = await this.client.create(RoomType.CUSTOM, roomData)
     this.initialize()
   }
 

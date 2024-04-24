@@ -6,14 +6,14 @@ import { useAppSelector } from '../hook'
 import { useNavigate } from 'react-router-dom'
 import { avatars } from '../utils/util'
 import { JoinOfficePage } from './JoinOfficePage'
-
 export default function TestSpace() {
   const [preJoinPageShow, setPreJoinPageShow] = useState(true)
   const user = useAppSelector((state) => state.user)
   const lobbyJoined = useAppSelector((state) => state.room.lobbyJoined)
   const game = phaserGame.scene.keys.game as Game
   const navigate = useNavigate()
-
+  //const { roomId } = queryString.parse(useLocation().search)
+  //console.log({ roomId })
   const JoinOffice = (playerName: string) => {
     game.registerKeys()
     game.myPlayer.setPlayerName(playerName)
@@ -32,9 +32,14 @@ export default function TestSpace() {
     const boostIntoGame = () => {
       bootstrap.launchGame()
     }
-
+    // todo: create/get room to get roomId
     bootstrap.network
-      .createCustom({ name: 'test', description: 'desc', password: '', autoDispose: false } as any)
+      .createCustom({
+        name: 'Sky office',
+        id: `662612dd90ff2c6a324dc39a`,
+        map: `6623f6a93981dda1700fc844`,
+        autoDispose: false,
+      } as any)
       .then(() => boostIntoGame())
       .catch((error) => console.error(error))
 
