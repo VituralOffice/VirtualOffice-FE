@@ -5,7 +5,7 @@ import Game from '../scenes/Game'
 import { useAppSelector } from '../hook'
 import { useNavigate } from 'react-router-dom'
 import { avatars } from '../utils/util'
-import { PreOfficeJoinPage } from './PreOfficeJoinPage'
+import { JoinOfficePage } from './OfficeJoinPage'
 
 export default function TestSpace() {
   const [preJoinPageShow, setPreJoinPageShow] = useState(true)
@@ -40,5 +40,5 @@ export default function TestSpace() {
 
     return () => bootstrap.stopGame()
   }, []) // Chạy chỉ một lần khi ứng dụng khởi động
-  return preJoinPageShow ? <PreOfficeJoinPage onSubmit={JoinOffice} /> : <></>
+  return preJoinPageShow ? <JoinOfficePage onSubmit={JoinOffice} /> : <></>
 }
