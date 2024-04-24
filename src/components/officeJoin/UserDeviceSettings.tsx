@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { ButtonProps } from '../../interfaces/Interfaces'
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded'
@@ -212,6 +212,7 @@ function CustomToggleButton({ onToggle, onMenuToggle, OnIcon, OffIcon, MenuPopup
 export default function UserDeviceSettings() {
   const [audioMenuShow, setAudioMenuShow] = useState(false)
   const [cameraMenuShow, setCameraMenuShow] = useState(false)
+  const [videoStream, setVideoStream] = useState<MediaStream | null>(null)
 
   const handleToggleMenu = (setFunction: () => void) => {
     setCameraMenuShow(false)
@@ -219,17 +220,66 @@ export default function UserDeviceSettings() {
     setFunction()
   }
 
+  // Function to start video stream from selected camera
+  const startVideoStream = () => {
+    navigator.mediaDevices
+      .enumerateDevices()
+      .then((devices) => {
+        if (!devices || devices.length == 0 || !devices[0]) return null
+        const videoDevice = devices[0]
+        if (videoDevice) {
+          const constraints = {
+            video: { deviceId: { exact: videoDevice.deviceId } },
+          }
+          return navigator.mediaDevices.getUserMedia(constraints)
+        }
+      })
+      .then((stream) => {
+        if (stream) setVideoStream(stream)
+      })
+      .catch((error) => {
+        console.error('Error starting video stream:', error)
+      })
+  }
+
+  // Function to stop video stream
+  const stopVideoStream = () => {
+    if (videoStream) {
+      videoStream.getTracks().forEach((track) => track.stop())
+      setVideoStream(null)
+    }
+  }
+
+  useEffect(() => {
+    if (cameraMenuShow) startVideoStream()
+  }, [cameraMenuShow])
+
+  useEffect(() => {
+    // Stop video stream when component unmounts
+    return () => stopVideoStream()
+  }, [videoStream])
+
   return (
     <BodyLeftContent>
       <CameraDisplay>
         <div className="video-display">
           <div>
-            <video playsInline webkit-playsinline="" preload="auto" autoPlay></video>
+            <video
+              playsInline
+              webkit-playsinline=""
+              preload="auto"
+              autoPlay
+              ref={(videoRef) => {
+                if (videoRef && videoStream) {
+                  videoRef.srcObject = videoStream
+                }
+              }}
+            ></video>
           </div>
         </div>
         <div className="camera-status-text">
           <div>
-            <div>Your camera is off</div>
+            <div>{videoStream == null && 'Your camera is off'}</div>
           </div>
         </div>
       </CameraDisplay>

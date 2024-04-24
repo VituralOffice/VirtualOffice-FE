@@ -9,10 +9,10 @@ import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded'
 import { useEffect, useState } from 'react'
 
 export const MicOptionsPopups = () => {
-  const [selectMicIndex, setSelectMicIndex] = useState(0)
-  const [selectSpeakerIndex, setSelectSpeakerIndex] = useState(0)
-  const [audioDeviceNames, setAudioDeviceNames] = useState<string[]>([])
-  const [speakerDeviceNames, setSpeakerDeviceNames] = useState<string[]>([])
+  const [selectedMicId, setSelectedMicId] = useState('')
+  const [micDevices, setMicDevices] = useState<{ [deviceId: string]: string }>({})
+  const [selectedSpeakerId, setSelectedSpeakerId] = useState('')
+  const [speakerDevices, setSpeakerDevices] = useState<{ [deviceId: string]: string }>({})
 
   useEffect(() => {
     // Request permission to access media devices
@@ -26,8 +26,25 @@ export const MicOptionsPopups = () => {
             const audios = devices.filter((device) => device.kind === 'audioinput')
             const speakers = devices.filter((device) => device.kind === 'audiooutput')
 
-            setAudioDeviceNames(audios.map((device) => device.label))
-            setSpeakerDeviceNames(speakers.map((device) => device.label))
+            const micDevicesMap = audios.reduce((acc, device) => {
+              acc[device.deviceId] = device.label
+              return acc
+            }, {})
+
+            setMicDevices(micDevicesMap)
+            const speakerDevicesMap = speakers.reduce((acc, device) => {
+              acc[device.deviceId] = device.label
+              return acc
+            }, {})
+
+            setSpeakerDevices(speakerDevicesMap)
+
+            // Find the deviceId of the current audio devices in use
+            const audioTracks = stream.getAudioTracks()
+            if (audioTracks.length > 0) {
+              const currentMicDeviceId = audioTracks[0].getSettings().deviceId
+              if (currentMicDeviceId) setSelectedMicId(currentMicDeviceId)
+            }
 
             // Stop all tracks after getting device labels
             stream.getTracks().forEach((track) => track.stop())
@@ -46,25 +63,25 @@ export const MicOptionsPopups = () => {
     <PopupContainer>
       <PopupContentSession>
         <PopupContentHeader icon={<MicRoundedIcon />} title="Select microphone" />
-        {audioDeviceNames.map((value, index) => (
+        {Object.entries(micDevices).map(([deviceId, label]) => (
           <PopupContentSelectableItem
-            key={index}
-            title={value}
+            key={deviceId}
+            title={label}
             icon={<CheckCircleRoundedIcon />}
-            selected={index == selectMicIndex}
-            onSelect={() => setSelectMicIndex(index)}
+            selected={selectedMicId === deviceId}
+            onSelect={() => setSelectedMicId(deviceId)}
           />
         ))}
       </PopupContentSession>
       <PopupContentSession>
         <PopupContentHeader icon={<MicRoundedIcon />} title="Select speaker" />
-        {speakerDeviceNames.map((value, index) => (
+        {Object.entries(speakerDevices).map(([deviceId, label]) => (
           <PopupContentSelectableItem
-            key={index}
-            title={value}
+            key={deviceId}
+            title={label}
             icon={<CheckCircleRoundedIcon />}
-            selected={index == selectSpeakerIndex}
-            onSelect={() => setSelectSpeakerIndex(index)}
+            selected={selectedSpeakerId === deviceId}
+            onSelect={() => setSelectedSpeakerId(deviceId)}
           />
         ))}
       </PopupContentSession>

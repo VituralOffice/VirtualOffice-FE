@@ -9,8 +9,8 @@ import { useEffect, useState } from 'react'
 import VideocamRoundedIcon from '@mui/icons-material/VideocamRounded'
 
 export const VideoOptionsPopups = () => {
-  const [selectCameraIndex, setSelectCameraIndex] = useState(0)
-  const [cameraDeviceNames, setCameraDeviceNames] = useState<string[]>([])
+  const [selectedCameraId, setSelectedCameraId] = useState('')
+  const [cameraDevices, setCameraDevices] = useState<{ [deviceId: string]: string }>({})
 
   useEffect(() => {
     // Request permission to access video devices
@@ -22,7 +22,23 @@ export const VideoOptionsPopups = () => {
           .enumerateDevices()
           .then((devices) => {
             const videoDevices = devices.filter((device) => device.kind === 'videoinput')
-            setCameraDeviceNames(videoDevices.map((device) => device.label))
+
+            // Create an object with deviceId as key and deviceLabel as value
+            const devicesMap = videoDevices.reduce((acc, device) => {
+              acc[device.deviceId] = device.label
+              return acc
+            }, {})
+
+            setCameraDevices(devicesMap)
+
+            // Find the deviceId of the current video device in use
+            const videoTracks = stream.getVideoTracks()
+            if (videoTracks.length > 0) {
+              const currentDeviceId = videoTracks[0].getSettings().deviceId
+              if (currentDeviceId) {
+                setSelectedCameraId(currentDeviceId)
+              }
+            }
 
             // Stop all tracks after getting device labels
             stream.getTracks().forEach((track) => track.stop())
@@ -41,13 +57,13 @@ export const VideoOptionsPopups = () => {
     <PopupContainer>
       <PopupContentSession>
         <PopupContentHeader icon={<VideocamRoundedIcon />} title="Select camera" />
-        {cameraDeviceNames.map((value, index) => (
+        {Object.entries(cameraDevices).map(([deviceId, label]) => (
           <PopupContentSelectableItem
-            key={index}
-            title={value}
+            key={deviceId}
+            title={label}
             icon={<CheckCircleRoundedIcon />}
-            selected={index == selectCameraIndex}
-            onSelect={() => setSelectCameraIndex(index)}
+            selected={selectedCameraId === deviceId}
+            onSelect={() => setSelectedCameraId(deviceId)}
           />
         ))}
       </PopupContentSession>
