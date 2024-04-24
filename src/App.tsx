@@ -10,7 +10,6 @@ import { setLoggedIn, setUserInfo } from './stores/UserStore'
 import { useDispatch } from 'react-redux'
 import LoadingPage from './pages/LoadingPage'
 import TestSpace from './pages/TestSpace'
-import Cookies from 'js-cookie';
 import { getLocalStorage } from './apis/util'
 
 const Backdrop = styled.div`
@@ -22,7 +21,6 @@ const Backdrop = styled.div`
 
 function App() {
   const user = useAppSelector((state) => state.user)
-  const lobbyJoined = useAppSelector((state) => state.room.lobbyJoined)
   const dispatch = useDispatch()
 
   useEffect(() => {
