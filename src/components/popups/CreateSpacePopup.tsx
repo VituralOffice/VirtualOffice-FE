@@ -1,6 +1,11 @@
 import styled from 'styled-components'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
-import { PopupProps } from '../../interfaces/Interfaces'
+import RemoveRedEyeRoundedIcon from '@mui/icons-material/RemoveRedEyeRounded';
+import VisibilityOffRoundedIcon from '@mui/icons-material/VisibilityOffRounded';
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
+import { ButtonProps, PopupProps } from '../../interfaces/Interfaces'
+import { OptionBox } from '../forms/OptionBox'
+import { useEffect, useState } from 'react'
 
 const PopupContainer = styled.div`
   display: flex;
@@ -47,6 +52,14 @@ const PopupContainer = styled.div`
           position: relative;
           overflow: visible;
           box-shadow: rgba(0, 0, 0, 0.55) 0px 10px 25px;
+
+          > .form-session {
+            margin-top: 0px;
+          }
+        
+          > .form-session ~ .form-session {
+            margin-top: 8px;
+          }
         }
       }
     }
@@ -143,7 +156,6 @@ const SpaceNameInput = styled.div`
 const SecurityOptionsContainer = styled.div`
 display: flex;
 flex-direction: column;
-margin-top: 8px;
 gap: 4px;
 .label {
     color: rgb(255, 255, 255);
@@ -152,87 +164,229 @@ gap: 4px;
     font-size: 13px;
     line-height: 17px;
 }
-.options-box {
-    position: relative;
-    box-sizing: border-box;
+`
+
+const PasswordInput = styled.div`
+display: flex;
+&>div {
+    display: flex;
+    flex-direction: column;
     width: 100%;
-    .container {
+    .label{
+        display: flex;
+        margin-bottom: 4px;
+        &>span{
+            color: rgb(255, 255, 255);
+            font-family: "DM Sans", sans-serif;
+            font-weight: 500;
+            font-size: 13px;
+            line-height: 17px;
+        }
+    }
+    .input{
+        width: 100%;
+        border: 2px solid rgb(144, 156, 226);
+        border-radius: 12px;
+        display: flex;
+        flex-direction: row;
         -webkit-box-align: center;
         align-items: center;
-        cursor: pointer;
-        display: flex;
-        flex-wrap: wrap;
-        -webkit-box-pack: justify;
-        justify-content: space-between;
-        min-height: 48px;
-        position: relative;
-        transition: all 0.2s ease -0.1s;
-        background-color: rgb(84, 92, 143);
-        border-color: transparent;
-        border-radius: 12px;
-        border-style: solid;
-        border-width: 0px;
-        box-shadow: none;
+        transition: border 200ms ease 0s;
         box-sizing: border-box;
-        opacity: 1;
-        outline: 0px !important;
-        .current-option {
-            -webkit-box-align: center;
-            align-items: center;
-            display: grid;
-            flex: 1 1 0%;
-            flex-wrap: wrap;
-            position: relative;
-            overflow: hidden;
-            padding: 2px 8px;
-            box-sizing: border-box;
-            .text {
-                grid-area: 1 / 1 / 2 / 3;
-                max-width: 100%;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                color: rgb(255, 255, 255);
-                margin-left: 2px;
-                margin-right: 2px;
-                box-sizing: border-box;
-                font-size: 15px;
-                font-weight: 600;
+        height: 48px;
+        padding: 0px 8px 0px 16px;
+        &:focus-within {
+            border-color: rgb(236, 241, 255);
+        }
+        &>input {
+            border: none;
+            box-shadow: none;
+            background: transparent;
+            -webkit-box-flex: 1;
+            flex-grow: 1;
+            font-weight: 500;
+            font-size: 15px;
+            font-family: inherit;
+            line-height: 20px;
+            color: rgb(255, 255, 255);
+            width: 100%;
+            height: 100%;
+
+            &:focus {
+                outline: none;
+            }
+        }
+        .show-icon {
+            display: flex;
+            width: 24px;
+            color: rgb(255, 255, 255);
+            flex-shrink: 0;
+            cursor: pointer;
+            &>svg{
+                width: 100%;
+                height: auto;
             }
         }
     }
 }
 `
 
+const SubmitButtonsContainer = styled.div`
+display: flex;
+    justify-content: space-between;
+    margin-top: 24px;
+`
+
+const BackButton = styled.button`
+display: flex;
+position: relative;
+box-sizing: border-box;
+outline: none;
+-webkit-box-align: center;
+align-items: center;
+-webkit-box-pack: center;
+justify-content: center;
+font-family: inherit;
+font-weight: 700;
+transition: background-color 200ms ease 0s, border-color 200ms ease 0s;
+cursor: pointer;
+opacity: 1;
+overflow: hidden;
+background-color: rgb(84, 92, 143);
+border: 2px solid transparent;
+padding: 0px 16px;
+width: auto;
+min-width: min(104px, 100%);
+max-width: 100%;
+height: 48px;
+border-radius: 12px;
+font-size: 15px;
+color: rgb(255, 255, 255) !important;
+`
+
+const SubmitButton = styled.button<ButtonProps>`
+display: flex;
+    position: relative;
+    box-sizing: border-box;
+    outline: none;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    font-family: inherit;
+    font-weight: 700;
+    transition: background-color 200ms ease 0s, border-color 200ms ease 0s;
+    cursor: default;
+    opacity: 0.5;
+    overflow: hidden;
+    background-color: ${(props) => props.isActive ? 'rgb(6, 214, 160)' : 'rgb(6, 214, 160)'};
+    border: 2px solid transparent;
+    padding: 0px 16px;
+    width: auto;
+    min-width: min(104px, 100%);
+    max-width: 100%;
+    height: 48px;
+    border-radius: 12px;
+    font-size: 15px;
+    color: rgb(40, 45, 78) !important;
+    .icon{
+        flex: 0 1 0%;
+        padding-right: 8px;
+        &>span{
+            display: flex;
+            width: 24px;
+            color: rgb(40, 45, 78);
+            &>svg{
+                width: 100%;
+                height: auto;
+            }
+        }
+    }
+`
+
 export const CreateSpacePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
-  return (
-    <PopupContainer>
-      <div>
-        <div>
-          <div>
+    const [spaceName, setSpaceName] = useState('');
+    const [securitySelectedOption, setSecuritySelectedOption] = useState(0);
+    const spaceOptions = ['Anyone with the office URL can enter', 'Everyone needs to enter password']
+    const [password, setPassword] = useState('');
+    const [passwordShowing, setPasswordShowing] = useState(false);
+
+    const [formComplete, setFormComplete] = useState(false);
+
+    const checkSpaceName = () => {
+        return false;
+    }
+
+    const checkPassword = () => {
+        return false;
+    }
+
+    const submitForm = () => {
+
+    }
+
+    useEffect(() => {
+        if (checkSpaceName() && (securitySelectedOption == 0 || checkPassword())) setFormComplete(true);
+        else setFormComplete(false);
+    }, [spaceName, password])
+
+    return (
+        <PopupContainer>
             <div>
-              <CloseIcon>
-                <span>
-                  <CloseRoundedIcon />
-                </span>
-              </CloseIcon>
-              <Title>
-                <span>Create a new office space for your team</span>
-              </Title>
-              <SpaceNameInput>
-                <div className="label">
-                  <label>
-                    <span>Space name* (Appears at the end of URL)</span>
-                  </label>
+                <div>
+                    <div>
+                        <div>
+                            <CloseIcon>
+                                <span>
+                                    <CloseRoundedIcon />
+                                </span>
+                            </CloseIcon>
+                            <Title>
+                                <span>Create a new office space for your team</span>
+                            </Title>
+                            <SpaceNameInput className='form-session'>
+                                <div className="label">
+                                    <label>
+                                        <span>Space name* (Appears at the end of URL)</span>
+                                    </label>
+                                </div>
+                                <div className="input">
+                                    <input type="text" maxLength={25} placeholder="yourspacename" value={spaceName} onChange={(e) => setSpaceName(e.target.value)} />
+                                </div>
+                            </SpaceNameInput>
+
+                            <SecurityOptionsContainer className='form-session'>
+                                <span className='label'>Security options</span>
+                                <OptionBox items={spaceOptions} onSelect={(index) => setSecuritySelectedOption(index)} />
+                            </SecurityOptionsContainer>
+
+                            {securitySelectedOption == 1 && <PasswordInput className='form-session'>
+                                <div>
+                                    <div className='label'>
+                                        <span>Password</span>
+                                    </div>
+                                    <div className='input'>
+                                        <input type={passwordShowing ? "text" : "password"} autoComplete="new-password" aria-autocomplete="list" value={password} onChange={(e) => setPassword(e.target.value)} />
+                                        <span className='show-icon'>
+                                            {passwordShowing ? <RemoveRedEyeRoundedIcon onClick={() => setPasswordShowing(false)} /> : <VisibilityOffRoundedIcon onClick={() => setPasswordShowing(true)} />}
+                                        </span>
+                                    </div>
+                                </div>
+                            </PasswordInput>}
+
+                            <SubmitButtonsContainer>
+                                <div style={{ display: 'flex', marginRight: '8px' }}><BackButton>Back</BackButton></div>
+                                <SubmitButton isActive={formComplete} onClick={submitForm}>
+                                    <span className='icon'>
+                                        <span><CheckCircleRoundedIcon /></span>
+                                    </span>
+                                    Create space
+                                </SubmitButton>
+                            </SubmitButtonsContainer>
+                        </div>
+                    </div>
                 </div>
-                <div className="input">
-                  <input type="text" maxLength={25} placeholder="yourspacename" />
-                </div>
-              </SpaceNameInput>
             </div>
-          </div>
-        </div>
-      </div>
-    </PopupContainer>
-  )
+        </PopupContainer>
+    )
 }
