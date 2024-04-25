@@ -65,7 +65,7 @@ const EmailButton = styled.div<ButtonProps>`
       transition: all 0.25s ease-in-out 0s;
       overflow: hidden;
       background-color: ${(props) =>
-    props.isEnabled ? 'rgba(255, 255, 255, 0.1)' : 'transparent'};
+        props.isEnabled ? 'rgba(255, 255, 255, 0.1)' : 'transparent'};
       &:hover {
         background-color: rgba(255, 255, 255, 0.1);
       }
@@ -117,8 +117,6 @@ const BodyContent = styled.div`
     display: flex;
   }
 `
-
-
 
 const BodyRightContent = styled.div`
   display: flex;
@@ -255,7 +253,6 @@ const JoinButton = styled.button`
     background-color: rgb(81, 226, 189);
   }
 `
-
 
 // ? 'rgba(255, 48, 73, 0.4)' : 'rgba(255, 48, 73, 0.2)'
 // ? 'rgba(6, 214, 160, 0.4)' : 'rgba(6, 214, 160, 0.2)'

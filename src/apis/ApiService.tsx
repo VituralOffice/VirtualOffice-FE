@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios'
 import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, getCookie, setTokenToCookie } from '../utils/util'
+import { API_URL } from '../constant'
 
 class ApiService {
   private static instance: ApiService | null = null // Biến static để lưu trữ instance của ApiService
@@ -37,7 +38,7 @@ class ApiService {
     if (!ApiService.instance) {
       // Nếu chưa được khởi tạo, tạo một instance mới
       // ApiService.instance = new ApiService(process.env.BASE_API_URL!);
-      ApiService.instance = new ApiService('https://api.voffice.space/v1')
+      ApiService.instance = new ApiService(API_URL + '/v1')
     }
     // Trả về instance đã có hoặc mới tạo
     return ApiService.instance
