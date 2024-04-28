@@ -102,9 +102,9 @@ const UserEditButton = styled.button<ButtonProps>`
 export default function UserMenuPopup() {
   const [isEditUserProfilePopupShow, setEditUserProfilePopupShow] = useState(false)
   const [isEditUserCharacterPopupShow, setEditUserCharacterPopupShow] = useState(false)
-  const user = useAppSelector((state) => state.user);
-  const navigate = useNavigate();
-  const handleSignOut = useSignOut();
+  const user = useAppSelector((state) => state.user)
+  const navigate = useNavigate()
+  const handleSignOut = useSignOut()
 
   return (
     <>
@@ -154,9 +154,7 @@ export default function UserMenuPopup() {
                   fontSize: '14px',
                   lineHeight: '18px',
                 }}
-              >
-                tunguyenhv@gmail.com
-              </span>
+              ></span>
             </div>
             <hr
               style={{
@@ -194,61 +192,59 @@ export default function UserMenuPopup() {
           Edit Character
         </NavItem>
 
-        {
-          user.loggedIn ? (
-            <NavItem onClick={() => handleSignOut()}>
+        {user.loggedIn ? (
+          <NavItem onClick={() => handleSignOut()}>
+            <span
+              style={{
+                flex: '0 1 0%',
+                paddingRight: '8px',
+                textDecoration: 'none',
+              }}
+            >
               <span
                 style={{
-                  flex: '0 1 0%',
-                  paddingRight: '8px',
-                  textDecoration: 'none',
+                  display: 'flex',
+                  width: '20px',
+                  color: 'rgb(255, 255, 255)',
                 }}
               >
-                <span
+                <LogoutRoundedIcon
                   style={{
-                    display: 'flex',
-                    width: '20px',
-                    color: 'rgb(255, 255, 255)',
+                    width: '100%',
+                    height: 'auto',
                   }}
-                >
-                  <LogoutRoundedIcon
-                    style={{
-                      width: '100%',
-                      height: 'auto',
-                    }}
-                  />
-                </span>
+                />
               </span>
-              Sign Out
-            </NavItem>
-          ) : (
-            <NavItem onClick={() => navigate('/signin')}>
+            </span>
+            Sign Out
+          </NavItem>
+        ) : (
+          <NavItem onClick={() => navigate('/signin')}>
+            <span
+              style={{
+                flex: '0 1 0%',
+                paddingRight: '8px',
+                textDecoration: 'none',
+              }}
+            >
               <span
                 style={{
-                  flex: '0 1 0%',
-                  paddingRight: '8px',
-                  textDecoration: 'none',
+                  display: 'flex',
+                  width: '20px',
+                  color: 'rgb(255, 255, 255)',
                 }}
               >
-                <span
+                <LoginRoundedIcon
                   style={{
-                    display: 'flex',
-                    width: '20px',
-                    color: 'rgb(255, 255, 255)',
+                    width: '100%',
+                    height: 'auto',
                   }}
-                >
-                  <LoginRoundedIcon
-                    style={{
-                      width: '100%',
-                      height: 'auto',
-                    }}
-                  />
-                </span>
+                />
               </span>
-              Sign In
-            </NavItem>
-          )
-        }
+            </span>
+            Sign In
+          </NavItem>
+        )}
       </Container>
       {isEditUserProfilePopupShow && (
         <EditUserProfilePopup onClosePopup={() => setEditUserProfilePopupShow(false)} />

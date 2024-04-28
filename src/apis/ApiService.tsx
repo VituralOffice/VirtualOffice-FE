@@ -9,6 +9,7 @@ class ApiService {
   private constructor(baseUrl: string) {
     this.axiosInstance = axios.create({
       baseURL: baseUrl,
+      withCredentials: true,
     })
     this.axiosInstance.interceptors.response.use(
       (response) => response,
