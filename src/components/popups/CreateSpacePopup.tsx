@@ -4,8 +4,10 @@ import RemoveRedEyeRoundedIcon from '@mui/icons-material/RemoveRedEyeRounded';
 import VisibilityOffRoundedIcon from '@mui/icons-material/VisibilityOffRounded';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import { ButtonProps, PopupProps } from '../../interfaces/Interfaces'
-import { OptionBox } from '../forms/OptionBox'
 import { useEffect, useState } from 'react'
+import { CreateRoom } from '../../apis/RoomApis';
+import { ChooseMap } from '../forms/ChooseMap';
+import { CreateRoomPanel } from '../forms/CreateRoom';
 
 const PopupContainer = styled.div`
   display: flex;
@@ -101,136 +103,6 @@ const Title = styled.div`
   }
 `
 
-const SpaceNameInput = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  .label {
-    display: flex;
-    margin-bottom: 4px;
-    & > label {
-      & > span {
-        color: rgb(255, 255, 255);
-        font-family: 'DM Sans', sans-serif;
-        font-weight: 500;
-        font-size: 13px;
-        line-height: 17px;
-      }
-    }
-  }
-  .input {
-    width: 100%;
-    border: 2px solid rgb(144, 156, 226);
-    border-radius: 12px;
-    display: flex;
-    flex-direction: row;
-    -webkit-box-align: center;
-    align-items: center;
-    transition: border 200ms ease 0s;
-    box-sizing: border-box;
-    height: 48px;
-    padding: 0px 8px 0px 16px;
-    &:focus-within {
-        border-color: rgb(236, 241, 255);
-    }
-    & > input {
-      border: none;
-      box-shadow: none;
-      background: transparent;
-      -webkit-box-flex: 1;
-      flex-grow: 1;
-      font-weight: 500;
-      font-size: 15px;
-      font-family: inherit;
-      line-height: 20px;
-      color: rgb(255, 255, 255);
-      width: 100%;
-      height: 100%;
-      &:focus {
-        outline: none;
-      }
-    }
-  }
-`
-
-const SecurityOptionsContainer = styled.div`
-display: flex;
-flex-direction: column;
-gap: 4px;
-.label {
-    color: rgb(255, 255, 255);
-    font-family: "DM Sans", sans-serif;
-    font-weight: 500;
-    font-size: 13px;
-    line-height: 17px;
-}
-`
-
-const PasswordInput = styled.div`
-display: flex;
-&>div {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    .label{
-        display: flex;
-        margin-bottom: 4px;
-        &>span{
-            color: rgb(255, 255, 255);
-            font-family: "DM Sans", sans-serif;
-            font-weight: 500;
-            font-size: 13px;
-            line-height: 17px;
-        }
-    }
-    .input{
-        width: 100%;
-        border: 2px solid rgb(144, 156, 226);
-        border-radius: 12px;
-        display: flex;
-        flex-direction: row;
-        -webkit-box-align: center;
-        align-items: center;
-        transition: border 200ms ease 0s;
-        box-sizing: border-box;
-        height: 48px;
-        padding: 0px 8px 0px 16px;
-        &:focus-within {
-            border-color: rgb(236, 241, 255);
-        }
-        &>input {
-            border: none;
-            box-shadow: none;
-            background: transparent;
-            -webkit-box-flex: 1;
-            flex-grow: 1;
-            font-weight: 500;
-            font-size: 15px;
-            font-family: inherit;
-            line-height: 20px;
-            color: rgb(255, 255, 255);
-            width: 100%;
-            height: 100%;
-
-            &:focus {
-                outline: none;
-            }
-        }
-        .show-icon {
-            display: flex;
-            width: 24px;
-            color: rgb(255, 255, 255);
-            flex-shrink: 0;
-            cursor: pointer;
-            &>svg{
-                width: 100%;
-                height: auto;
-            }
-        }
-    }
-}
-`
-
 const SubmitButtonsContainer = styled.div`
 display: flex;
     justify-content: space-between;
@@ -276,10 +148,11 @@ display: flex;
     font-family: inherit;
     font-weight: 700;
     transition: background-color 200ms ease 0s, border-color 200ms ease 0s;
-    cursor: default;
+    cursor: ${(props) => props.isActive ? 'pointer' : 'default'};
     opacity: 0.5;
     overflow: hidden;
-    background-color: ${(props) => props.isActive ? 'rgb(6, 214, 160)' : 'rgb(6, 214, 160)'};
+    background-color: rgb(6, 214, 160);
+    opacity: ${(props) => props.isActive ? '1' : '0.5'};
     border: 2px solid transparent;
     padding: 0px 16px;
     width: auto;
@@ -289,6 +162,12 @@ display: flex;
     border-radius: 12px;
     font-size: 15px;
     color: rgb(40, 45, 78) !important;
+
+    ${(props) => props.isActive && `&:hover {
+        background-color: rgb(81, 226, 189);
+    }`}
+    
+
     .icon{
         flex: 0 1 0%;
         padding-right: 8px;
@@ -305,30 +184,52 @@ display: flex;
 `
 
 export const CreateSpacePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
+    const [stepIndex, setStepIndex] = useState(0);
+    const totalSteps = 2;
+    const titles = ['Choose your office template', 'Create a new office space for your team']
+
     const [spaceName, setSpaceName] = useState('');
     const [securitySelectedOption, setSecuritySelectedOption] = useState(0);
-    const spaceOptions = ['Anyone with the office URL can enter', 'Everyone needs to enter password']
-    const [password, setPassword] = useState('');
-    const [passwordShowing, setPasswordShowing] = useState(false);
+    const spaceOptions = ['Anyone with the office URL can enter', 'Only invited members can enter']
+
+    const mapIds = ['6623f6a93981dda1700fc844', '6623f6a93981dda1700fc845', '6623f6a93981dda1700fc846', '6623f6a93981dda1700fc847']
+    const [mapId, setMapId] = useState(mapIds[0]);
+    const [mapSize, setMapSize] = useState(10);
+
+    // const [password, setPassword] = useState('');
+    // const [passwordShowing, setPasswordShowing] = useState(false);
 
     const [formComplete, setFormComplete] = useState(false);
 
     const checkSpaceName = () => {
+        if (spaceName && spaceName.length > 0) return true;
         return false;
     }
-
-    const checkPassword = () => {
+    const checkSecurityOption = () => {
+        if (securitySelectedOption >= 0 && securitySelectedOption <= spaceOptions.length - 1) return true;
         return false;
     }
+    const checkMapId = () => mapId && mapId.length > 0;
+    const checkMapSize = () => mapSize > 0;
 
-    const submitForm = () => {
+    const submitForm = async () => {
+        console.log(checkSpaceName())
+        console.log(checkSecurityOption())
+        console.log(checkMapId())
+        console.log(checkMapSize())
+        if (!checkSpaceName() || !checkSecurityOption() || !checkMapId() || !checkMapSize()) return;
 
+        const response = await CreateRoom({ map: '6623f6a93981dda1700fc844', name: spaceName, private: securitySelectedOption == 1 })
+
+        console.log(response)
     }
+
+    const PopupContents = [<ChooseMap mapIds={mapIds} mapId={mapId} setMapId={setMapId} mapSize={mapSize} setMapSize={setMapSize} />, <CreateRoomPanel spaceName={spaceName} setSpaceName={setSpaceName} setSecuritySelectedOption={setSecuritySelectedOption} spaceOptions={spaceOptions} />]
 
     useEffect(() => {
-        if (checkSpaceName() && (securitySelectedOption == 0 || checkPassword())) setFormComplete(true);
+        if (checkSpaceName() && checkSecurityOption()) setFormComplete(true);
         else setFormComplete(false);
-    }, [spaceName, password])
+    }, [spaceName, securitySelectedOption])
 
     return (
         <PopupContainer>
@@ -338,51 +239,42 @@ export const CreateSpacePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
                         <div>
                             <CloseIcon>
                                 <span>
-                                    <CloseRoundedIcon />
+                                    <CloseRoundedIcon onClick={onClosePopup} />
                                 </span>
                             </CloseIcon>
                             <Title>
-                                <span>Create a new office space for your team</span>
+                                <span>{titles[stepIndex]}</span>
                             </Title>
-                            <SpaceNameInput className='form-session'>
-                                <div className="label">
-                                    <label>
-                                        <span>Space name* (Appears at the end of URL)</span>
-                                    </label>
-                                </div>
-                                <div className="input">
-                                    <input type="text" maxLength={25} placeholder="yourspacename" value={spaceName} onChange={(e) => setSpaceName(e.target.value)} />
-                                </div>
-                            </SpaceNameInput>
 
-                            <SecurityOptionsContainer className='form-session'>
-                                <span className='label'>Security options</span>
-                                <OptionBox items={spaceOptions} onSelect={(index) => setSecuritySelectedOption(index)} />
-                            </SecurityOptionsContainer>
+                            {
+                                PopupContents[stepIndex]
+                            }
 
-                            {securitySelectedOption == 1 && <PasswordInput className='form-session'>
-                                <div>
-                                    <div className='label'>
-                                        <span>Password</span>
-                                    </div>
-                                    <div className='input'>
-                                        <input type={passwordShowing ? "text" : "password"} autoComplete="new-password" aria-autocomplete="list" value={password} onChange={(e) => setPassword(e.target.value)} />
-                                        <span className='show-icon'>
-                                            {passwordShowing ? <RemoveRedEyeRoundedIcon onClick={() => setPasswordShowing(false)} /> : <VisibilityOffRoundedIcon onClick={() => setPasswordShowing(true)} />}
-                                        </span>
-                                    </div>
-                                </div>
-                            </PasswordInput>}
+                            {/* {securitySelectedOption == 1 &&
+                                <>
+                                    <InviteInput onAdd={addInvitedUser} />
+                                    <UserList users={invitedUsers} onRemove={removeInvitedUser} />
+                                </>
+                            } */}
 
                             <SubmitButtonsContainer>
-                                <div style={{ display: 'flex', marginRight: '8px' }}><BackButton>Back</BackButton></div>
-                                <SubmitButton isActive={formComplete} onClick={submitForm}>
-                                    <span className='icon'>
-                                        <span><CheckCircleRoundedIcon /></span>
-                                    </span>
-                                    Create space
-                                </SubmitButton>
+                                <div style={{ display: 'flex', marginRight: '8px' }}><BackButton onClick={() => setStepIndex(stepIndex - 1)}>Back</BackButton></div>
+                                {
+                                    stepIndex == totalSteps - 1 ? (
+                                        <SubmitButton isActive={formComplete} onClick={submitForm}>
+                                            <span className='icon'>
+                                                <span><CheckCircleRoundedIcon /></span>
+                                            </span>
+                                            Create space
+                                        </SubmitButton>
+                                    ) : (
+                                        <SubmitButton isActive={true} onClick={() => setStepIndex(stepIndex + 1)}>
+                                            Confirm selection
+                                        </SubmitButton>
+                                    )
+                                }
                             </SubmitButtonsContainer>
+
                         </div>
                     </div>
                 </div>

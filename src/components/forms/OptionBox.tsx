@@ -146,7 +146,7 @@ export const OptionBox = ({ items, onSelect }) => {
                     <div>
                         {
                             items.map((value, index) => (
-                                <div className="item" onClick={() => { setCurrentSelected(index); onSelect(index); setDropdownShow(false) }}>{value}</div>
+                                <div key={index} className="item" onClick={() => { setCurrentSelected(index); onSelect(index); setDropdownShow(false) }}>{value}</div>
                             ))
                         }
                     </div>

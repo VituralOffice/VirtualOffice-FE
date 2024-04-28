@@ -10,6 +10,18 @@ class ApiService {
     this.axiosInstance = axios.create({
       baseURL: baseUrl,
     })
+    this.axiosInstance.interceptors.request.use((config) => {
+      const accessToken = getCookie(ACCESS_TOKEN_KEY); // Implement getAccessToken() to retrieve token
+    
+      if (accessToken) {
+        config.headers.Authorization = `Bearer ${accessToken}`;
+      }
+    
+      return config;
+    }, (error) => {
+      // Handle request errors (optional)
+      return Promise.reject(error);
+    });
     this.axiosInstance.interceptors.response.use(
       (response) => response,
       async (error) => {
