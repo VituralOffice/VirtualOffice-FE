@@ -148,14 +148,14 @@ export const ChooseMap = ({ mapIds, mapId, setMapId, mapSize, setMapSize }) => {
             </RoomPreview>
             <LeftContent>
                 <MapSize>
-                    <SizeSelectHeader>
+                    <SizeSelectHeader onClick={() => {}}>
                         <span className="title">MAP SIZE</span>
                         <div className="size-display">
                             <span className="icon"><PeopleAltRoundedIcon /></span>
                             <span className="number">{mapSize}</span>
                         </div>
                     </SizeSelectHeader>
-                    <DiscreteSlider width={240} label="MAP SIZE" defaultValue={10} step={10} shiftStep={30} min={10} max={30} onChange={(value) => setMapSize(value)} />
+                    <DiscreteSlider width={240} label="MAP SIZE" defaultValue={10} step={10} shiftStep={30} min={10} max={30} onChange={(event, value) => setMapSize(value)} />
                 </MapSize>
                 <MapTheme>
                     <span className="title">MAP THEME</span>
