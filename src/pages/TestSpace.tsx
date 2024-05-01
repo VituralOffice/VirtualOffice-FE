@@ -25,7 +25,7 @@ export default function TestSpace() {
   useEffect(() => {
     if (!lobbyJoined || !user.loggedIn) {
       navigate('/app')
-      return
+    return
     }
     const bootstrap = phaserGame.scene.keys.bootstrap as Bootstrap
 

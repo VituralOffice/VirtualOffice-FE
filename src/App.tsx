@@ -11,6 +11,7 @@ import { useDispatch } from 'react-redux'
 import LoadingPage from './pages/LoadingPage'
 import TestSpace from './pages/TestSpace'
 import { getLocalStorage } from './apis/util'
+import { OfficeSpace } from './pages/OfficeSpace'
 
 const Backdrop = styled.div`
   position: absolute;
@@ -24,8 +25,8 @@ function App() {
   const dispatch = useDispatch()
 
   useEffect(() => {
+    if (user.loggedIn) return;
     const userData = getLocalStorage('userData')
-    // const userData = Cookies.get('userData'); // Get user data from cookie
     if (userData) {
       dispatch(setUserInfo(userData));
       dispatch(setLoggedIn(true));
@@ -51,6 +52,7 @@ function App() {
             <Route path="/dashboard" element={<SpaceDashboardPage />} />
             {/* <Route path="/dashboard" element={user.loggedIn ? <Navigate to="/app" replace /> : <SpaceDashboardPage />} /> */}
             <Route path="/test-space" element={<TestSpace />} />
+            <Route path="/room/:roomId" element={<OfficeSpace />} />
           </Routes>
         </React.Fragment>
       </Backdrop>

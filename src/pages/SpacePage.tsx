@@ -4,6 +4,9 @@ import { MutableRefObject, SetStateAction, useEffect, useRef, useState } from "r
 import SpaceItem from "../components/SpaceItem";
 import { ButtonProps } from "../interfaces/Interfaces";
 import Header from "../components/Header";
+import { GetRoomsByUserId } from "../apis/RoomApis";
+import { useAppSelector } from "../hook";
+import { isApiSuccess } from "../apis/util";
 
 const TopBar = styled.div`
 display: flex;
@@ -146,6 +149,8 @@ display: grid;
 
 export default function SpacePage() {
     const [activeSpaceItemId, setActiveSpaceItemId] = useState(-1);
+    const [spaces, setSpaces] = useState<any[]>([]);
+    const user = useAppSelector((state) => state.user)
 
     const handleOptionPopupShow = (itemId: SetStateAction<number>) => {
         if (activeSpaceItemId === itemId) {
@@ -154,8 +159,6 @@ export default function SpacePage() {
         }
         setActiveSpaceItemId(itemId);
     };
-
-    const spaceItemIds = [1, 2, 3, 4];
 
     const handleClickOutside = () => {
         if (activeSpaceItemId !== -1) {
@@ -166,6 +169,14 @@ export default function SpacePage() {
 
 
     useEffect(() => {
+        const GetRoomsData = async () => {
+            const response = await GetRoomsByUserId({ userId: user.userId });
+            if (isApiSuccess(response)) {
+                setSpaces(response.result)
+            }
+        }
+        GetRoomsData();
+
         document.addEventListener("click", handleClickOutside);
 
         return () => {
@@ -187,11 +198,11 @@ export default function SpacePage() {
             </TopBar>
             <SpacesContainer>
                 <SpacesGrid>
-                    {spaceItemIds.map(id => (
+                    {spaces.map(space => (
                         <SpaceItem
-                            key={id}
-                            id={id}
-                            isOptionPopupShow={activeSpaceItemId === id}
+                            key={space._id}
+                            id={space._id}
+                            isOptionPopupShow={activeSpaceItemId === space._id}
                             setOptionPopupShow={handleOptionPopupShow}
                         />
                     ))}

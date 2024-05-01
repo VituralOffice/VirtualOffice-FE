@@ -3,3 +3,11 @@ export type CreateRoomParams = {
     name: string,
     private: boolean
 }
+
+export type GetRoomParams = {
+    roomId: string,
+}
+
+export type GetRoomByUserIdParams = {
+    userId: string,
+}

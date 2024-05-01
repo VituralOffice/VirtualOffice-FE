@@ -4,12 +4,9 @@ import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded'
 import UserMenuPopup from './popups/UserMenuPopup'
 import { useState } from 'react'
 import { ButtonProps } from '../interfaces/Interfaces'
-import EditUserProfilePopup from './popups/EditUserProfilePopup'
 import { useNavigate } from 'react-router-dom'
 import { useAppSelector } from '../hook'
 import { getAvatarById } from '../utils/util'
-import phaserGame from '../PhaserGame'
-import Bootstrap from '../scenes/Bootstrap'
 import { CreateSpacePopup } from './popups/CreateSpacePopup'
 
 const HeaderContainer = styled.div`

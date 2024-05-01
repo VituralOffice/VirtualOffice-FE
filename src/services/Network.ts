@@ -37,6 +37,7 @@ export default class Network {
     //   process.env.NODE_ENV === 'production'
     //     ? import.meta.env.VITE_SERVER_URL
     //     : `${protocol}//${window.location.hostname}:2567`
+    console.log("Init Network")
     const endpoint = API_URL.replace(`https`, `wss`)
     this.client = new Client(endpoint)
     this.client.auth.token = getCookie(ACCESS_TOKEN_KEY) as string
