@@ -14,6 +14,8 @@ import React from 'react'
 import { spinAnimation } from '../anims/CssAnims'
 import AutorenewRoundedIcon from '@mui/icons-material/AutorenewRounded'
 import { setTokenToCookie } from '../utils/util'
+import { Button } from '@mui/material'
+import { API_URL } from '../constant'
 
 const Container = styled.div`
   height: 100%;
@@ -439,7 +441,12 @@ export default function LoginPage() {
                   <span>Welcome to Virtual Office</span>
                 </HeaderTitle>
 
-                <GoogleLoginButton onSuccess={handleLoginSuccess} onFailure={handleLoginFailure} />
+                <GoogleLoginButton
+                  onClick={(ev) => {
+                    ev.preventDefault()
+                    window.open(API_URL + '/v1/auth/google', '_self')
+                  }}
+                />
 
                 <ORSpan>
                   <span>OR</span>

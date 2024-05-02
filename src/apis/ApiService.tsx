@@ -9,6 +9,7 @@ class ApiService {
   private constructor(baseUrl: string) {
     this.axiosInstance = axios.create({
       baseURL: baseUrl,
+      withCredentials: true,
     })
     this.axiosInstance.interceptors.request.use((config) => {
       const accessToken = getCookie(ACCESS_TOKEN_KEY); // Implement getAccessToken() to retrieve token
