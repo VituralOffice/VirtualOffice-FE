@@ -4,13 +4,13 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from 'axios'
-import { getCookie, getLocalStorage, setCookie, setLocalStorage } from './util'
+import { getLocalStorage, setLocalStorage } from './util'
 import { Logout, RefreshToken } from './AuthApis'
-import ApiService from './ApiService'
 import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from '../utils/util'
+import Cookies from 'js-cookie'
 
 export const onRequestSuccess = (config: AxiosRequestConfig) => {
-  const accessToken = getCookie('accessToken')
+  const accessToken = Cookies.get('accessToken')
   config.timeout = 10000
   if (accessToken) {
     config.headers = {
@@ -40,8 +40,8 @@ const refreshToken = async (error: AxiosError, logout: Function) => {
   }
   try {
     const result = await (await RefreshToken(refreshToken)).result
-    setCookie(REFRESH_TOKEN_KEY, result.refreshToken, 7)
-    setCookie(ACCESS_TOKEN_KEY, result.accessToken, 7)
+    Cookies.set(REFRESH_TOKEN_KEY, result.refreshToken)
+    Cookies.set(ACCESS_TOKEN_KEY, result.accessToken)
     const newConfig: AxiosRequestConfig = { ...error.config }
     newConfig.headers = {
       ...newConfig.headers,

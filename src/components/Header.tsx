@@ -4,12 +4,11 @@ import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded'
 import UserMenuPopup from './popups/UserMenuPopup'
 import { useState } from 'react'
 import { ButtonProps } from '../interfaces/Interfaces'
-import EditUserProfilePopup from './popups/EditUserProfilePopup'
 import { useNavigate } from 'react-router-dom'
 import { useAppSelector } from '../hook'
-import { getAvatarById } from '../utils/util'
-import phaserGame from '../PhaserGame'
-import Bootstrap from '../scenes/Bootstrap'
+import { ACCESS_TOKEN_KEY, getAvatarById } from '../utils/util'
+import { CreateSpacePopup } from './popups/CreateSpacePopup'
+import Cookies from 'js-cookie'
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -232,6 +231,7 @@ const Text = styled.span`
 
 export default function Header() {
   const [isUserMenuShow, setUserMenuShow] = useState(false)
+  const [showCreateSpacePopup, setShowCreateSpacePopup] = useState(false)
   const navigate = useNavigate()
   const user = useAppSelector((state) => state.user)
 
@@ -239,37 +239,43 @@ export default function Header() {
   const tabs = [0]
 
   return (
-    <HeaderContainer>
-      <LeftContent>
-        <LogoContainer>
-          <Logo src="logo_transparent.svg" />
-        </LogoContainer>
-        <Item isEnabled={activeTab == 0} onClick={() => setActiveTab(0)}>
-          <AutoAwesomeIcon /> <Text>My Spaces</Text>
-        </Item>
-      </LeftContent>
-      <RightContent>
-        <div>
-          <ButtonItem isEnabled={isUserMenuShow} onClick={() => setUserMenuShow(!isUserMenuShow)}>
-            <AvatarContainer>
-              <AvatarBackground>
-                <AvatarImg src={getAvatarById(user.character_id).img} />
-              </AvatarBackground>
-            </AvatarContainer>
-            <Text>{user.username}</Text>
-          </ButtonItem>
-          {isUserMenuShow && <UserMenuPopup />}
-        </div>
-        {!user.loggedIn && (
-          <ButtonItemPrimary onClick={() => navigate('/signin')}>
-            <Text>Sign In</Text>
-          </ButtonItemPrimary>
-        )}
-        <ButtonItemSecondary onClick={() => navigate('/test-space')}>
-          <AddCircleRoundedIcon style={{ width: '20px' }} />
-          <Text>Create Space</Text>
-        </ButtonItemSecondary>
-      </RightContent>
-    </HeaderContainer>
+    <>
+      <HeaderContainer>
+        <LeftContent>
+          <LogoContainer>
+            <Logo src="/logo_transparent.svg" />
+          </LogoContainer>
+          <Item isEnabled={activeTab == 0} onClick={() => setActiveTab(0)}>
+            <AutoAwesomeIcon /> <Text>My Spaces</Text>
+          </Item>
+        </LeftContent>
+        <RightContent>
+          <div>
+            <ButtonItem isEnabled={isUserMenuShow} onClick={() => setUserMenuShow(!isUserMenuShow)}>
+              <AvatarContainer>
+                <AvatarBackground>
+                  <AvatarImg src={"/" + getAvatarById(user.character_id).img} />
+                </AvatarBackground>
+              </AvatarContainer>
+              <Text>{user.username}</Text>
+            </ButtonItem>
+            {isUserMenuShow && <UserMenuPopup />}
+          </div>
+          {!user.loggedIn && (
+            <ButtonItemPrimary onClick={() => navigate('/signin')}>
+              <Text>Sign In</Text>
+            </ButtonItemPrimary>
+          )}
+          <button onClick={() => console.log(Cookies.get(ACCESS_TOKEN_KEY))}></button>
+          <ButtonItemSecondary onClick={() => setShowCreateSpacePopup(true)}>
+            <AddCircleRoundedIcon style={{ width: '20px' }} />
+            <Text>Create Space</Text>
+          </ButtonItemSecondary>
+        </RightContent>
+      </HeaderContainer>
+      {showCreateSpacePopup && (
+        <CreateSpacePopup onClosePopup={() => setShowCreateSpacePopup(false)} />
+      )}
+    </>
   )
 }

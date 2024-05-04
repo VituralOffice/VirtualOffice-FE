@@ -1,10 +1,13 @@
+import Cookies from 'js-cookie'
 import { resetUserState } from '../stores/UserStore'
 import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from '../utils/util'
 import ApiService from './ApiService'
-import { callApi, isApiSuccess, setCookie, setLocalStorage } from './util'
+import { isApiSuccess, setLocalStorage } from './util'
 
 export const Logout = () => {
   localStorage.removeItem('userData')
+  Cookies.remove(ACCESS_TOKEN_KEY)
+  Cookies.remove(REFRESH_TOKEN_KEY)
 }
 
 export const LoginByEmail = async (email: string) => {
@@ -17,8 +20,8 @@ export const VerifyOtpLogin = async (email: string, otp: string) => {
   const response = await ApiService.getInstance().post('/auth/verify', { email, otp })
   if (isApiSuccess(response)) {
     setLocalStorage('userData', response.result.user)
-    setCookie(ACCESS_TOKEN_KEY, response.result.accessToken, 7)
-    setLocalStorage(REFRESH_TOKEN_KEY, response.result.refreshToken)
+    Cookies.set(ACCESS_TOKEN_KEY, response.result.accessToken)
+    Cookies.set(REFRESH_TOKEN_KEY, response.result.refreshToken)
   }
   return response
 }

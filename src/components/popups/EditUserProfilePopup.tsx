@@ -244,7 +244,7 @@ const EditUserProfilePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
         </IconCloseContainer>
         <PopupContent>
           <UpperContentContainer>
-            <img src={avatars[user.character_id].img} />
+            <img src={"/" + avatars[user.character_id].img} />
             <UserShadow />
           </UpperContentContainer>
           <UsernameTopDisplay>

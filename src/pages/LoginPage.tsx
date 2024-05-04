@@ -7,14 +7,10 @@ import { isApiSuccess } from '../apis/util'
 import { setLoggedIn, setUserInfo } from '../stores/UserStore'
 import { useAppDispatch } from '../hook'
 import CircularIndeterminate, {
-  FacebookCircularProgress,
-  GradientCircularProgress,
 } from '../components/loadings/LoadingIcon'
 import React from 'react'
 import { spinAnimation } from '../anims/CssAnims'
 import AutorenewRoundedIcon from '@mui/icons-material/AutorenewRounded'
-import { setTokenToCookie } from '../utils/util'
-import { Button } from '@mui/material'
 import { API_URL } from '../constant'
 
 const Container = styled.div`
@@ -432,10 +428,10 @@ export default function LoginPage() {
             {!otpShow ? (
               <div>
                 <HeaderDecorationContainer>
-                  <img src="assets/login/Adam_login.png"></img>
-                  <img src="assets/login/Ash_login.png"></img>
-                  <img src="assets/login/Lucy_login.png"></img>
-                  <img src="assets/login/Nancy_login.png"></img>
+                  <img src="/assets/login/Adam_login.png"></img>
+                  <img src="/assets/login/Ash_login.png"></img>
+                  <img src="/assets/login/Lucy_login.png"></img>
+                  <img src="/assets/login/Nancy_login.png"></img>
                 </HeaderDecorationContainer>
                 <HeaderTitle>
                   <span>Welcome to Virtual Office</span>
@@ -490,10 +486,10 @@ export default function LoginPage() {
             ) : (
               <div>
                 <HeaderDecorationContainer>
-                  <img src="assets/login/Adam_login.png"></img>
-                  <img src="assets/login/Ash_login.png"></img>
-                  <img src="assets/login/Lucy_login.png"></img>
-                  <img src="assets/login/Nancy_login.png"></img>
+                  <img src="/assets/login/Adam_login.png"></img>
+                  <img src="/assets/login/Ash_login.png"></img>
+                  <img src="/assets/login/Lucy_login.png"></img>
+                  <img src="/assets/login/Nancy_login.png"></img>
                 </HeaderDecorationContainer>
                 <HeaderTitle>
                   <span>Enter your code</span>

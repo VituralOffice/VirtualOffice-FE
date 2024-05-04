@@ -207,7 +207,7 @@ export default function SpaceDashboardSidebar({ menuId, setMenuId }) {
           <UserAvatar>
             <div>
               <div>
-                <img src="assets/login/Adam_login.png" />
+                <img src="/assets/login/Adam_login.png" />
               </div>
             </div>
           </UserAvatar>

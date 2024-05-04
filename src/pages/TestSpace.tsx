@@ -25,15 +25,13 @@ export default function TestSpace() {
   useEffect(() => {
     if (!lobbyJoined || !user.loggedIn) {
       navigate('/app')
-      return
+    return
     }
-    const bootstrap = phaserGame.scene.keys.bootstrap as Bootstrap
-
     const boostIntoGame = () => {
-      bootstrap.launchGame()
+      Bootstrap.getInstance()?.launchGame()
     }
     // todo: create/get room to get roomId
-    bootstrap.network
+    Bootstrap.getInstance()?.network
       .createCustom({
         name: 'Sky office',
         id: `662612dd90ff2c6a324dc39a`,
@@ -43,7 +41,7 @@ export default function TestSpace() {
       .then(() => boostIntoGame())
       .catch((error) => console.error(error))
 
-    return () => bootstrap.stopGame()
+    return () => Bootstrap.getInstance()?.stopGame()
   }, []) // Chạy chỉ một lần khi ứng dụng khởi động
-  return preJoinPageShow ? <JoinOfficePage onSubmit={JoinOffice} /> : <></>
+  return <></>
 }

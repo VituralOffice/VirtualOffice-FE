@@ -68,7 +68,7 @@ export default function LoadingPage() {
                     <Container>
                         <div>
                             <div>
-                                <Spinner src="logo_transparent.svg" />
+                                <Spinner src="/logo_transparent.svg" />
                                 <LoadingText>Loading ...</LoadingText>
                             </div>
                         </div>
