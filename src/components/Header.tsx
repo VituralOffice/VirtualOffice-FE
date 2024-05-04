@@ -6,8 +6,9 @@ import { useState } from 'react'
 import { ButtonProps } from '../interfaces/Interfaces'
 import { useNavigate } from 'react-router-dom'
 import { useAppSelector } from '../hook'
-import { getAvatarById } from '../utils/util'
+import { ACCESS_TOKEN_KEY, getAvatarById } from '../utils/util'
 import { CreateSpacePopup } from './popups/CreateSpacePopup'
+import Cookies from 'js-cookie'
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -242,7 +243,7 @@ export default function Header() {
       <HeaderContainer>
         <LeftContent>
           <LogoContainer>
-            <Logo src="logo_transparent.svg" />
+            <Logo src="/logo_transparent.svg" />
           </LogoContainer>
           <Item isEnabled={activeTab == 0} onClick={() => setActiveTab(0)}>
             <AutoAwesomeIcon /> <Text>My Spaces</Text>
@@ -253,7 +254,7 @@ export default function Header() {
             <ButtonItem isEnabled={isUserMenuShow} onClick={() => setUserMenuShow(!isUserMenuShow)}>
               <AvatarContainer>
                 <AvatarBackground>
-                  <AvatarImg src={getAvatarById(user.character_id).img} />
+                  <AvatarImg src={"/" + getAvatarById(user.character_id).img} />
                 </AvatarBackground>
               </AvatarContainer>
               <Text>{user.username}</Text>
@@ -265,6 +266,7 @@ export default function Header() {
               <Text>Sign In</Text>
             </ButtonItemPrimary>
           )}
+          <button onClick={() => console.log(Cookies.get(ACCESS_TOKEN_KEY))}></button>
           <ButtonItemSecondary onClick={() => setShowCreateSpacePopup(true)}>
             <AddCircleRoundedIcon style={{ width: '20px' }} />
             <Text>Create Space</Text>

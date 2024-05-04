@@ -8,6 +8,8 @@ import { useEffect, useState } from 'react'
 import { CreateRoom } from '../../apis/RoomApis';
 import { ChooseMap } from '../forms/ChooseMap';
 import { CreateRoomPanel } from '../forms/CreateRoom';
+import Bootstrap from '../../scenes/Bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 const PopupContainer = styled.div`
   display: flex;
@@ -184,6 +186,8 @@ display: flex;
 `
 
 export const CreateSpacePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
+    const navigate = useNavigate();
+
     const [stepIndex, setStepIndex] = useState(0);
     const totalSteps = 2;
     const titles = ['Choose your office template', 'Create a new office space for your team']
@@ -213,15 +217,20 @@ export const CreateSpacePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
     const checkMapSize = () => mapSize > 0;
 
     const submitForm = async () => {
-        console.log(checkSpaceName())
-        console.log(checkSecurityOption())
-        console.log(checkMapId())
-        console.log(checkMapSize())
         if (!checkSpaceName() || !checkSecurityOption() || !checkMapId() || !checkMapSize()) return;
 
         const response = await CreateRoom({ map: '6623f6a93981dda1700fc844', name: spaceName, private: securitySelectedOption == 1 })
 
-        console.log(response)
+        console.log("Room created" + response)
+        console.log(Bootstrap.getInstance() == null)
+        console.log(Bootstrap.getInstance()?.network == null)
+        await Bootstrap.getInstance()?.network.createCustom({
+            name: response.result.name,
+            id: response.result._id,
+            map: response.result.map,
+            autoDispose: false,
+        } as any);
+        navigate(`/join/${response.result._id}`);
     }
 
     const PopupContents = [<ChooseMap mapIds={mapIds} mapId={mapId} setMapId={setMapId} mapSize={mapSize} setMapSize={setMapSize} />, <CreateRoomPanel spaceName={spaceName} setSpaceName={setSpaceName} setSecuritySelectedOption={setSecuritySelectedOption} spaceOptions={spaceOptions} />]

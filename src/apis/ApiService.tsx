@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from 'axios'
-import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, getCookie, setTokenToCookie } from '../utils/util'
+import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from '../utils/util'
 import { API_URL } from '../constant'
+import Cookies from 'js-cookie'
 
 class ApiService {
   private static instance: ApiService | null = null // Biến static để lưu trữ instance của ApiService
@@ -12,7 +13,7 @@ class ApiService {
       withCredentials: true,
     })
     this.axiosInstance.interceptors.request.use((config) => {
-      const accessToken = getCookie(ACCESS_TOKEN_KEY); // Implement getAccessToken() to retrieve token
+      const accessToken = Cookies.get(ACCESS_TOKEN_KEY); // Implement getAccessToken() to retrieve token
     
       if (accessToken) {
         config.headers.Authorization = `Bearer ${accessToken}`;
@@ -30,12 +31,12 @@ class ApiService {
         const status = error?.response?.status
         const errorMessage = error?.response?.data?.message
         if (status === 401 && errorMessage === 'token expired') {
-          const refreshFromCookie = getCookie(REFRESH_TOKEN_KEY)
+          const refreshFromCookie = Cookies.get(REFRESH_TOKEN_KEY)
           if (!refreshFromCookie) return error
           // call refresh token and save to cookie
           const { accessToken, refreshToken } = await this.refreshToken(refreshFromCookie)
-          setTokenToCookie(REFRESH_TOKEN_KEY, refreshToken)
-          setTokenToCookie(ACCESS_TOKEN_KEY, accessToken)
+          Cookies.set(REFRESH_TOKEN_KEY, refreshToken)
+          Cookies.set(ACCESS_TOKEN_KEY, accessToken)
           originalRequest.headers['Authorization'] = 'Bearer ' + accessToken
           // retry pre failed request
           return this.axiosInstance.request(originalRequest)

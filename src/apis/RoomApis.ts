@@ -1,5 +1,5 @@
 import ApiService from "./ApiService"
-import { CreateRoomParams, GetRoomByUserIdParams, GetRoomParams } from "./types";
+import { CreateRoomParams, GetRoomParams } from "./types";
 
 export const CreateRoom = async (data: CreateRoomParams) => {
     // Gọi API đăng nhập
@@ -7,14 +7,14 @@ export const CreateRoom = async (data: CreateRoomParams) => {
     return response;
 }
 
-export const GetRoomData = async (data: GetRoomParams) => {
+export const GetRoomById = async (data: GetRoomParams) => {
     // Gọi API đăng nhập
-    const response = await ApiService.getInstance().get(`/rooms/${data.roomId}`);
+    const response = await ApiService.getInstance().get(`/rooms/${data._id}`);
     return response;
 }
 
-export const GetRoomsByUserId = async (data: GetRoomByUserIdParams) => {
+export const GetRoomsByUserId = async () => {
     // Gọi API đăng nhập
-    const response = await ApiService.getInstance().get(`/rooms/${data.userId}`);
+    const response = await ApiService.getInstance().get(`/rooms`);
     return response;
 }

@@ -22,6 +22,8 @@ import { useAppSelector } from '../hook'
 import { avatars } from '../utils/util'
 
 export default class Game extends Phaser.Scene {
+  private static instance: Game | null = null; // Biến static instance
+
   network!: Network
   private cursors!: NavKeys
   private keyE!: Phaser.Input.Keyboard.Key
@@ -35,6 +37,12 @@ export default class Game extends Phaser.Scene {
 
   constructor() {
     super('game')
+    console.log("Initialize Game")
+    Game.instance = this;
+  }
+
+  static getInstance(): Game | null {
+    return Game.instance;
   }
 
   registerKeys() {
@@ -81,7 +89,7 @@ export default class Game extends Phaser.Scene {
     groundLayer!.setCollisionByProperty({ collides: true })
 
     // debugDraw(groundLayer, this)
-    
+
     this.myPlayer = this.add.myPlayer(705, 500, 'adam', this.network.mySessionId)
     this.playerSelector = new PlayerSelector(this, 0, 0, 16, 16)
 

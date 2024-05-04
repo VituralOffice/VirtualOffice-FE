@@ -2,6 +2,7 @@ import { Schema, ArraySchema, SetSchema, MapSchema } from '@colyseus/schema'
 import { IUser } from '../interfaces/user'
 
 export interface IPlayer extends IUser, Schema {
+  name: string
   x: number
   y: number
   anim: string

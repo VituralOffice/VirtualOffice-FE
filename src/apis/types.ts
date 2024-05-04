@@ -5,9 +5,5 @@ export type CreateRoomParams = {
 }
 
 export type GetRoomParams = {
-    roomId: string,
-}
-
-export type GetRoomByUserIdParams = {
-    userId: string,
+    _id: string,
 }

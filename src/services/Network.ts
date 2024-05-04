@@ -19,9 +19,9 @@ import {
 } from '../stores/ChatStore'
 import { ItemType } from '../types/Items'
 import { Message } from '../types/Messages'
-import { getCookie } from '../apis/util'
 import { ACCESS_TOKEN_KEY } from '../utils/util'
 import { API_URL } from '../constant'
+import Cookies from 'js-cookie'
 
 export default class Network {
   private client: Client
@@ -32,16 +32,14 @@ export default class Network {
   mySessionId!: string
 
   constructor() {
-    //const protocol = window.location.protocol.replace('http', 'ws')
-    // const endpoint =
-    //   process.env.NODE_ENV === 'production'
-    //     ? import.meta.env.VITE_SERVER_URL
-    //     : `${protocol}//${window.location.hostname}:2567`
     console.log("Init Network")
     const endpoint = API_URL.replace(`https`, `wss`)
+    // const endpoint = API_URL.replace(`http`, `ws`)
     this.client = new Client(endpoint)
-    this.client.auth.token = getCookie(ACCESS_TOKEN_KEY) as string
+    this.client.auth.token = Cookies.get(ACCESS_TOKEN_KEY) as string
+    console.log("client token: " + this.client.auth.token)
     this.joinLobbyRoom().then(() => {
+      console.log("Lobby joined")
       store.dispatch(setLobbyJoined(true))
     })
 
@@ -85,6 +83,7 @@ export default class Network {
   // method to create a custom room
   async createCustom(roomData: IRoomData) {
     this.room = await this.client.create(RoomType.CUSTOM, roomData)
+    console.log("Room created")
     this.initialize()
   }
 

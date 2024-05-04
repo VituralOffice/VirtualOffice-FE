@@ -1,7 +1,6 @@
 import styled from 'styled-components'
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
 import { MutableRefObject, SetStateAction, useEffect, useRef, useState } from 'react'
-import SpaceItem from '../components/SpaceItem'
 import { ButtonProps } from '../interfaces/Interfaces'
 import Header from '../components/Header'
 import { useDispatch } from 'react-redux'
@@ -12,6 +11,7 @@ import { useNavigate } from 'react-router-dom'
 import { GetRoomsByUserId } from '../apis/RoomApis'
 import { useAppSelector } from '../hook'
 import { isApiSuccess } from '../apis/util'
+import { SpaceItem } from '../components/SpaceItem'
 
 const TopBar = styled.div`
   display: flex;
@@ -158,7 +158,7 @@ const SpacesGrid = styled.div`
 `
 
 export default function SpacePage() {
-  const [activeSpaceItemId, setActiveSpaceItemId] = useState(-1)
+  const [activeSpaceItemId, setActiveSpaceItemId] = useState('')
   const [spaces, setSpaces] = useState<any[]>([])
   const user = useAppSelector((state) => state.user)
   const navigate = useNavigate()
@@ -166,7 +166,6 @@ export default function SpacePage() {
   const getUserProfile = async () => {
     try {
       const response = await ApiService.getInstance().get('/users/profile')
-      console.log(response)
       if (response.message === `Success` && response.result) {
         setLocalStorage('userData', response.result)
         dispatch(setUserInfo(response.result))
@@ -181,48 +180,39 @@ export default function SpacePage() {
     }
   }
   useEffect(() => {
-    console.log(`first user profile`)
     getUserProfile()
   }, [])
-  const handleOptionPopupShow = (itemId: SetStateAction<number>) => {
+  const handleOptionPopupShow = (itemId: SetStateAction<string>) => {
     if (activeSpaceItemId === itemId) {
-      setActiveSpaceItemId(-1)
+      setActiveSpaceItemId('')
       return
     }
     setActiveSpaceItemId(itemId)
   }
 
-  const spaceItemIds = [1, 2, 3, 4]
+  // const handleClickOutside = () => {
+  //   if (activeSpaceItemId !== '') {
+  //     handleOptionPopupShow('')
+  //     console.log(activeSpaceItemId)
+  //   }
+  // }
 
-  const handleClickOutside = () => {
-    if (activeSpaceItemId !== -1) {
-      handleOptionPopupShow(-1)
-      console.log(activeSpaceItemId)
-    }
-  }
+  // useEffect(() => {
+  //   document.addEventListener('click', handleClickOutside)
 
-  useEffect(() => {
-    document.addEventListener('click', handleClickOutside)
-
-    return () => {
-      document.removeEventListener('click', handleClickOutside)
-    }
-  }, [])
+  //   return () => {
+  //     document.removeEventListener('click', handleClickOutside)
+  //   }
+  // }, [])
 
   useEffect(() => {
     const GetRoomsData = async () => {
-      const response = await GetRoomsByUserId({ userId: user.userId })
+      const response = await GetRoomsByUserId()
       if (isApiSuccess(response)) {
-        setSpaces(response.result)
+        setSpaces([...response.result])
       }
     }
     GetRoomsData()
-
-    document.addEventListener('click', handleClickOutside)
-
-    return () => {
-      document.removeEventListener('click', handleClickOutside)
-    }
   }, [])
 
   return (
@@ -244,7 +234,7 @@ export default function SpacePage() {
           {spaces.map((space) => (
             <SpaceItem
               key={space._id}
-              id={space._id}
+              room={space}
               isOptionPopupShow={activeSpaceItemId === space._id}
               setOptionPopupShow={handleOptionPopupShow}
             />

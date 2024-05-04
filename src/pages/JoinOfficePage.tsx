@@ -6,10 +6,13 @@ import { useEffect, useState } from 'react'
 import { MenuPopupContainer, MenuPopupItem } from '../components/popups/DashboardUserMenuPopup'
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
 import { avatars } from '../utils/util'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useSignOut } from '../apis/AuthApis'
 import EditUserCharacterPopup from '../components/popups/EditUserCharacterPopup'
 import UserDeviceSettings from '../components/officeJoin/UserDeviceSettings'
+import Bootstrap from '../scenes/Bootstrap'
+import { useDispatch } from 'react-redux'
+import { setPlayerName as setPlayerNameFromRedux } from '../stores/UserStore'
 
 //#region
 const Background = styled.div`
@@ -65,7 +68,7 @@ const EmailButton = styled.div<ButtonProps>`
       transition: all 0.25s ease-in-out 0s;
       overflow: hidden;
       background-color: ${(props) =>
-        props.isEnabled ? 'rgba(255, 255, 255, 0.1)' : 'transparent'};
+    props.isEnabled ? 'rgba(255, 255, 255, 0.1)' : 'transparent'};
       &:hover {
         background-color: rgba(255, 255, 255, 0.1);
       }
@@ -275,16 +278,71 @@ function EmailMenu() {
   )
 }
 
-export function JoinOfficePage({ onSubmit }) {
+const PageContainer = styled.div`
+display: flex;
+width: 100%;
+height: 100%;
+justify-content: center;
+align-items: center;
+
+background-color: linear-gradient(rgb(30, 37, 82) 20.28%, rgb(56, 45, 119) 89.8%);
+`
+
+const Logo = styled.div`
+position: absolute;
+    top: 24px;
+    left: 32px;
+    &>button{
+      height: 35px;
+      color: rgb(255, 255, 255);
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+      &>svg{
+        width: auto;
+    height: 100%;
+}
+      }
+    }
+`
+
+
+function PasswordRequirePanel() {
+
+  return (
+    <PageContainer>
+      <Logo><img src="LogoWithText.svg" /></Logo>
+    </PageContainer>
+  )
+}
+
+export function JoinOfficePage() {
+  let { roomId } = useParams();
   const [isEditUserCharacterPopupShow, setEditUserCharacterPopupShow] = useState(false)
   const user = useAppSelector((state) => state.user)
   const [playerName, setPlayerName] = useState(user.username)
+  const [password, setPassword] = useState('')
   const [menuShow, setMenuShow] = useState(false)
   const navigate = useNavigate()
+  const dispatch = useDispatch();
 
-  const handleJoin = (event) => {
-    event.preventDefault()
-    onSubmit()
+  const handleJoin = async () => {
+    try {
+      await Bootstrap.getInstance()?.network.joinCustomById(roomId!, password);
+      // await Bootstrap.getInstance()?.network.createCustom({
+      //   name: "test",
+      //   id: roomId,
+      //   map: "6623f6a93981dda1700fc844",
+      //   autoDispose: false,
+      // } as any);
+
+      dispatch(setPlayerNameFromRedux(playerName));
+      navigate(`/room/${roomId}`);
+    }
+    catch (e) {
+      console.log(e)
+      navigate('/')
+    }
   }
 
   const preventDefaultSubmit = (event) => {
@@ -304,7 +362,7 @@ export function JoinOfficePage({ onSubmit }) {
             <TopContent>
               <LogoButton onClick={() => navigate('/app')}>
                 <img
-                  src="LogoWithText.svg"
+                  src="/LogoWithText.svg"
                   style={{
                     width: 'auto',
                     height: '100%',
@@ -342,7 +400,7 @@ export function JoinOfficePage({ onSubmit }) {
                         >
                           <div className="avatar-block">
                             <div className="shadow"></div>
-                            <img src={avatars[user.character_id].img} alt="" />
+                            <img src={"/" + avatars[user.character_id].img} alt="" />
                           </div>
                           <div className="edit-button">
                             <span>Edit</span>

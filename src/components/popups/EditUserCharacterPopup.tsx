@@ -242,7 +242,7 @@ const EditUserCharacterPopup: React.FC<PopupProps> = ({ onClosePopup }) => {
         </IconCloseContainer>
         <PopupContent>
           <UpperContentContainer>
-            <img src={avatars[avatarIdx].img} />
+            <img src={"/" + avatars[avatarIdx].img} />
             <UserShadow />
           </UpperContentContainer>
           <UsernameTopDisplay>
@@ -253,7 +253,7 @@ const EditUserCharacterPopup: React.FC<PopupProps> = ({ onClosePopup }) => {
               <StyledSlider {...settings} style={{ maxWidth: '100%' }}>
                 {avatars.map((avatar, index) => (
                   <div key={index}>
-                    <img src={avatar.img} alt={`Skin ${index}`} style={{ margin: '0 auto', imageRendering: 'pixelated', width: '96px', height: '144px', objectFit: 'cover' }} />
+                    <img src={"/" + avatar.img} alt={`Skin ${index}`} style={{ margin: '0 auto', imageRendering: 'pixelated', width: '96px', height: '144px', objectFit: 'cover' }} />
                   </div>
                 ))}
               </StyledSlider>

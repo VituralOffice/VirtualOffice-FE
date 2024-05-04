@@ -5,6 +5,8 @@ import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 import { useRef, useState } from "react";
 import { ButtonProps } from "../interfaces/Interfaces";
 import SpaceOptionPopup from "./popups/SpaceOptionPopup";
+import { IRoomData } from "../types/Rooms";
+import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`
 display: flex;
@@ -186,17 +188,24 @@ width: auto;
     }
 `
 
-export default function SpaceItem({ id, isOptionPopupShow, setOptionPopupShow }) {
+interface SpaceItemProps {
+    room: IRoomData; // Declare room as type IRoomData
+    isOptionPopupShow: boolean;
+    setOptionPopupShow: React.Dispatch<React.SetStateAction<string>>;
+}
+
+export const SpaceItem: React.FC<SpaceItemProps> = ({ room, isOptionPopupShow, setOptionPopupShow }) => {
     const [isEnterSpaceVisible, setEnterSpaceVisible] = useState(false);
+    const navigate = useNavigate();
 
     const handleButtonClick = (event) => {
         event.stopPropagation();
-        setOptionPopupShow(id);
+        setOptionPopupShow(room._id);
     };
 
     return (
         <Container>
-            <MapDisplay onMouseEnter={() => setEnterSpaceVisible(true)} onMouseLeave={() => setEnterSpaceVisible(false)}>
+            <MapDisplay onMouseEnter={() => setEnterSpaceVisible(true)} onMouseLeave={() => setEnterSpaceVisible(false)} onClick={() => navigate(`/join/${room._id}`)}>
                 <SpaceLink>
                     <SpaceMapInside />
                 </SpaceLink>
@@ -213,7 +222,7 @@ export default function SpaceItem({ id, isOptionPopupShow, setOptionPopupShow })
                 </EnterSpaceContainer>
             </MapDisplay>
             <DetailsDisplay>
-                <SpaceName>Space Name</SpaceName>
+                <SpaceName>{room.name}</SpaceName>
                 <div style={{
                     display: 'flex',
                     alignItems: 'center'

@@ -12,6 +12,7 @@ import LoadingPage from './pages/LoadingPage'
 import TestSpace from './pages/TestSpace'
 import { getLocalStorage } from './apis/util'
 import { OfficeSpace } from './pages/OfficeSpace'
+import { JoinOfficePage } from './pages/JoinOfficePage'
 
 const Backdrop = styled.div`
   position: absolute;
@@ -52,6 +53,7 @@ function App() {
             <Route path="/dashboard" element={<SpaceDashboardPage />} />
             {/* <Route path="/dashboard" element={user.loggedIn ? <Navigate to="/app" replace /> : <SpaceDashboardPage />} /> */}
             <Route path="/test-space" element={<TestSpace />} />
+            <Route path="/join/:roomId" element={<JoinOfficePage />} />
             <Route path="/room/:roomId" element={<OfficeSpace />} />
           </Routes>
         </React.Fragment>
