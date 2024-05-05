@@ -12,9 +12,9 @@ export default class Bootstrap extends Phaser.Scene {
 
     constructor() {
         super('bootstrap')
-        // Gán instance cho biến static khi lớp được khởi tạo
-        console.log("Initialize Bootstrap")
+        console.log("Construct Bootstrap")
         Bootstrap.instance = this;
+        // this.network = new Network()
     }
 
     static getInstance(): Bootstrap | null {
@@ -22,6 +22,7 @@ export default class Bootstrap extends Phaser.Scene {
     }
 
     preload() {
+        console.log("Bootstrap preload")
         this.load.atlas(
             'cloud_day',
             '/assets/background/cloud_day.png',
@@ -93,6 +94,7 @@ export default class Bootstrap extends Phaser.Scene {
     }
 
     init() {
+        console.log("Init bootstrap")
         this.network = new Network()
     }
 
@@ -100,8 +102,17 @@ export default class Bootstrap extends Phaser.Scene {
         this.scene.launch('background', { backgroundMode })
     }
 
+    // launchBootstrap() {
+    //     console.log("Launch Bootstrap")
+    //     // Check for preload completion before launching game
+    // }
+
+    create() {
+        this.launchGame();
+    }
+
     launchGame() {
-        if (!this.preloadComplete) return
+        if (!this.preloadComplete) return;
         this.network.webRTC?.checkPreviousPermission()
         this.scene.launch('game', {
             network: this.network,
@@ -112,11 +123,11 @@ export default class Bootstrap extends Phaser.Scene {
         console.log("Launch Game")
     }
 
-    stopGame() {
+    stop() {
         console.log("Stop Game")
         this.scene.stop('background')
         this.scene.stop('game')
-        store.dispatch(setRoomJoined(true))
+        store.dispatch(setRoomJoined(false))
     }
 
     changeBackgroundMode(backgroundMode: BackgroundMode) {

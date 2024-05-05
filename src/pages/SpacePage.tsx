@@ -8,7 +8,7 @@ import ApiService from '../apis/ApiService'
 import { setLocalStorage } from '../apis/util'
 import { setLoggedIn, setUserInfo } from '../stores/UserStore'
 import { useNavigate } from 'react-router-dom'
-import { GetRoomsByUserId } from '../apis/RoomApis'
+import { GetRoomsByUserId, InviteUserToRoom, JoinRoom } from '../apis/RoomApis'
 import { useAppSelector } from '../hook'
 import { isApiSuccess } from '../apis/util'
 import { SpaceItem } from '../components/SpaceItem'
@@ -161,27 +161,7 @@ export default function SpacePage() {
   const [activeSpaceItemId, setActiveSpaceItemId] = useState('')
   const [spaces, setSpaces] = useState<any[]>([])
   const user = useAppSelector((state) => state.user)
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
-  const getUserProfile = async () => {
-    try {
-      const response = await ApiService.getInstance().get('/users/profile')
-      if (response.message === `Success` && response.result) {
-        setLocalStorage('userData', response.result)
-        dispatch(setUserInfo(response.result))
-        dispatch(setLoggedIn(true))
-      } else {
-        dispatch(setLoggedIn(false))
-        navigate('/signin')
-      }
-    } catch (error) {
-      dispatch(setLoggedIn(false))
-      navigate('/signin')
-    }
-  }
-  useEffect(() => {
-    getUserProfile()
-  }, [])
+
   const handleOptionPopupShow = (itemId: SetStateAction<string>) => {
     if (activeSpaceItemId === itemId) {
       setActiveSpaceItemId('')
@@ -189,6 +169,11 @@ export default function SpacePage() {
     }
     setActiveSpaceItemId(itemId)
   }
+
+  const [inviteRoomId, setInviteRoomId] = useState('')
+  const [inviteUserEmail, setInviteUserEmail] = useState('')
+  const [joinRoomId, setJoinRoomId] = useState('')
+  const [joinToken, setJoinToken] = useState('')
 
   // const handleClickOutside = () => {
   //   if (activeSpaceItemId !== '') {
@@ -219,6 +204,14 @@ export default function SpacePage() {
     <>
       <Header />
       <TopBar>
+        invite:
+        <input placeholder='roomId' value={inviteRoomId} onChange={(e) => setInviteRoomId(e.target.value)} type="text" />
+        <input placeholder='email' value={inviteUserEmail} onChange={(e) => setInviteUserEmail(e.target.value)} type="text" />
+        <button onClick={() => InviteUserToRoom({ roomId: inviteRoomId, email: inviteUserEmail })}>invite</button>
+        join:
+        <input placeholder='roomId' value={joinRoomId} onChange={(e) => setJoinRoomId(e.target.value)} type="text" />
+        <input placeholder='token' value={joinToken} onChange={(e) => setJoinToken(e.target.value)} type="text" />
+        <button onClick={() => JoinRoom({ roomId: joinRoomId, token: joinToken })}>join</button>
         <GroupedButtons />
         <SearchBarContainer>
           <SearchBarInner>

@@ -205,7 +205,7 @@ export const SpaceItem: React.FC<SpaceItemProps> = ({ room, isOptionPopupShow, s
 
     return (
         <Container>
-            <MapDisplay onMouseEnter={() => setEnterSpaceVisible(true)} onMouseLeave={() => setEnterSpaceVisible(false)} onClick={() => navigate(`/join/${room._id}`)}>
+            <MapDisplay onMouseEnter={() => setEnterSpaceVisible(true)} onMouseLeave={() => setEnterSpaceVisible(false)} onClick={() => navigate(`/room/${room._id}`)}>
                 <SpaceLink>
                     <SpaceMapInside />
                 </SpaceLink>

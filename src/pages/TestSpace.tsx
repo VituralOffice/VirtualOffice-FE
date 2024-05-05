@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import phaserGame from '../PhaserGame'
 import Bootstrap from '../scenes/Bootstrap'
 import Game from '../scenes/Game'
 import { useAppSelector } from '../hook'
@@ -10,15 +9,14 @@ export default function TestSpace() {
   const [preJoinPageShow, setPreJoinPageShow] = useState(true)
   const user = useAppSelector((state) => state.user)
   const lobbyJoined = useAppSelector((state) => state.room.lobbyJoined)
-  const game = phaserGame.scene.keys.game as Game
   const navigate = useNavigate()
   //const { roomId } = queryString.parse(useLocation().search)
   //console.log({ roomId })
   const JoinOffice = (playerName: string) => {
-    game.registerKeys()
-    game.myPlayer.setPlayerName(playerName)
-    game.myPlayer.setPlayerTexture(avatars[user.character_id].name)
-    game.network.readyToConnect()
+    Game.getInstance()?.registerKeys()
+    Game.getInstance()?.myPlayer.setPlayerName(playerName)
+    Game.getInstance()?.myPlayer.setPlayerTexture(avatars[user.character_id].name)
+    Game.getInstance()?.network.readyToConnect()
     setPreJoinPageShow(false)
   }
 
@@ -41,7 +39,7 @@ export default function TestSpace() {
       .then(() => boostIntoGame())
       .catch((error) => console.error(error))
 
-    return () => Bootstrap.getInstance()?.stopGame()
+    return () => Bootstrap.getInstance()?.stop()
   }, []) // Chạy chỉ một lần khi ứng dụng khởi động
   return <></>
 }

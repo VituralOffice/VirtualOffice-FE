@@ -32,12 +32,11 @@ export default class Network {
   mySessionId!: string
 
   constructor() {
-    console.log("Init Network")
-    const endpoint = API_URL.replace(`https`, `wss`)
-    // const endpoint = API_URL.replace(`http`, `ws`)
+    console.log("Construct Network")
+    // const endpoint = API_URL.replace(`https`, `wss`)
+    const endpoint = API_URL.replace(`http`, `ws`)
     this.client = new Client(endpoint)
     this.client.auth.token = Cookies.get(ACCESS_TOKEN_KEY) as string
-    console.log("client token: " + this.client.auth.token)
     this.joinLobbyRoom().then(() => {
       console.log("Lobby joined")
       store.dispatch(setLobbyJoined(true))
@@ -74,9 +73,15 @@ export default class Network {
     this.initialize()
   }
 
+  // // method to join a custom room
+  // async joinCustomById(roomId: string, password: string | null) {
+  //   this.room = await this.client.joinById(roomId, { password })
+  //   this.initialize()
+  // }
+
   // method to join a custom room
-  async joinCustomById(roomId: string, password: string | null) {
-    this.room = await this.client.joinById(roomId, { password })
+  async joinCustomById(roomId: string) {
+    this.room = await this.client.joinById(roomId)
     this.initialize()
   }
 

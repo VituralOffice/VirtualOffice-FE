@@ -1,32 +1,4 @@
 import Phaser from 'phaser'
-import Game from './scenes/Game'
-import Background from './scenes/Background'
-import Bootstrap from './scenes/Bootstrap'
-
-// const config: Phaser.Types.Core.GameConfig = {
-//   type: Phaser.AUTO,
-//   parent: 'phaser-container',
-//   backgroundColor: '#93cbee',
-//   pixelArt: true, // Prevent pixel art from becoming blurred when scaled.
-//   scale: {
-//     mode: Phaser.Scale.ScaleModes.RESIZE,
-//     width: window.innerWidth,
-//     height: window.innerHeight,
-//   },
-//   physics: {
-//     default: 'arcade',
-//     arcade: {
-//       gravity: { x: 0, y: 0 },
-//       debug: false,
-//     },
-//   },
-//   autoFocus: true,
-//   scene: [Bootstrap, Background, Game],
-// }
-
-// const phaserGame = new Phaser.Game(config);
-
-// (window as any).game = phaserGame;
 
 const loadBootstrapScene = async () => {
   const BootstrapModule = await import('./scenes/Bootstrap');
@@ -41,12 +13,17 @@ const loadBackgroundScene = async () => {
   return BackgroundModule.default;
 };
 
-const initGame = async () => {
+let PhaserGame: Phaser.Game | null = null;
+
+export const InitGame = async () => {
+  console.log("Init Phaser Game")
+
   const Bootstrap = await loadBootstrapScene();
   const Game = await loadGameScene();
   const Background = await loadBackgroundScene();
+
   const config: Phaser.Types.Core.GameConfig = {
-    type: Phaser.AUTO,
+    type: Phaser.CANVAS,
     parent: 'phaser-container',
     backgroundColor: '#93cbee',
     pixelArt: true, // Prevent pixel art from becoming blurred when scaled.
@@ -64,13 +41,31 @@ const initGame = async () => {
     },
     autoFocus: true,
     scene: [Bootstrap, Background, Game],
+    fps: {
+      target: 45,
+      forceSetTimeOut: true
+    },
   }
 
-  const phaserGame = new Phaser.Game(config);
-  (window as any).game = phaserGame;
-  return phaserGame;
+  PhaserGame = new Phaser.Game(config);
+  (window as any).game = PhaserGame;
+
+  // // Khởi tạo các scene theo yêu cầu
+  // PhaserGame.scene.add('Bootstrap', Bootstrap);
+  // PhaserGame.scene.add('Game', Game);
+  // PhaserGame.scene.add('Background', Background);
 };
 
-export default initGame().then((game) => {
-  return game;
-});
+export const DestroyGame = () => {
+  console.log("Destroy Phaser Game")
+  if (PhaserGame) PhaserGame.destroy(true);
+  PhaserGame = null;
+  (window as any).game = null;
+}
+
+export const PhaserGameInstance = async () => {
+  if (PhaserGame === null) {
+    InitGame();
+  }
+  return PhaserGame;
+}

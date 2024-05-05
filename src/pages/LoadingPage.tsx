@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import styled, { keyframes } from "styled-components"
 import { spinAnimation } from "../anims/CssAnims";
+import { useDispatch } from "react-redux";
+import { GetUserProfile } from "../apis/UserApis";
+import { getLocalStorage, setLocalStorage } from "../apis/util";
+import { setLoggedIn, setUserInfo } from "../stores/UserStore";
+import { useAppSelector } from "../hook";
 
 const Container = styled.div`
     display: flex;
@@ -47,7 +52,44 @@ const LoadingText = styled.span`
 
 export default function LoadingPage() {
     const [loading, setLoading] = useState(false);
+
     const location = useLocation();
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const user = useAppSelector((state) => state.user);
+
+    const getUserProfile = async () => {
+        try {
+            const response = await GetUserProfile();
+            if (response.message === `Success` && response.result) {
+                setLocalStorage('userData', response.result)
+                dispatch(setUserInfo(response.result))
+                dispatch(setLoggedIn(true))
+            } else {
+                dispatch(setLoggedIn(false))
+                navigate('/signin')
+            }
+        } catch (error) {
+            dispatch(setLoggedIn(false))
+            navigate('/signin')
+        }
+    }
+
+    useEffect(() => {
+        if (!user.loggedIn) {
+            getUserProfile();
+            return;
+        }
+        const userData = getLocalStorage('userData')
+        if (userData) {
+            dispatch(setUserInfo(userData));
+            dispatch(setLoggedIn(true));
+        } else {
+            dispatch(setLoggedIn(false))
+            navigate('/signin')
+        }
+    }, []); // Run only once when the application starts
 
 
     useEffect(() => {

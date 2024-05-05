@@ -1,6 +1,5 @@
 import Peer from 'peerjs'
 import store from '../stores'
-import phaserGame from '../PhaserGame'
 import Game from '../scenes/Game'
 import { addVideoStream, removeVideoStream, setMyStream } from '../stores/MeetingStore'
 
@@ -65,8 +64,7 @@ export default class ShareScreenManager {
         store.dispatch(setMyStream(stream))
 
         // Call all existing users.
-        const game = phaserGame.scene.keys.game as Game
-        const meetingItem = game.meetingMap.get(store.getState().meeting.meetingId!)
+        const meetingItem = Game.getInstance()?.meetingMap.get(store.getState().meeting.meetingId!)
         if (meetingItem) {
           for (const userId of meetingItem.currentUsers) {
             this.onUserJoined(userId)
@@ -84,8 +82,7 @@ export default class ShareScreenManager {
     if (shouldDispatch) {
       store.dispatch(setMyStream(null))
       // Manually let all other existing users know screen sharing is stopped
-      const game = phaserGame.scene.keys.game as Game
-      game.network.onStopScreenShare(store.getState().meeting.meetingId!)
+      Game.getInstance()?.network.onStopScreenShare(store.getState().meeting.meetingId!)
     }
   }
 

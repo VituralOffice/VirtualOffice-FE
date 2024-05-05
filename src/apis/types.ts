@@ -7,3 +7,13 @@ export type CreateRoomParams = {
 export type GetRoomParams = {
     _id: string,
 }
+
+export type InviteUserParams = {
+    roomId: string,
+    email: string,
+}
+
+export type JoinRoomParams = {
+    roomId: string,
+    token: string,
+}
