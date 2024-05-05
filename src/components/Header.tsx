@@ -266,7 +266,6 @@ export default function Header() {
               <Text>Sign In</Text>
             </ButtonItemPrimary>
           )}
-          <button onClick={() => console.log(Cookies.get(ACCESS_TOKEN_KEY))}></button>
           <ButtonItemSecondary onClick={() => setShowCreateSpacePopup(true)}>
             <AddCircleRoundedIcon style={{ width: '20px' }} />
             <Text>Create Space</Text>

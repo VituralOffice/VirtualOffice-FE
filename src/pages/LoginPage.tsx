@@ -20,7 +20,7 @@ const Container = styled.div`
   align-items: center;
   -webkit-box-pack: center;
   justify-content: center;
-  background-image: url(assets/background/Summer2.png);
+  background-image: url(/assets/background/Summer2.png);
   background-repeat: repeat-x;
   background-size: cover;
   image-rendering: pixelated;

@@ -6,6 +6,8 @@ import { isApiSuccess } from '../apis/util'
 import Bootstrap from '../scenes/Bootstrap'
 import Game from '../scenes/Game'
 import { avatars } from '../utils/util'
+import { InitGame, DestroyGame } from '../PhaserGame'
+import { JoinOfficePage } from './JoinOfficePage'
 
 export const OfficeSpace = () => {
     const user = useAppSelector((state) => state.user)
@@ -13,27 +15,32 @@ export const OfficeSpace = () => {
     const navigate = useNavigate()
     let { roomId } = useParams();
 
+    const [joinPageShow, setJoinPageShow] = useState(true);
+
+    const handleJoin = (playerName: string) => {
+        setJoinPageShow(false);
+        if (!lobbyJoined) {
+            navigate('/app')
+            return
+        }
+        Game.getInstance()?.registerKeys()
+        Game.getInstance()?.myPlayer.setPlayerName(playerName)
+        Game.getInstance()?.myPlayer.setPlayerTexture(avatars[user.character_id].name)
+        Game.getInstance()?.network.readyToConnect()
+    }
+
     useEffect(() => {
-        Bootstrap.getInstance()?.launchGame();
-        
         const fetchData = async () => {
-            if (!lobbyJoined || !user.loggedIn || !roomId) {
-                navigate('/app')
-                return
-            }
+            await InitGame();
+            // Bootstrap.getInstance()?.launchGame();
 
             try {
-                const response = await GetRoomById({ _id: roomId });
+                const response = await GetRoomById({ _id: roomId! });
 
                 if (!isApiSuccess(response)) {
                     navigate('/app')
                     return
                 }
-
-                Game.getInstance()?.registerKeys()
-                Game.getInstance()?.myPlayer.setPlayerName(user.playerName)
-                Game.getInstance()?.myPlayer.setPlayerTexture(avatars[user.character_id].name)
-                Game.getInstance()?.network.readyToConnect()
             } catch (error) {
                 console.error(error);
             }
@@ -42,8 +49,9 @@ export const OfficeSpace = () => {
         fetchData();
 
         return () => {
-            Bootstrap.getInstance()?.stopGame();
+            DestroyGame();
         };
     }, []);
-    return <></>
+    
+    return joinPageShow && <JoinOfficePage handleSubmit={handleJoin} />
 }

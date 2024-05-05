@@ -221,9 +221,7 @@ export const CreateSpacePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
 
         const response = await CreateRoom({ map: '6623f6a93981dda1700fc844', name: spaceName, private: securitySelectedOption == 1 })
 
-        console.log("Room created" + response)
-        console.log(Bootstrap.getInstance() == null)
-        console.log(Bootstrap.getInstance()?.network == null)
+        console.log("Room created: " , response)
         await Bootstrap.getInstance()?.network.createCustom({
             name: response.result.name,
             id: response.result._id,

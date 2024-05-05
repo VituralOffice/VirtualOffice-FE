@@ -7,7 +7,8 @@ export default class Background extends Phaser.Scene {
   private backdropKey!: string
 
   constructor() {
-    super('background')
+    super({ key: 'background' })
+    console.log("Construct Background")
   }
 
   create(data: { backgroundMode: BackgroundMode }) {

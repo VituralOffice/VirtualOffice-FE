@@ -1,6 +1,5 @@
 import Peer, { MediaConnection } from 'peerjs'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import phaserGame from '../PhaserGame'
 import Game from '../scenes/Game'
 import { sanitizeId } from '../utils/util'
 import ShareScreenManager from '../web/ScreenSharingManager'
@@ -38,17 +37,15 @@ export const meetingSlice = createSlice({
       if (!state.shareScreenManager) {
         state.shareScreenManager = new ShareScreenManager(action.payload.myUserId)
       }
-      const game = phaserGame.scene.keys.game as Game
-      game.disableKeys()
+      Game.getInstance()?.disableKeys()
       state.shareScreenManager.onOpen()
       state.meetingDialogOpen = true
       state.meetingId = action.payload.meetingId
     },
     closeMeetingDialog: (state) => {
       // Tell server the meeting dialog is closed.
-      const game = phaserGame.scene.keys.game as Game
-      game.enableKeys()
-      game.network.disconnectFromMeeting(state.meetingId!)
+      Game.getInstance()?.enableKeys()
+      Game.getInstance()?.network.disconnectFromMeeting(state.meetingId!)
       for (const { call } of state.peerStreams.values()) {
         call.close()
       }

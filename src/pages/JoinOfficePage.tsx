@@ -12,7 +12,10 @@ import EditUserCharacterPopup from '../components/popups/EditUserCharacterPopup'
 import UserDeviceSettings from '../components/officeJoin/UserDeviceSettings'
 import Bootstrap from '../scenes/Bootstrap'
 import { useDispatch } from 'react-redux'
-import { setPlayerName as setPlayerNameFromRedux } from '../stores/UserStore'
+import { GetRoomById } from '../apis/RoomApis'
+import { isApiSuccess } from '../apis/util'
+import { IRoomData } from '../types/Rooms'
+import { InitGame, DestroyGame } from '../PhaserGame'
 
 //#region
 const Background = styled.div`
@@ -278,68 +281,75 @@ function EmailMenu() {
   )
 }
 
-const PageContainer = styled.div`
-display: flex;
-width: 100%;
-height: 100%;
-justify-content: center;
-align-items: center;
+// const PageContainer = styled.div`
+// display: flex;
+// width: 100%;
+// height: 100%;
+// justify-content: center;
+// align-items: center;
 
-background-color: linear-gradient(rgb(30, 37, 82) 20.28%, rgb(56, 45, 119) 89.8%);
-`
+// background-color: linear-gradient(rgb(30, 37, 82) 20.28%, rgb(56, 45, 119) 89.8%);
+// `
 
-const Logo = styled.div`
-position: absolute;
-    top: 24px;
-    left: 32px;
-    &>button{
-      height: 35px;
-      color: rgb(255, 255, 255);
-      background-color: transparent;
-      border: none;
-      cursor: pointer;
-      &>svg{
-        width: auto;
-    height: 100%;
-}
-      }
-    }
-`
+// const Logo = styled.div`
+// position: absolute;
+//     top: 24px;
+//     left: 32px;
+//     &>button{
+//       height: 35px;
+//       color: rgb(255, 255, 255);
+//       background-color: transparent;
+//       border: none;
+//       cursor: pointer;
+//       &>svg{
+//         width: auto;
+//     height: 100%;
+// }
+//       }
+//     }
+// `
 
 
-function PasswordRequirePanel() {
+// function PasswordRequirePanel() {
 
-  return (
-    <PageContainer>
-      <Logo><img src="LogoWithText.svg" /></Logo>
-    </PageContainer>
-  )
-}
+//   return (
+//     <PageContainer>
+//       <Logo><img src="/LogoWithText.svg" /></Logo>
+//     </PageContainer>
+//   )
+// }
 
-export function JoinOfficePage() {
+export function JoinOfficePage({ handleSubmit }) {
   let { roomId } = useParams();
   const [isEditUserCharacterPopupShow, setEditUserCharacterPopupShow] = useState(false)
   const user = useAppSelector((state) => state.user)
   const [playerName, setPlayerName] = useState(user.username)
-  const [password, setPassword] = useState('')
+  // const [passwordRequired, setPasswordRequired] = useState(false);
+  // const [password, setPassword] = useState('')
   const [menuShow, setMenuShow] = useState(false)
   const navigate = useNavigate()
-  const dispatch = useDispatch();
 
   const handleJoin = async () => {
     try {
-      await Bootstrap.getInstance()?.network.joinCustomById(roomId!, password);
-      // await Bootstrap.getInstance()?.network.createCustom({
-      //   name: "test",
-      //   id: roomId,
-      //   map: "6623f6a93981dda1700fc844",
-      //   autoDispose: false,
-      // } as any);
-
-      dispatch(setPlayerNameFromRedux(playerName));
-      navigate(`/room/${roomId}`);
+      await Bootstrap.getInstance()?.network.joinCustomById(roomId!);
+      handleSubmit(playerName);
     }
-    catch (e) {
+    catch (e: any) {
+      if (e.message.includes("not found")) {
+        try {
+          await Bootstrap.getInstance()?.network.createCustom({
+            name: "test",
+            id: roomId,
+            map: "6623f6a93981dda1700fc844",
+            autoDispose: false,
+          } as any);
+          handleSubmit(playerName);
+        } catch (createError) {
+          console.log('Error creating room:', createError);
+          navigate('/');
+        }
+        return;
+      }
       console.log(e)
       navigate('/')
     }
@@ -351,6 +361,9 @@ export function JoinOfficePage() {
 
   return (
     <>
+      {/* {passwordRequired ? (
+        <PasswordRequirePanel />
+      ) : ( */}
       <div
         style={{
           display: 'flex',
@@ -429,9 +442,12 @@ export function JoinOfficePage() {
           </div>
         </Background>
       </div>
-      {isEditUserCharacterPopupShow && (
-        <EditUserCharacterPopup onClosePopup={() => setEditUserCharacterPopupShow(false)} />
-      )}
+      {/* )} */}
+      {
+        isEditUserCharacterPopupShow && (
+          <EditUserCharacterPopup onClosePopup={() => setEditUserCharacterPopupShow(false)} />
+        )
+      }
     </>
   )
 }

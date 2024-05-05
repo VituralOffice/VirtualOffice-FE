@@ -15,7 +15,6 @@ export const userSlice = createSlice({
         backgroundMode: getInitialBackgroundMode(),
         sessionId: '',
         videoConnected: false,
-        playerName: '',
         playerNameMap: new Map<string, string>(),
         showJoystick: window.innerWidth < 650,
         
@@ -45,9 +44,6 @@ export const userSlice = createSlice({
         },
         setLoggedIn: (state, action: PayloadAction<boolean>) => {
             state.loggedIn = action.payload
-        },
-        setPlayerName: (state, action: PayloadAction<string>) => {
-            state.playerName = action.payload
         },
         setPlayerNameMap: (state, action: PayloadAction<{ id: string; name: string }>) => {
             state.playerNameMap.set(sanitizeId(action.payload.id), action.payload.name)
@@ -84,7 +80,6 @@ export const userSlice = createSlice({
             state.role = action.payload.role ? action.payload.role : 'user';
             state.character_id = action.payload.character_id ? action.payload.character_id : 0;
             state.isVerified = action.payload.isVerified;
-            state.playerName = state.username;
         },
 
         resetUserState: (state) => {
@@ -101,8 +96,6 @@ export const userSlice = createSlice({
             state.role = 'user';
             state.character_id = 0;
             state.isVerified = false;
-
-            state.playerName = state.username;
         },
     },
 })
@@ -112,7 +105,6 @@ export const {
     setSessionId,
     setVideoConnected,
     setLoggedIn,
-    setPlayerName,
     setPlayerNameMap,
     removePlayerNameMap,
     setShowJoystick,

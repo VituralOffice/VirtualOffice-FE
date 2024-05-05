@@ -18,8 +18,6 @@ import Item from '../items/Item'
 import { PlayerBehavior } from '../types/PlayerBehaviour'
 import { IPlayer } from '../types/ISpaceState'
 import { ItemType } from '../types/Items'
-import { useAppSelector } from '../hook'
-import { avatars } from '../utils/util'
 
 export default class Game extends Phaser.Scene {
   private static instance: Game | null = null; // Biến static instance
@@ -37,7 +35,7 @@ export default class Game extends Phaser.Scene {
 
   constructor() {
     super('game')
-    console.log("Initialize Game")
+    console.log("Construct Game")
     Game.instance = this;
   }
 

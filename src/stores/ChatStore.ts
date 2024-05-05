@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import phaserGame from '../PhaserGame'
 import Game from '../scenes/Game'
 import { IChatMessage } from '../types/ISpaceState';
 
@@ -44,8 +43,7 @@ export const chatSlice = createSlice({
       })
     },
     setFocused: (state, action: PayloadAction<boolean>) => {
-      const game = phaserGame.scene.keys.game as Game
-      action.payload ? game.disableKeys() : game.enableKeys()
+      action.payload ? Game.getInstance()?.disableKeys() : Game.getInstance()?.enableKeys()
       state.focused = action.payload
     },
     setShowChat: (state, action: PayloadAction<boolean>) => {
