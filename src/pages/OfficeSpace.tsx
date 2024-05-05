@@ -52,6 +52,10 @@ export const OfficeSpace = () => {
             DestroyGame();
         };
     }, []);
-    
-    return joinPageShow && <JoinOfficePage handleSubmit={handleJoin} />
+
+    return <>
+        {
+            joinPageShow && <JoinOfficePage handleSubmit={handleJoin} />
+        }
+    </>
 }
