@@ -18,6 +18,7 @@ import Item from '../items/Item'
 import { PlayerBehavior } from '../types/PlayerBehaviour'
 import { IPlayer } from '../types/ISpaceState'
 import { ItemType } from '../types/Items'
+import { avatars } from '../utils/util'
 
 export default class Game extends Phaser.Scene {
   private static instance: Game | null = null; // Biến static instance
@@ -152,6 +153,11 @@ export default class Game extends Phaser.Scene {
     this.network.onItemUserAdded(this.handleItemUserAdded, this)
     this.network.onItemUserRemoved(this.handleItemUserRemoved, this)
     this.network.onChatMessageAdded(this.handleChatMessageAdded, this)
+
+    this.registerKeys();
+    this.myPlayer.setPlayerName(store.getState().user.playerName);
+    this.myPlayer.setPlayerTexture(avatars[store.getState().user.character_id].name);
+    this.network.readyToConnect();
   }
 
   private handleItemSelectorOverlap(playerSelector, selectionItem) {
@@ -206,6 +212,8 @@ export default class Game extends Phaser.Scene {
 
   // function to add new player to the otherPlayer group
   private handlePlayerJoined(newPlayer: IPlayer, id: string) {
+    console.log("On player join: " + id)
+    console.log("On player join: " + newPlayer)
     const otherPlayer = this.add.otherPlayer(newPlayer.x, newPlayer.y, 'adam', id, newPlayer.name)
     this.otherPlayers.add(otherPlayer)
     this.otherPlayerMap.set(id, otherPlayer)
@@ -232,6 +240,8 @@ export default class Game extends Phaser.Scene {
   // function to update target position upon receiving player updates
   private handlePlayerUpdated(field: string, value: number | string, id: string) {
     const otherPlayer = this.otherPlayerMap.get(id)
+    console.log("Update player: " + id)
+    console.log("Update player: " + otherPlayer)
     otherPlayer?.updateOtherPlayer(field, value)
   }
 

@@ -96,6 +96,8 @@ export default class Network {
   initialize() {
     if (!this.room) return
 
+    console.log("Initilize Network")
+
     this.lobby.leave()
     this.mySessionId = this.room.sessionId
     store.dispatch(setSessionId(this.room.sessionId))
@@ -109,10 +111,14 @@ export default class Network {
       player.onChange = (changes) => {
         changes.forEach((change) => {
           const { field, value } = change
+          console.log("field: " + field)
+          console.log("value: " + value)
           phaserEvents.emit(GameEvent.PLAYER_UPDATED, field, value, key)
+          console.log("emit update event")
 
           // when a new player finished setting up player name
-          if (field === 'name' && value !== '') {
+          if (field === 'fullname' && value !== '') {
+            console.log("emit join event")
             phaserEvents.emit(GameEvent.PLAYER_JOINED, player, key)
             store.dispatch(setPlayerNameMap({ id: key, name: value }))
             store.dispatch(pushPlayerJoinedMessage(value))
@@ -191,6 +197,9 @@ export default class Network {
 
   // method to register event listener and call back function when a player joined
   onPlayerJoined(callback: (Player: IPlayer, key: string) => void, context?: any) {
+    console.log("OnUser join")
+    console.log(callback == null)
+    console.log(context == null)
     phaserEvents.on(GameEvent.PLAYER_JOINED, callback, context)
   }
 

@@ -16,6 +16,7 @@ import { GetRoomById } from '../apis/RoomApis'
 import { isApiSuccess } from '../apis/util'
 import { IRoomData } from '../types/Rooms'
 import { InitGame, DestroyGame } from '../PhaserGame'
+import { setPlayerName as setPlayerNameInRedux } from '../stores/UserStore'
 
 //#region
 const Background = styled.div`
@@ -326,24 +327,29 @@ export function JoinOfficePage({ handleSubmit }) {
   const [playerName, setPlayerName] = useState(user.username)
   // const [passwordRequired, setPasswordRequired] = useState(false);
   // const [password, setPassword] = useState('')
-  const [menuShow, setMenuShow] = useState(false)
+  const [menuShow, setMenuShow] = useState(false);
+  const [room, setRoom] = useState<IRoomData | null>();
   const navigate = useNavigate()
 
   const handleJoin = async () => {
     try {
-      await Bootstrap.getInstance()?.network.joinCustomById(roomId!);
-      handleSubmit(playerName);
+      setPlayerNameInRedux(playerName)
+      await Bootstrap.getInstance()?.network.joinCustomById(room!._id);
+      Bootstrap.getInstance()?.launchGame();
+      handleSubmit();
     }
     catch (e: any) {
       if (e.message.includes("not found")) {
         try {
+          setPlayerNameInRedux(playerName)
           await Bootstrap.getInstance()?.network.createCustom({
-            name: "test",
-            id: roomId,
-            map: "6623f6a93981dda1700fc844",
-            autoDispose: false,
+            name: room!.name,
+            id: room!._id,
+            map: room!.map,
+            autoDispose: room!.autoDispose,
           } as any);
-          handleSubmit(playerName);
+          Bootstrap.getInstance()?.launchGame();
+          handleSubmit();
         } catch (createError) {
           console.log('Error creating room:', createError);
           navigate('/');
@@ -358,6 +364,25 @@ export function JoinOfficePage({ handleSubmit }) {
   const preventDefaultSubmit = (event) => {
     event.preventDefault()
   }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await GetRoomById({ _id: roomId! });
+
+        if (!isApiSuccess(response)) {
+          navigate('/app')
+          return
+        }
+
+        setRoom(response.result)
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <>

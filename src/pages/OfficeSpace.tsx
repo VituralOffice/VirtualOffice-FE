@@ -17,33 +17,21 @@ export const OfficeSpace = () => {
 
     const [joinPageShow, setJoinPageShow] = useState(true);
 
-    const handleJoin = (playerName: string) => {
+    const handleJoin = () => {
         setJoinPageShow(false);
         if (!lobbyJoined) {
             navigate('/app')
             return
         }
-        Game.getInstance()?.registerKeys()
-        Game.getInstance()?.myPlayer.setPlayerName(playerName)
-        Game.getInstance()?.myPlayer.setPlayerTexture(avatars[user.character_id].name)
-        Game.getInstance()?.network.readyToConnect()
+        // Game.getInstance()?.registerKeys()
+        // Game.getInstance()?.myPlayer.setPlayerName(playerName)
+        // Game.getInstance()?.myPlayer.setPlayerTexture(avatars[user.character_id].name)
+        // Game.getInstance()?.network.readyToConnect()
     }
 
     useEffect(() => {
         const fetchData = async () => {
             await InitGame();
-            // Bootstrap.getInstance()?.launchGame();
-
-            try {
-                const response = await GetRoomById({ _id: roomId! });
-
-                if (!isApiSuccess(response)) {
-                    navigate('/app')
-                    return
-                }
-            } catch (error) {
-                console.error(error);
-            }
         };
 
         fetchData();
