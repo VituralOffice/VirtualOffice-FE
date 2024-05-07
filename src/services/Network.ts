@@ -22,6 +22,7 @@ import { Message } from '../types/Messages'
 import { ACCESS_TOKEN_KEY } from '../utils/util'
 import { API_URL } from '../constant'
 import Cookies from 'js-cookie'
+import Game from '../scenes/Game'
 
 export default class Network {
   private client: Client
@@ -93,8 +94,10 @@ export default class Network {
   }
 
   // set up all network listeners before the game starts
-  initialize() {
+  async initialize() {
     if (!this.room) return
+
+    console.log("Initilize Network")
 
     this.lobby.leave()
     this.mySessionId = this.room.sessionId
@@ -112,7 +115,7 @@ export default class Network {
           phaserEvents.emit(GameEvent.PLAYER_UPDATED, field, value, key)
 
           // when a new player finished setting up player name
-          if (field === 'name' && value !== '') {
+          if (field === 'fullname' && value !== '') {
             phaserEvents.emit(GameEvent.PLAYER_JOINED, player, key)
             store.dispatch(setPlayerNameMap({ id: key, name: value }))
             store.dispatch(pushPlayerJoinedMessage(value))

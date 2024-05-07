@@ -26,6 +26,8 @@ export const userSlice = createSlice({
         character_id: 0,
         isVerified: false,
         loggedIn: false,
+
+        playerName: 'Anonymous',
     },
     reducers: {
         toggleBackgroundMode: (state) => {
@@ -71,12 +73,17 @@ export const userSlice = createSlice({
             state.isVerified = action.payload
         },
 
+        setPlayerName: (state, action: PayloadAction<string>) => {
+            state.playerName = action.payload
+        },
+
         setUserInfo: (state, action: PayloadAction<UserData>) => {
             state.userId = action.payload._id;
             state.email = action.payload.email;
             if (!action.payload.fullname)
                 state.username = action.payload.email.split('@')[0]
             else state.username = action.payload.fullname;
+            state.playerName = state.username;
             state.role = action.payload.role ? action.payload.role : 'user';
             state.character_id = action.payload.character_id ? action.payload.character_id : 0;
             state.isVerified = action.payload.isVerified;
@@ -96,6 +103,8 @@ export const userSlice = createSlice({
             state.role = 'user';
             state.character_id = 0;
             state.isVerified = false;
+
+            state.playerName = state.username;
         },
     },
 })
@@ -110,6 +119,7 @@ export const {
     setShowJoystick,
     setUserId,
     setUsername,
+    setPlayerName,
     setEmail,
     setCharacterId,
     setIsVerified,

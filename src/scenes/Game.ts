@@ -18,6 +18,7 @@ import Item from '../items/Item'
 import { PlayerBehavior } from '../types/PlayerBehaviour'
 import { IPlayer } from '../types/ISpaceState'
 import { ItemType } from '../types/Items'
+import { avatars } from '../utils/util'
 
 export default class Game extends Phaser.Scene {
   private static instance: Game | null = null; // Biến static instance
@@ -152,6 +153,11 @@ export default class Game extends Phaser.Scene {
     this.network.onItemUserAdded(this.handleItemUserAdded, this)
     this.network.onItemUserRemoved(this.handleItemUserRemoved, this)
     this.network.onChatMessageAdded(this.handleChatMessageAdded, this)
+
+    this.registerKeys();
+    this.myPlayer.setPlayerName(store.getState().user.playerName);
+    this.myPlayer.setPlayerTexture(avatars[store.getState().user.character_id].name);
+    this.network.readyToConnect();
   }
 
   private handleItemSelectorOverlap(playerSelector, selectionItem) {
@@ -206,6 +212,7 @@ export default class Game extends Phaser.Scene {
 
   // function to add new player to the otherPlayer group
   private handlePlayerJoined(newPlayer: IPlayer, id: string) {
+    console.log("On player join, id: " + id + ", name: " + newPlayer.fullname)
     const otherPlayer = this.add.otherPlayer(newPlayer.x, newPlayer.y, 'adam', id, newPlayer.name)
     this.otherPlayers.add(otherPlayer)
     this.otherPlayerMap.set(id, otherPlayer)
