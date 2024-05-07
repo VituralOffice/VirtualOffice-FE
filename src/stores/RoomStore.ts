@@ -34,7 +34,6 @@ export const roomSlice = createSlice({
       state,
       action: PayloadAction<{ id: string; name: string; description: string }>
     ) => {
-      console.log("Join room: " + action.payload.id)
       state.roomId = action.payload.id
       state.roomName = action.payload.name
       state.roomDescription = action.payload.description

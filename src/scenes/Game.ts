@@ -212,8 +212,7 @@ export default class Game extends Phaser.Scene {
 
   // function to add new player to the otherPlayer group
   private handlePlayerJoined(newPlayer: IPlayer, id: string) {
-    console.log("On player join: " + id)
-    console.log("On player join: " + newPlayer)
+    console.log("On player join, id: " + id + ", name: " + newPlayer.fullname)
     const otherPlayer = this.add.otherPlayer(newPlayer.x, newPlayer.y, 'adam', id, newPlayer.name)
     this.otherPlayers.add(otherPlayer)
     this.otherPlayerMap.set(id, otherPlayer)
@@ -240,8 +239,6 @@ export default class Game extends Phaser.Scene {
   // function to update target position upon receiving player updates
   private handlePlayerUpdated(field: string, value: number | string, id: string) {
     const otherPlayer = this.otherPlayerMap.get(id)
-    console.log("Update player: " + id)
-    console.log("Update player: " + otherPlayer)
     otherPlayer?.updateOtherPlayer(field, value)
   }
 

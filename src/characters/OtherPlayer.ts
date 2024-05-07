@@ -4,6 +4,7 @@ import MyPlayer from './MyPlayer'
 import { sittingShiftData } from './Player'
 import WebRTC from '../web/WebRTC'
 import { GameEvent, phaserEvents } from '../events/EventCenter'
+import Game from '../scenes/Game'
 
 export default class OtherPlayer extends Player {
   private targetPosition: [number, number]

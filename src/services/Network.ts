@@ -22,6 +22,7 @@ import { Message } from '../types/Messages'
 import { ACCESS_TOKEN_KEY } from '../utils/util'
 import { API_URL } from '../constant'
 import Cookies from 'js-cookie'
+import Game from '../scenes/Game'
 
 export default class Network {
   private client: Client
@@ -93,7 +94,7 @@ export default class Network {
   }
 
   // set up all network listeners before the game starts
-  initialize() {
+  async initialize() {
     if (!this.room) return
 
     console.log("Initilize Network")
@@ -111,14 +112,10 @@ export default class Network {
       player.onChange = (changes) => {
         changes.forEach((change) => {
           const { field, value } = change
-          console.log("field: " + field)
-          console.log("value: " + value)
           phaserEvents.emit(GameEvent.PLAYER_UPDATED, field, value, key)
-          console.log("emit update event")
 
           // when a new player finished setting up player name
           if (field === 'fullname' && value !== '') {
-            console.log("emit join event")
             phaserEvents.emit(GameEvent.PLAYER_JOINED, player, key)
             store.dispatch(setPlayerNameMap({ id: key, name: value }))
             store.dispatch(pushPlayerJoinedMessage(value))
@@ -197,9 +194,6 @@ export default class Network {
 
   // method to register event listener and call back function when a player joined
   onPlayerJoined(callback: (Player: IPlayer, key: string) => void, context?: any) {
-    console.log("OnUser join")
-    console.log(callback == null)
-    console.log(context == null)
     phaserEvents.on(GameEvent.PLAYER_JOINED, callback, context)
   }
 

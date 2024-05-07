@@ -334,22 +334,22 @@ export function JoinOfficePage({ handleSubmit }) {
   const handleJoin = async () => {
     try {
       setPlayerNameInRedux(playerName)
-      await Bootstrap.getInstance()?.network.joinCustomById(room!._id);
       Bootstrap.getInstance()?.launchGame();
+      await Bootstrap.getInstance()?.network.joinCustomById(room!._id);
       handleSubmit();
     }
     catch (e: any) {
       if (e.message.includes("not found")) {
         try {
           setPlayerNameInRedux(playerName)
+          Bootstrap.getInstance()?.launchGame();
           await Bootstrap.getInstance()?.network.createCustom({
             name: room!.name,
             id: room!._id,
             map: room!.map,
             autoDispose: room!.autoDispose,
           } as any);
-          Bootstrap.getInstance()?.launchGame();
-          handleSubmit();
+          handleSubmit()
         } catch (createError) {
           console.log('Error creating room:', createError);
           navigate('/');
