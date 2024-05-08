@@ -225,8 +225,11 @@ export default function UserDeviceSettings() {
     navigator.mediaDevices
       .enumerateDevices()
       .then((devices) => {
-        if (!devices || devices.length == 0 || !devices[0]) return null
-        const videoDevice = devices[0]
+        const videoDevices = devices.filter((device) => device.kind === 'videoinput')
+        if (videoDevices.length === 0) {
+          throw new Error('No video input devices found.')
+        }
+        const videoDevice = videoDevices[0]
         if (videoDevice) {
           const constraints = {
             video: { deviceId: { exact: videoDevice.deviceId } },
@@ -278,9 +281,7 @@ export default function UserDeviceSettings() {
           </div>
         </div>
         <div className="camera-status-text">
-          <div>
-            <div>{videoStream == null && 'Your camera is off'}</div>
-          </div>
+          <div>{videoStream == null && 'Your camera is off'}</div>
         </div>
       </CameraDisplay>
       <CameraOptionButtonGroup>
