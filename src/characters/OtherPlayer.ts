@@ -20,13 +20,13 @@ export default class OtherPlayer extends Player {
     y: number,
     texture: string,
     id: string,
-    name: string,
+    playerName: string,
     frame?: string | number
   ) {
     super(scene, x, y, texture, id, frame)
     this.targetPosition = [x, y]
 
-    this.playerName.setText(name)
+    this.playerNameText.setText(playerName)
     this.playContainerBody = this.playerContainer.body as Phaser.Physics.Arcade.Body
   }
 
@@ -49,9 +49,9 @@ export default class OtherPlayer extends Player {
 
   updateOtherPlayer(field: string, value: number | string | boolean) {
     switch (field) {
-      case 'name':
+      case 'playerName':
         if (typeof value === 'string') {
-          this.playerName.setText(value)
+          this.playerNameText.setText(value)
         }
         break
 
@@ -178,7 +178,7 @@ declare global {
         y: number,
         texture: string,
         id: string,
-        name: string,
+        playerName: string,
         frame?: string | number
       ): OtherPlayer
     }
@@ -193,10 +193,10 @@ Phaser.GameObjects.GameObjectFactory.register(
     y: number,
     texture: string,
     id: string,
-    name: string,
+    playerName: string,
     frame?: string | number
   ) {
-    const sprite = new OtherPlayer(this.scene, x, y, texture, id, name, frame)
+    const sprite = new OtherPlayer(this.scene, x, y, texture, id, playerName, frame)
 
     this.displayList.add(sprite)
     this.updateList.add(sprite)

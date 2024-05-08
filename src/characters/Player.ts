@@ -17,7 +17,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   playerBehavior = PlayerBehavior.IDLE
   readyToConnect = false
   videoConnected = false
-  playerName: Phaser.GameObjects.Text
+  playerNameText: Phaser.GameObjects.Text
   playerContainer: Phaser.GameObjects.Container
   private playerDialogBubble: Phaser.GameObjects.Container
   private timeoutID?: number
@@ -45,13 +45,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.playerContainer.add(this.playerDialogBubble)
 
     // add playerName to playerContainer
-    this.playerName = this.scene.add
+    this.playerNameText = this.scene.add
       .text(0, 0, '')
       .setFontFamily('Arial')
       .setFontSize(12)
       .setColor('#000000')
       .setOrigin(0.5)
-    this.playerContainer.add(this.playerName)
+    this.playerContainer.add(this.playerNameText)
 
     this.scene.physics.world.enable(this.playerContainer)
     const playContainerBody = this.playerContainer.body as Phaser.Physics.Arcade.Body
@@ -78,7 +78,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     const innerTextHeight = innerText.height
     const innerTextWidth = innerText.width
 
-    innerText.setY(-innerTextHeight / 2 - this.playerName.height / 2)
+    innerText.setY(-innerTextHeight / 2 - this.playerNameText.height / 2)
     const dialogBoxWidth = innerTextWidth + 10
     const dialogBoxHeight = innerTextHeight + 3
     const dialogBoxX = innerText.x - innerTextWidth / 2 - 5

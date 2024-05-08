@@ -22,7 +22,6 @@ import { Message } from '../types/Messages'
 import { ACCESS_TOKEN_KEY } from '../utils/util'
 import { API_URL } from '../constant'
 import Cookies from 'js-cookie'
-import Game from '../scenes/Game'
 
 export default class Network {
   private client: Client
@@ -46,6 +45,16 @@ export default class Network {
     phaserEvents.on(GameEvent.MY_PLAYER_NAME_CHANGE, this.updatePlayerName, this)
     phaserEvents.on(GameEvent.MY_PLAYER_TEXTURE_CHANGE, this.updatePlayer, this)
     phaserEvents.on(GameEvent.PLAYER_DISCONNECTED, this.playerStreamDisconnect, this)
+  }
+
+  public disconnectClient() {
+    console.log("Disconnecting client");
+    this.room?.leave();
+  }
+
+  public disconnectWebRTC() {
+    console.log("Disconnecting webRTC");
+    this.webRTC?.disconnect();
   }
 
   /**
@@ -115,7 +124,7 @@ export default class Network {
           phaserEvents.emit(GameEvent.PLAYER_UPDATED, field, value, key)
 
           // when a new player finished setting up player name
-          if (field === 'fullname' && value !== '') {
+          if (field === 'playerName' && value !== '') {
             phaserEvents.emit(GameEvent.PLAYER_JOINED, player, key)
             store.dispatch(setPlayerNameMap({ id: key, name: value }))
             store.dispatch(pushPlayerJoinedMessage(value))
@@ -129,7 +138,7 @@ export default class Network {
       phaserEvents.emit(GameEvent.PLAYER_LEFT, key)
       this.webRTC?.deleteVideoStream(key)
       this.webRTC?.deleteOnCalledVideoStream(key)
-      store.dispatch(pushPlayerLeftMessage(player.name))
+      store.dispatch(pushPlayerLeftMessage(player.playerName))
       store.dispatch(removePlayerNameMap(key))
     }
 

@@ -52,6 +52,20 @@ export default class WebRTC {
     })
   }
 
+  disconnect() {
+    this.peers.forEach((peer) => {
+      peer.call.close();
+      peer.video.remove();
+    });
+    this.peers.clear();
+
+    this.onCalledPeers.forEach((onCalledPeer) => {
+      onCalledPeer.call.close();
+      onCalledPeer.video.remove();
+    });
+    this.onCalledPeers.clear();
+  }
+
   // check if permission has been granted before
   checkPreviousPermission() {
     const permissionName = 'microphone' as PermissionName
