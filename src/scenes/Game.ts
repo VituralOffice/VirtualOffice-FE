@@ -154,10 +154,10 @@ export default class Game extends Phaser.Scene {
     this.network.onItemUserRemoved(this.handleItemUserRemoved, this)
     this.network.onChatMessageAdded(this.handleChatMessageAdded, this)
 
-    this.registerKeys();
-    this.myPlayer.setPlayerName(store.getState().user.playerName);
-    this.myPlayer.setPlayerTexture(avatars[store.getState().user.character_id].name);
-    this.network.readyToConnect();
+    // this.registerKeys();
+    // this.myPlayer.setPlayerName(store.getState().user.playerName);
+    // this.myPlayer.setPlayerTexture(avatars[store.getState().user.character_id].name);
+    // this.network.readyToConnect();
   }
 
   private handleItemSelectorOverlap(playerSelector, selectionItem) {
@@ -212,8 +212,8 @@ export default class Game extends Phaser.Scene {
 
   // function to add new player to the otherPlayer group
   private handlePlayerJoined(newPlayer: IPlayer, id: string) {
-    console.log("On player join, id: " + id + ", name: " + newPlayer.fullname)
-    const otherPlayer = this.add.otherPlayer(newPlayer.x, newPlayer.y, 'adam', id, newPlayer.name)
+    console.log("Other player join, name: " + newPlayer.playerName)
+    const otherPlayer = this.add.otherPlayer(newPlayer.x, newPlayer.y, 'adam', id, newPlayer.playerName)
     this.otherPlayers.add(otherPlayer)
     this.otherPlayerMap.set(id, otherPlayer)
   }

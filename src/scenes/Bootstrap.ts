@@ -107,9 +107,9 @@ export default class Bootstrap extends Phaser.Scene {
     //     // Check for preload completion before launching game
     // }
 
-    // create() {
-    //     this.launchGame();
-    // }
+    create() {
+        this.launchGame();
+    }
 
     launchGame() {
         if (!this.preloadComplete) return;

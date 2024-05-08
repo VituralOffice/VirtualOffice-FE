@@ -17,6 +17,7 @@ import { isApiSuccess } from '../apis/util'
 import { IRoomData } from '../types/Rooms'
 import { InitGame, DestroyGame } from '../PhaserGame'
 import { setPlayerName as setPlayerNameInRedux } from '../stores/UserStore'
+import Game from '../scenes/Game'
 
 //#region
 const Background = styled.div`
@@ -320,42 +321,26 @@ function EmailMenu() {
 //   )
 // }
 
-export function JoinOfficePage({ handleSubmit }) {
-  let { roomId } = useParams();
+export function JoinOfficePage({ handleJoinRoom }) {
   const [isEditUserCharacterPopupShow, setEditUserCharacterPopupShow] = useState(false)
   const user = useAppSelector((state) => state.user)
   const [playerName, setPlayerName] = useState(user.username)
   // const [passwordRequired, setPasswordRequired] = useState(false);
   // const [password, setPassword] = useState('')
   const [menuShow, setMenuShow] = useState(false);
-  const [room, setRoom] = useState<IRoomData | null>();
   const navigate = useNavigate()
 
   const handleJoin = async () => {
     try {
+      console.log('Join! Name:', playerName, 'Avatar:', avatars[user.character_id].name)
+      await handleJoinRoom()
+      Game.getInstance()?.registerKeys()
+      Game.getInstance()?.myPlayer.setPlayerName(playerName)
+      Game.getInstance()?.myPlayer.setPlayerTexture(avatars[user.character_id].name)
+      Game.getInstance()?.network.readyToConnect()
       setPlayerNameInRedux(playerName)
-      Bootstrap.getInstance()?.launchGame();
-      await Bootstrap.getInstance()?.network.joinCustomById(room!._id);
-      handleSubmit();
     }
     catch (e: any) {
-      if (e.message.includes("not found")) {
-        try {
-          setPlayerNameInRedux(playerName)
-          Bootstrap.getInstance()?.launchGame();
-          await Bootstrap.getInstance()?.network.createCustom({
-            name: room!.name,
-            id: room!._id,
-            map: room!.map,
-            autoDispose: room!.autoDispose,
-          } as any);
-          handleSubmit()
-        } catch (createError) {
-          console.log('Error creating room:', createError);
-          navigate('/');
-        }
-        return;
-      }
       console.log(e)
       navigate('/')
     }
@@ -364,25 +349,6 @@ export function JoinOfficePage({ handleSubmit }) {
   const preventDefaultSubmit = (event) => {
     event.preventDefault()
   }
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await GetRoomById({ _id: roomId! });
-
-        if (!isApiSuccess(response)) {
-          navigate('/app')
-          return
-        }
-
-        setRoom(response.result)
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   return (
     <>

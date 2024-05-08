@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+import Bootstrap from './scenes/Bootstrap';
 
 const loadBootstrapScene = async () => {
   const BootstrapModule = await import('./scenes/Bootstrap');
@@ -14,6 +15,7 @@ const loadBackgroundScene = async () => {
 };
 
 let PhaserGame: Phaser.Game | null = null;
+let bootstrapCreatedResolver: (() => void) | null = null;
 
 export const InitGame = async () => {
   console.log("Init Phaser Game")
@@ -21,6 +23,11 @@ export const InitGame = async () => {
   const Bootstrap = await loadBootstrapScene();
   const Game = await loadGameScene();
   const Background = await loadBackgroundScene();
+
+  // Create a promise that will be resolved when the Bootstrap scene is created
+  const bootstrapCreatedPromise = new Promise<void>((resolve) => {
+    bootstrapCreatedResolver = resolve;
+  });
 
   const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.CANVAS,
@@ -50,6 +57,9 @@ export const InitGame = async () => {
   PhaserGame = new Phaser.Game(config);
   (window as any).game = PhaserGame;
 
+  // Wait for Bootstrap scene to be created before continuing
+  return bootstrapCreatedPromise;
+
   // // Khởi tạo các scene theo yêu cầu
   // PhaserGame.scene.add('Bootstrap', Bootstrap);
   // PhaserGame.scene.add('Game', Game);
@@ -57,10 +67,12 @@ export const InitGame = async () => {
 };
 
 export const DestroyGame = () => {
-  console.log("Destroy Phaser Game")
+  Bootstrap.getInstance()?.network.disconnectClient();
+  Bootstrap.getInstance()?.network.disconnectWebRTC();
   if (PhaserGame) PhaserGame.destroy(true);
   PhaserGame = null;
   (window as any).game = null;
+  console.log("Destroy Phaser Game")
 }
 
 export const PhaserGameInstance = async () => {
