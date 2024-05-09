@@ -28,6 +28,8 @@ export const userSlice = createSlice({
         loggedIn: false,
 
         playerName: 'Anonymous',
+        micDevideId: '',
+        cameraDeviceId: '',
     },
     reducers: {
         toggleBackgroundMode: (state) => {
@@ -72,9 +74,14 @@ export const userSlice = createSlice({
         setIsVerified: (state, action: PayloadAction<boolean>) => {
             state.isVerified = action.payload
         },
-
         setPlayerName: (state, action: PayloadAction<string>) => {
             state.playerName = action.payload
+        },
+        setMicDeviceId: (state, action: PayloadAction<string>) => {
+            state.micDevideId = action.payload
+        },
+        setCameraDeviceId: (state, action: PayloadAction<string>) => {
+            state.cameraDeviceId = action.payload
         },
 
         setUserInfo: (state, action: PayloadAction<UserData>) => {
@@ -105,6 +112,8 @@ export const userSlice = createSlice({
             state.isVerified = false;
 
             state.playerName = state.username;
+            state.micDevideId = '';
+            state.cameraDeviceId = '';
         },
     },
 })
@@ -123,6 +132,8 @@ export const {
     setEmail,
     setCharacterId,
     setIsVerified,
+    setMicDeviceId,
+    setCameraDeviceId,
     setUserInfo,
     resetUserState,
 } = userSlice.actions

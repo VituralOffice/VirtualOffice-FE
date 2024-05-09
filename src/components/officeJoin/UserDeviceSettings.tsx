@@ -1,13 +1,10 @@
-import { useEffect, useState } from 'react'
+import { LegacyRef, RefObject, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { ButtonProps } from '../../interfaces/Interfaces'
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded'
-import MicRoundedIcon from '@mui/icons-material/MicRounded'
-import MicOffRoundedIcon from '@mui/icons-material/MicOffRounded'
-import VideocamRoundedIcon from '@mui/icons-material/VideocamRounded'
-import VideocamOffRoundedIcon from '@mui/icons-material/VideocamOffRounded'
-import { MicOptionsPopups } from '../popups/MicOptionsPopup'
-import { VideoOptionsPopups } from '../popups/VideoOptionsPopup'
+
+import { MicToggleButton } from '../popups/MicOptionsPopup'
+import { CameraToggleButton } from '../popups/VideoOptionsPopup'
 
 const BodyLeftContent = styled.div`
   width: 100%;
@@ -100,13 +97,13 @@ const OptionButton = styled.div<ButtonProps>`
     border: none;
     border-radius: 20px;
     background-color: ${(props) =>
-      props.isEnabled ? 'rgba(6, 214, 160, 0.2)' : 'rgba(255, 48, 73, 0.2)'};
+    props.isEnabled ? 'rgba(6, 214, 160, 0.2)' : 'rgba(255, 48, 73, 0.2)'};
     transition: background-color 200ms ease 0s;
     cursor: pointer;
     position: relative;
     &:hover {
       background-color: ${(props) =>
-        props.isEnabled ? 'rgba(6, 214, 160, 0.4)' : 'rgba(255, 48, 73, 0.4)'};
+    props.isEnabled ? 'rgba(6, 214, 160, 0.4)' : 'rgba(255, 48, 73, 0.4)'};
     }
     & > span {
       display: flex;
@@ -127,7 +124,7 @@ const OptionButton = styled.div<ButtonProps>`
     width: 2px;
     height: 20px;
     background-color: ${(props) =>
-      props.isEnabled ? 'rgb(6, 214, 160)' : 'rgba(255, 48, 73, 0.2)'};
+    props.isEnabled ? 'rgb(6, 214, 160)' : 'rgba(255, 48, 73, 0.2)'};
   }
 `
 
@@ -164,22 +161,20 @@ const OptionMenuToggleButton = styled.div<ButtonProps>`
         ? 'rgba(6, 214, 160, 0.4)'
         : 'transparent'
       : props.isEnabled
-      ? 'rgba(255, 48, 73, 0.4)'
-      : 'transparent'};
+        ? 'rgba(255, 48, 73, 0.4)'
+        : 'transparent'};
 
   &:hover {
     background-color: ${(props) =>
-      props.isActive ? 'rgba(6, 214, 160, 0.4)' : 'rgba(255, 48, 73, 0.4)'};
+    props.isActive ? 'rgba(6, 214, 160, 0.4)' : 'rgba(255, 48, 73, 0.4)'};
   }
 `
 
-function CustomToggleButton({ onToggle, onMenuToggle, OnIcon, OffIcon, MenuPopup, menuShow }) {
-  const [isButtonEnabled, setIsButtonEnabled] = useState(false)
+export function CustomToggleButton({ enabled, onToggle, onMenuToggle, OnIcon, OffIcon, MenuPopup, menuShow }) {
 
   const handleToggle = (e) => {
     e.stopPropagation()
-    onToggle(!isButtonEnabled)
-    setIsButtonEnabled(!isButtonEnabled)
+    onToggle()
   }
 
   const handleToggleOpenMenu = (e) => {
@@ -189,13 +184,13 @@ function CustomToggleButton({ onToggle, onMenuToggle, OnIcon, OffIcon, MenuPopup
 
   return (
     <>
-      <OptionButton isEnabled={isButtonEnabled} onClick={handleToggle}>
+      <OptionButton isEnabled={enabled} onClick={handleToggle}>
         <button className="button-icon">
-          <span>{isButtonEnabled ? OnIcon : OffIcon}</span>
+          <span>{enabled ? OnIcon : OffIcon}</span>
         </button>
         <div className="line"></div>
         <OptionMenuToggleButton
-          isActive={isButtonEnabled}
+          isActive={enabled}
           isEnabled={menuShow}
           onClick={handleToggleOpenMenu}
         >
@@ -210,54 +205,15 @@ function CustomToggleButton({ onToggle, onMenuToggle, OnIcon, OffIcon, MenuPopup
 }
 
 export default function UserDeviceSettings() {
-  const [audioMenuShow, setAudioMenuShow] = useState(false)
-  const [cameraMenuShow, setCameraMenuShow] = useState(false)
-  const [videoStream, setVideoStream] = useState<MediaStream | null>(null)
 
-  const handleToggleMenu = (setFunction: () => void) => {
-    setCameraMenuShow(false)
-    setAudioMenuShow(false)
-    setFunction()
-  }
+  const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Function to start video stream from selected camera
-  const startVideoStream = () => {
-    navigator.mediaDevices
-      .enumerateDevices()
-      .then((devices) => {
-        if (!devices || devices.length == 0 || !devices[0]) return null
-        const videoDevice = devices[0]
-        if (videoDevice) {
-          const constraints = {
-            video: { deviceId: { exact: videoDevice.deviceId } },
-          }
-          return navigator.mediaDevices.getUserMedia(constraints)
-        }
-      })
-      .then((stream) => {
-        if (stream) setVideoStream(stream)
-      })
-      .catch((error) => {
-        console.error('Error starting video stream:', error)
-      })
-  }
-
-  // Function to stop video stream
-  const stopVideoStream = () => {
-    if (videoStream) {
-      videoStream.getTracks().forEach((track) => track.stop())
-      setVideoStream(null)
+  const onVideoStreamChange = (stream: MediaStream | null) => {
+    console.log(stream)
+    if (videoRef.current && stream) {
+      videoRef.current.srcObject = stream;
     }
   }
-
-  useEffect(() => {
-    if (cameraMenuShow) startVideoStream()
-  }, [cameraMenuShow])
-
-  useEffect(() => {
-    // Stop video stream when component unmounts
-    return () => stopVideoStream()
-  }, [videoStream])
 
   return (
     <BodyLeftContent>
@@ -269,38 +225,20 @@ export default function UserDeviceSettings() {
               webkit-playsinline=""
               preload="auto"
               autoPlay
-              ref={(videoRef) => {
-                if (videoRef && videoStream) {
-                  videoRef.srcObject = videoStream
-                }
-              }}
+              ref={videoRef}
             ></video>
           </div>
         </div>
         <div className="camera-status-text">
           <div>
-            <div>{videoStream == null && 'Your camera is off'}</div>
+            <div>{(!videoRef.current || videoRef.current.srcObject == null) && 'Your camera is off'}</div>
           </div>
         </div>
       </CameraDisplay>
       <CameraOptionButtonGroup>
         <div>
-          <CustomToggleButton
-            onToggle={() => {}}
-            OnIcon={<MicRoundedIcon />}
-            OffIcon={<MicOffRoundedIcon />}
-            MenuPopup={<MicOptionsPopups />}
-            onMenuToggle={() => handleToggleMenu(() => setAudioMenuShow(!audioMenuShow))}
-            menuShow={audioMenuShow}
-          />
-          <CustomToggleButton
-            onToggle={() => {}}
-            OnIcon={<VideocamRoundedIcon />}
-            OffIcon={<VideocamOffRoundedIcon />}
-            MenuPopup={<VideoOptionsPopups />}
-            onMenuToggle={() => handleToggleMenu(() => setCameraMenuShow(!cameraMenuShow))}
-            menuShow={cameraMenuShow}
-          />
+          <MicToggleButton onAudioInputActive={() => { }} />
+          <CameraToggleButton onVideoStreamChange={onVideoStreamChange} />
         </div>
       </CameraOptionButtonGroup>
     </BodyLeftContent>
