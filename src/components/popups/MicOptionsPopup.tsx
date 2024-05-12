@@ -4,8 +4,7 @@ import {
   PopupContentSelectableItem,
   PopupContentSession,
 } from './utils'
-import MicRoundedIcon from '@mui/icons-material/MicRounded'
-import MicOffRoundedIcon from '@mui/icons-material/MicOffRounded'
+
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded'
 import { useEffect, useState } from 'react'
 import { CustomToggleButton } from '../officeJoin/UserDeviceSettings'
@@ -13,11 +12,11 @@ import { CustomToggleButton } from '../officeJoin/UserDeviceSettings'
 export const MicToggleButton = ({ onAudioInputActive }) => {
   const [enabled, setEnabled] = useState(false)
 
-  const [audioMenuShow, setAudioMenuShow] = useState(false)
+  // const [audioMenuShow, setAudioMenuShow] = useState(false)
   // const [audioStream, setAudioStream] = useState<MediaStream | null>(null)
 
-  const [selectedMicId, setSelectedMicId] = useState('')
-  const [micDevices, setMicDevices] = useState<{ [deviceId: string]: string }>({})
+  // const [selectedMicId, setSelectedMicId] = useState('')
+  // const [micDevices, setMicDevices] = useState<{ [deviceId: string]: string }>({})
 
   const handleToggleMic = () => {
     const nextState = !enabled;
@@ -27,28 +26,28 @@ export const MicToggleButton = ({ onAudioInputActive }) => {
     // }
   }
 
-  useEffect(() => {
-    if (!audioMenuShow) return;
+  // useEffect(() => {
+  //   if (!audioMenuShow) return;
 
-    navigator.mediaDevices
-      .enumerateDevices()
-      .then(async (devices) => {
-        const mics = devices.filter((device) => device.kind === 'audioinput')
+  //   navigator.mediaDevices
+  //     .enumerateDevices()
+  //     .then(async (devices) => {
+  //       const mics = devices.filter((device) => device.kind === 'audioinput')
 
-        if (mics.length > 0) {
-          const micDevicesMap = mics.reduce((acc, device) => {
-            acc[device.deviceId] = device.label
-            return acc
-          }, {})
-          setMicDevices(micDevicesMap)
+  //       if (mics.length > 0) {
+  //         const micDevicesMap = mics.reduce((acc, device) => {
+  //           acc[device.deviceId] = device.label
+  //           return acc
+  //         }, {})
+  //         setMicDevices(micDevicesMap)
 
-          if (!selectedMicId) {
-            const currentMicDeviceId = mics[0].deviceId
-            setSelectedMicId(currentMicDeviceId)
-          }
-        }
-      })
-  }, [audioMenuShow])
+  //         if (!selectedMicId) {
+  //           const currentMicDeviceId = mics[0].deviceId
+  //           setSelectedMicId(currentMicDeviceId)
+  //         }
+  //       }
+  //     })
+  // }, [audioMenuShow])
 
   let analyserNode: AnalyserNode | null = null;
 
@@ -60,7 +59,7 @@ export const MicToggleButton = ({ onAudioInputActive }) => {
   };
 
   useEffect(() => {
-    if (selectedMicId) {
+    if (enabled) {
       async () => {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: { deviceId: selectedMicId } });
 
@@ -92,7 +91,7 @@ export const MicToggleButton = ({ onAudioInputActive }) => {
     } else {
       cleanupAudioContext();
     }
-  }, [selectedMicId]);
+  }, [enabled]);
 
   return (
     <CustomToggleButton

@@ -31,3 +31,17 @@ export const ACCESS_TOKEN_KEY = `accessToken`
 export function getCookie(name: string): string | undefined {
   return Cookies.get(name)
 }
+
+export async function addStopAllTrackBeforeUnloadEvent() {
+  const func = async () => {
+    console.log("unload")
+    const stream = await navigator.mediaDevices
+      ?.getUserMedia({
+        audio: true,
+        video: true,
+      })
+    stream.getTracks().forEach((t) => t.stop());
+    window.removeEventListener('unload', func);
+  }
+  window.addEventListener('unload', func);
+}

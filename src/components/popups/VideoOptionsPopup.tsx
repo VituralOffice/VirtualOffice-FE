@@ -6,8 +6,8 @@ import {
 } from './utils'
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded'
 import { useEffect, useState } from 'react'
-import VideocamRoundedIcon from '@mui/icons-material/VideocamRounded'
 import { CustomToggleButton } from '../officeJoin/UserDeviceSettings'
+import VideocamRoundedIcon from '@mui/icons-material/VideocamRounded'
 import VideocamOffRoundedIcon from '@mui/icons-material/VideocamOffRounded'
 
 export const CameraToggleButton = ({ onVideoStreamChange }) => {
