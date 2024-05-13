@@ -7,6 +7,7 @@ import { GetUserProfile } from "../apis/UserApis";
 import { getLocalStorage, setLocalStorage } from "../apis/util";
 import { setLoggedIn, setUserInfo } from "../stores/UserStore";
 import { useAppSelector } from "../hook";
+import { addStopAllTrackBeforeUnloadEvent } from "../utils/util";
 
 const Container = styled.div`
     display: flex;
@@ -95,11 +96,28 @@ export default function LoadingPage() {
     useEffect(() => {
         setLoading(true);
 
+        const stopAllTracks = async () => {
+            const stream = await navigator.mediaDevices
+                ?.getUserMedia({
+                    audio: true,
+                    video: true,
+                })
+                console.log(stream.getTracks().length)
+            stream.getTracks().forEach((t) => t.stop());
+            stream.getAudioTracks().forEach((t) => t.stop());
+            stream.getVideoTracks().forEach((t) => t.stop());
+        }
+
+        
+
         const promise = new Promise<void>((resolve) => {
             setTimeout(resolve, 500);
         });
 
-        promise.then(() => setLoading(false));
+        promise.then(() => {
+            setLoading(false)
+            stopAllTracks();
+        });
 
         return () => setLoading(false);
     }, [location]);

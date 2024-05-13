@@ -35,6 +35,7 @@ function App() {
           {/* public */}
           <Route path="/" element={<Navigate to="/app" replace />} />
           <Route path="/app" element={<SpacePage />} />
+          <Route path="/appp" element={<></>} />
           <Route
             path="/signin"
             element={user.loggedIn ? <Navigate to="/app" replace /> : <LoginPage />}
