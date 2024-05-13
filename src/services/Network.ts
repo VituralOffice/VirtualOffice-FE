@@ -33,8 +33,8 @@ export default class Network {
 
   constructor() {
     console.log("Construct Network")
-    // const endpoint = API_URL.replace(`https`, `wss`)
-    const endpoint = API_URL.replace(`http`, `ws`)
+    const endpoint = API_URL.replace(`https`, `wss`)
+    // const endpoint = API_URL.replace(`http`, `ws`)
     this.client = new Client(endpoint)
     this.client.auth.token = Cookies.get(ACCESS_TOKEN_KEY) as string
     this.joinLobbyRoom().then(() => {
@@ -112,6 +112,8 @@ export default class Network {
     this.mySessionId = this.room.sessionId
     store.dispatch(setSessionId(this.room.sessionId))
     this.webRTC = new WebRTC(this.mySessionId, this)
+
+    this.webRTC.checkPreviousPermission()
 
     // new instance added to the players MapSchema
     this.room.state.players.onAdd = (player: IPlayer, key: string) => {
