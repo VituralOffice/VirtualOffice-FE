@@ -2,6 +2,7 @@ import Peer, { MediaConnection } from 'peerjs'
 import Network from '../services/Network'
 import store from '../stores'
 import { setVideoConnected } from '../stores/UserStore'
+import { PEER_CONNECT_OPTIONS } from '../constant'
 
 export default class WebRTC {
   private myPeer: Peer
@@ -15,7 +16,7 @@ export default class WebRTC {
 
   constructor(userId: string, network: Network) {
     const sanitizedId = this.replaceInvalidId(userId)
-    this.myPeer = new Peer(sanitizedId)
+    this.myPeer = new Peer(sanitizedId, PEER_CONNECT_OPTIONS)
     this.network = network
     console.log('userId:', userId)
     console.log('sanitizedId:', sanitizedId)
@@ -54,16 +55,16 @@ export default class WebRTC {
 
   disconnect() {
     this.peers.forEach((peer) => {
-      peer.call.close();
-      peer.video.remove();
-    });
-    this.peers.clear();
+      peer.call.close()
+      peer.video.remove()
+    })
+    this.peers.clear()
 
     this.onCalledPeers.forEach((onCalledPeer) => {
-      onCalledPeer.call.close();
-      onCalledPeer.video.remove();
-    });
-    this.onCalledPeers.clear();
+      onCalledPeer.call.close()
+      onCalledPeer.video.remove()
+    })
+    this.onCalledPeers.clear()
   }
 
   // check if permission has been granted before

@@ -1,15 +1,17 @@
-import { useEffect, useState } from 'react'
+import { LegacyRef, RefObject, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { ButtonProps } from '../../interfaces/Interfaces'
-import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded'
+// import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded'
 import MicRoundedIcon from '@mui/icons-material/MicRounded'
 import MicOffRoundedIcon from '@mui/icons-material/MicOffRounded'
 import VideocamRoundedIcon from '@mui/icons-material/VideocamRounded'
 import VideocamOffRoundedIcon from '@mui/icons-material/VideocamOffRounded'
-import { MicOptionsPopups } from '../popups/MicOptionsPopup'
-import { VideoOptionsPopups } from '../popups/VideoOptionsPopup'
 import store from '../../stores'
 import { setVideoConnected } from '../../stores/UserStore'
+
+import { MicToggleButton } from '../popups/MicOptionsPopup'
+import { CameraToggleButton } from '../popups/VideoOptionsPopup'
+import { addStopAllTrackBeforeUnloadEvent } from '../../utils/util'
 
 const BodyLeftContent = styled.div`
   width: 100%;
@@ -18,14 +20,15 @@ const BodyLeftContent = styled.div`
   position: relative;
 `
 
-const CameraDisplay = styled.div`
+const CameraDisplay = styled.div<ButtonProps>`
   position: relative;
   height: 0px;
   border-radius: 16px;
   overflow: hidden;
   background-color: rgb(17, 17, 17);
   padding-bottom: 66%;
-  border: 2px solid rgb(63, 71, 118);
+  border: ${(props) =>
+    props.isActive ? '2px solid rgb(6, 214, 160)' : '2px solid rgb(63, 71, 118)'};
   .video-display {
     position: absolute;
     width: 100%;
@@ -61,7 +64,6 @@ const CameraDisplay = styled.div`
       & > div {
         padding: 4px 12px;
         border-radius: 16px;
-        background: rgba(17, 17, 17, 0.7);
         width: 100%;
         max-width: 300px;
         font-weight: 500;
@@ -92,13 +94,13 @@ const OptionButton = styled.div<ButtonProps>`
   position: relative;
   .button-icon {
     height: 40px;
-    width: 60px;
+    width: 50px;
     padding: 8px;
     display: flex;
     -webkit-box-align: center;
     align-items: center;
-    -webkit-box-pack: start;
-    justify-content: flex-start;
+    -webkit-box-pack: center;
+    justify-content: center;
     border: none;
     border-radius: 20px;
     background-color: ${(props) =>
@@ -175,135 +177,245 @@ const OptionMenuToggleButton = styled.div<ButtonProps>`
   }
 `
 
-function CustomToggleButton({ onToggle, onMenuToggle, OnIcon, OffIcon, MenuPopup, menuShow }) {
-  const [isButtonEnabled, setIsButtonEnabled] = useState(false)
-
+export function CustomToggleButton({ enabled, onToggle, OnIcon, OffIcon }) {
   const handleToggle = (e) => {
     e.stopPropagation()
-    onToggle(!isButtonEnabled)
-    setIsButtonEnabled(!isButtonEnabled)
-  }
-
-  const handleToggleOpenMenu = (e) => {
-    e.stopPropagation()
-    onMenuToggle()
+    onToggle()
   }
 
   return (
     <>
-      <OptionButton isEnabled={isButtonEnabled} onClick={handleToggle}>
+      <OptionButton isEnabled={enabled} onClick={handleToggle}>
         <button className="button-icon">
-          <span>{isButtonEnabled ? OnIcon : OffIcon}</span>
+          <span>{enabled ? OnIcon : OffIcon}</span>
         </button>
-        <div className="line"></div>
+        {/* <div className="line"></div>
         <OptionMenuToggleButton
-          isActive={isButtonEnabled}
+          isActive={enabled}
           isEnabled={menuShow}
           onClick={handleToggleOpenMenu}
         >
           <span>
             <KeyboardArrowDownRoundedIcon />
           </span>
-        </OptionMenuToggleButton>
+        </OptionMenuToggleButton> */}
       </OptionButton>
-      {menuShow && MenuPopup}
+      {/* {menuShow && MenuPopup} */}
     </>
   )
 }
 
 export default function UserDeviceSettings() {
-  const [audioMenuShow, setAudioMenuShow] = useState(false)
-  const [cameraMenuShow, setCameraMenuShow] = useState(false)
-  const [videoStream, setVideoStream] = useState<MediaStream | null>(null)
+  const [micEnabled, setMicEnabled] = useState(false)
+  const [camEnabled, setCamEnabled] = useState(false)
 
-  const handleToggleMenu = (setFunction: () => void) => {
-    setCameraMenuShow(false)
-    setAudioMenuShow(false)
-    setFunction()
-  }
+  const [hasSoundInput, setHasSoundInput] = useState(false)
 
-  // Function to start video stream from selected camera
-  const startVideoStream = () => {
-    navigator.mediaDevices
-      .enumerateDevices()
-      .then((devices) => {
-        const videoDevices = devices.filter((device) => device.kind === 'videoinput')
-        if (videoDevices.length === 0) {
-          throw new Error('No video input devices found.')
-        }
-        const videoDevice = videoDevices[0]
-        if (videoDevice) {
-          const constraints = {
-            video: { deviceId: { exact: videoDevice.deviceId } },
-          }
-          return navigator.mediaDevices.getUserMedia(constraints)
-        }
-      })
-      .then((stream) => {
-        if (stream) setVideoStream(stream)
-        store.dispatch(setVideoConnected(true))
-      })
-      .catch((error) => {
-        console.error('Error starting video stream:', error)
-      })
-  }
+  const [camMS, setCamMS] = useState<MediaStream | null>(null)
+  const [micMS, setMicMS] = useState<MediaStream | null>(null)
 
-  // Function to stop video stream
-  const stopVideoStream = () => {
-    if (videoStream) {
-      videoStream.getTracks().forEach((track) => track.stop())
-      setVideoStream(null)
+  // const [micId, setMidId] = useState<string>('');
+  // const [camId, setCamId] = useState<string>('');
+
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  const toggetMic = () => {
+    const nextState = !micEnabled
+    if (!nextState) {
+      if (micMS) micMS.getTracks().forEach((track) => track.stop())
+      setMicEnabled(false)
+    } else {
+      getMicMS()
     }
   }
 
-  useEffect(() => {
-    if (cameraMenuShow) startVideoStream()
-  }, [cameraMenuShow])
+  const toggetCam = () => {
+    const nextState = !camEnabled
+    if (!nextState) {
+      if (camMS) camMS.getTracks().forEach((track) => track.stop())
+      setCamEnabled(false)
+    } else {
+      getCamMS()
+    }
+  }
 
+  const getCamMS = (alertOnError = true) => {
+    navigator.mediaDevices
+      ?.getUserMedia({
+        audio: false,
+        video: true,
+      })
+      .then((stream) => {
+        if (videoRef.current) videoRef.current.srcObject = stream
+        setCamMS(stream)
+        setCamEnabled(true)
+      })
+      .catch((error) => {
+        console.log(error)
+        if (alertOnError) window.alert('No webcam found, or permission is blocked')
+        setCamMS(null)
+        setCamEnabled(false)
+      })
+  }
+
+  // let audioContext: AudioContext | null;
+  // let audioSource: MediaStreamAudioSourceNode | null;
+  // let audioWorkletNode: AudioWorkletNode | null;
+  // let audioInitialized = false;
+
+  // const hehe = (hihi: boolean) => {
+  //   console.log(hihi)
+  //   setHasSoundInput(hihi)
+  // }
+  // const handleProcessVolumeEvent = async (event: MessageEvent<any>) => {
+  //   // Check if the audio level is above a certain threshold
+  //   if (event.data.volume > 0.01) {
+  //     hehe(true);
+  //   } else {
+  //     hehe(false);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   console.log(hasSoundInput); // This will log whenever hasSoundInput changes
+  // }, [hasSoundInput]);
+  const getMicMS = async (alertOnError = true) => {
+    navigator.mediaDevices
+      ?.getUserMedia({
+        audio: true,
+        video: false,
+      })
+      .then(async (stream) => {
+        // if (!audioInitialized) {
+        //   audioContext = new AudioContext();
+        //   await audioContext.audioWorklet.addModule('/worklets/audioMeter.js');
+
+        //   // Load the worklet
+        //   audioWorkletNode = new AudioWorkletNode(audioContext, 'audioMeter');
+
+        //   audioWorkletNode.port.onmessage = handleProcessVolumeEvent;
+
+        //   audioInitialized = true;
+        // } else {
+        //   audioSource?.disconnect(audioWorkletNode!)
+        //   if (audioSource?.mediaStream) {
+        //     audioSource.mediaStream.getTracks().forEach(track => track.stop());
+        //   }
+        //   audioSource = null;
+
+        //   // audioWorkletNode!.port.onmessage = () => {};
+        //   // audioWorkletNode?.port.close();
+        //   audioWorkletNode?.disconnect(audioContext!.destination);
+        // }
+
+        // // Create the Audio Context
+        // audioSource = audioContext!.createMediaStreamSource(stream);
+
+        // // Connect the audio pipeline - this will start the processing
+        // audioSource.connect(audioWorkletNode!).connect(audioContext!.destination);
+        setMicMS(stream)
+        setMicEnabled(true)
+      })
+      .catch((error) => {
+        console.log(error)
+        if (alertOnError) window.alert('No microphone found, or permission is blocked')
+        setMicMS(null)
+        setMicEnabled(false)
+      })
+  }
+
+  const UnregisterMicrophoneEvents = () => {
+    // console.log(micMS != null)
+    // if (micMS) {
+    //   console.log("hihi")
+    //   const trackPromises = micMS.getTracks().map(track => track.stop());
+    //   await Promise.all(trackPromises);
+    // }
+    micMS?.getTracks().forEach((track) => track.stop())
+    // if (audioWorkletNode) {
+    //   audioWorkletNode.port.close(); // Disconnect worklet port
+    //   audioWorkletNode.disconnect(); // Disconnect worklet from pipeline
+    // }
+    // if (audioSource) {
+    //   audioSource.disconnect(); // Disconnect audio source from pipeline
+    // }
+    // if (audioContext) {
+    //   await audioContext.close(); // Close audio context
+    // }
+    // audioSource = null;
+    // audioWorkletNode = null;
+    // audioContext = null;
+  }
+  const UnregisterCameraEvents = () => {
+    // console.log(camMS != null)
+    // if (camMS) {
+    //   console.log("haha")
+    //   const trackPromises = camMS.getTracks().map(track => track.stop());
+    //   await Promise.all(trackPromises);
+    // }
+    camMS?.getTracks().forEach((track) => track.stop())
+    if (videoRef && videoRef.current) videoRef.current.srcObject = null
+  }
   useEffect(() => {
-    // Stop video stream when component unmounts
-    return () => stopVideoStream()
-  }, [videoStream])
+    const initialize = async () => {
+      getCamMS()
+      getMicMS()
+    }
+
+    initialize()
+
+    // Hàm dọn dẹp trước khi trang unload
+    const handleBeforeUnload = async () => {
+      UnregisterMicrophoneEvents()
+      UnregisterCameraEvents()
+      // console.log("stop all")
+    }
+
+    // addStopAllTrackBeforeUnloadEvent();
+
+    return () => {
+      // window.alert('No microphone found, or permission is blocked')
+      handleBeforeUnload()
+    }
+
+    // window.addEventListener('beforeunload', async (event) => {
+    //   event.preventDefault(); // Prevent the default behavior (e.g., showing a confirmation dialog)
+
+    //   // Call your cleanup functions
+    //   await UnregisterMicrophoneEvents();
+    //   await UnregisterCameraEvents();
+    // });
+  }, [])
 
   return (
     <BodyLeftContent>
-      <CameraDisplay>
+      <CameraDisplay isActive={hasSoundInput}>
         <div className="video-display">
           <div>
-            <video
-              playsInline
-              webkit-playsinline=""
-              preload="auto"
-              autoPlay
-              ref={(videoRef) => {
-                if (videoRef && videoStream) {
-                  videoRef.srcObject = videoStream
-                }
-              }}
-            ></video>
+            <video playsInline webkit-playsinline="" preload="auto" autoPlay ref={videoRef}></video>
           </div>
         </div>
-        <div className="camera-status-text">
-          <div>{videoStream == null && 'Your camera is off'}</div>
-        </div>
+        {!camEnabled && (
+          <div className="camera-status-text">
+            <div>
+              <div>Your camera is off</div>
+            </div>
+          </div>
+        )}
       </CameraDisplay>
       <CameraOptionButtonGroup>
         <div>
           <CustomToggleButton
-            onToggle={() => {}}
+            enabled={micEnabled}
+            onToggle={toggetMic}
             OnIcon={<MicRoundedIcon />}
             OffIcon={<MicOffRoundedIcon />}
-            MenuPopup={<MicOptionsPopups />}
-            onMenuToggle={() => handleToggleMenu(() => setAudioMenuShow(!audioMenuShow))}
-            menuShow={audioMenuShow}
           />
           <CustomToggleButton
-            onToggle={() => {}}
+            enabled={camEnabled}
+            onToggle={toggetCam}
             OnIcon={<VideocamRoundedIcon />}
             OffIcon={<VideocamOffRoundedIcon />}
-            MenuPopup={<VideoOptionsPopups />}
-            onMenuToggle={() => handleToggleMenu(() => setCameraMenuShow(!cameraMenuShow))}
-            menuShow={cameraMenuShow}
           />
         </div>
       </CameraOptionButtonGroup>

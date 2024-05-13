@@ -2,6 +2,7 @@ import Peer from 'peerjs'
 import store from '../stores'
 import Game from '../scenes/Game'
 import { addVideoStream, removeVideoStream, setMyStream } from '../stores/MeetingStore'
+import { PEER_CONNECT_OPTIONS } from '../constant'
 
 export default class ShareScreenManager {
   private myPeer: Peer
@@ -9,7 +10,7 @@ export default class ShareScreenManager {
 
   constructor(private userId: string) {
     const sanatizedId = this.makeId(userId)
-    this.myPeer = new Peer(sanatizedId)
+    this.myPeer = new Peer(sanatizedId, PEER_CONNECT_OPTIONS)
     this.myPeer.on('error', (err) => {
       console.log('ShareScreenWebRTC err.type', err.type)
       console.error('ShareScreenWebRTC', err)
@@ -17,7 +18,6 @@ export default class ShareScreenManager {
 
     this.myPeer.on('call', (call) => {
       call.answer()
-
       call.on('stream', (userVideoStream) => {
         store.dispatch(addVideoStream({ id: call.peer, call, stream: userVideoStream }))
       })
