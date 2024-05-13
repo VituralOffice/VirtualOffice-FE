@@ -32,13 +32,13 @@ export default class Network {
   mySessionId!: string
 
   constructor() {
-    console.log("Construct Network")
-    const endpoint = API_URL.replace(`https`, `wss`)
+    console.log('Construct Network')
+    const endpoint = API_URL.replace(`http`, `ws`)
     // const endpoint = API_URL.replace(`http`, `ws`)
     this.client = new Client(endpoint)
     this.client.auth.token = Cookies.get(ACCESS_TOKEN_KEY) as string
     this.joinLobbyRoom().then(() => {
-      console.log("Lobby joined")
+      console.log('Lobby joined')
       store.dispatch(setLobbyJoined(true))
     })
 
@@ -48,13 +48,13 @@ export default class Network {
   }
 
   public disconnectClient() {
-    console.log("Disconnecting client");
-    this.room?.leave();
+    console.log('Disconnecting client')
+    this.room?.leave()
   }
 
   public disconnectWebRTC() {
-    console.log("Disconnecting webRTC");
-    this.webRTC?.disconnect();
+    console.log('Disconnecting webRTC')
+    this.webRTC?.disconnect()
   }
 
   /**
@@ -98,7 +98,7 @@ export default class Network {
   // method to create a custom room
   async createCustom(roomData: IRoomData) {
     this.room = await this.client.create(RoomType.CUSTOM, roomData)
-    console.log("Room created")
+    console.log('Room created')
     this.initialize()
   }
 
@@ -106,7 +106,7 @@ export default class Network {
   async initialize() {
     if (!this.room) return
 
-    console.log("Initilize Network")
+    console.log('Initilize Network')
 
     this.lobby.leave()
     this.mySessionId = this.room.sessionId

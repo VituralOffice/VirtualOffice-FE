@@ -8,6 +8,8 @@ import VideocamRoundedIcon from '@mui/icons-material/VideocamRounded'
 import VideocamOffRoundedIcon from '@mui/icons-material/VideocamOffRounded'
 import { MicOptionsPopups } from '../popups/MicOptionsPopup'
 import { VideoOptionsPopups } from '../popups/VideoOptionsPopup'
+import store from '../../stores'
+import { setVideoConnected } from '../../stores/UserStore'
 
 const BodyLeftContent = styled.div`
   width: 100%;
@@ -239,6 +241,7 @@ export default function UserDeviceSettings() {
       })
       .then((stream) => {
         if (stream) setVideoStream(stream)
+        store.dispatch(setVideoConnected(true))
       })
       .catch((error) => {
         console.error('Error starting video stream:', error)

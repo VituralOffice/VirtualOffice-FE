@@ -204,8 +204,8 @@ Phaser.GameObjects.GameObjectFactory.register(
     this.scene.physics.world.enableBody(sprite, Phaser.Physics.Arcade.DYNAMIC_BODY)
 
     const collisionScale = [6, 4]
-    sprite.body!
-      .setSize(sprite.width * collisionScale[0], sprite.height * collisionScale[1])
+    sprite
+      .body!.setSize(sprite.width * collisionScale[0], sprite.height * collisionScale[1])
       .setOffset(
         sprite.width * (1 - collisionScale[0]) * 0.5,
         sprite.height * (1 - collisionScale[1]) * 0.5 + 17
