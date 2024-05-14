@@ -1,4 +1,4 @@
-import { LegacyRef, RefObject, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { ButtonProps } from '../../interfaces/Interfaces'
 // import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded'
@@ -6,10 +6,6 @@ import MicRoundedIcon from '@mui/icons-material/MicRounded'
 import MicOffRoundedIcon from '@mui/icons-material/MicOffRounded'
 import VideocamRoundedIcon from '@mui/icons-material/VideocamRounded'
 import VideocamOffRoundedIcon from '@mui/icons-material/VideocamOffRounded'
-
-import { MicToggleButton } from '../popups/MicOptionsPopup'
-import { CameraToggleButton } from '../popups/VideoOptionsPopup'
-import { addStopAllTrackBeforeUnloadEvent } from '../../utils/util'
 
 const BodyLeftContent = styled.div`
   width: 100%;
@@ -25,7 +21,8 @@ const CameraDisplay = styled.div<ButtonProps>`
   overflow: hidden;
   background-color: rgb(17, 17, 17);
   padding-bottom: 66%;
-  border: ${(props) => props.isActive ? '2px solid rgb(6, 214, 160)' : '2px solid rgb(63, 71, 118)'};
+  border: ${(props) =>
+    props.isActive ? '2px solid rgb(6, 214, 160)' : '2px solid rgb(63, 71, 118)'};
   .video-display {
     position: absolute;
     width: 100%;
@@ -101,13 +98,13 @@ const OptionButton = styled.div<ButtonProps>`
     border: none;
     border-radius: 20px;
     background-color: ${(props) =>
-    props.isEnabled ? 'rgba(6, 214, 160, 0.2)' : 'rgba(255, 48, 73, 0.2)'};
+      props.isEnabled ? 'rgba(6, 214, 160, 0.2)' : 'rgba(255, 48, 73, 0.2)'};
     transition: background-color 200ms ease 0s;
     cursor: pointer;
     position: relative;
     &:hover {
       background-color: ${(props) =>
-    props.isEnabled ? 'rgba(6, 214, 160, 0.4)' : 'rgba(255, 48, 73, 0.4)'};
+        props.isEnabled ? 'rgba(6, 214, 160, 0.4)' : 'rgba(255, 48, 73, 0.4)'};
     }
     & > span {
       display: flex;
@@ -128,7 +125,7 @@ const OptionButton = styled.div<ButtonProps>`
     width: 2px;
     height: 20px;
     background-color: ${(props) =>
-    props.isEnabled ? 'rgb(6, 214, 160)' : 'rgba(255, 48, 73, 0.2)'};
+      props.isEnabled ? 'rgb(6, 214, 160)' : 'rgba(255, 48, 73, 0.2)'};
   }
 `
 
@@ -165,17 +162,16 @@ const OptionMenuToggleButton = styled.div<ButtonProps>`
         ? 'rgba(6, 214, 160, 0.4)'
         : 'transparent'
       : props.isEnabled
-        ? 'rgba(255, 48, 73, 0.4)'
-        : 'transparent'};
+      ? 'rgba(255, 48, 73, 0.4)'
+      : 'transparent'};
 
   &:hover {
     background-color: ${(props) =>
-    props.isActive ? 'rgba(6, 214, 160, 0.4)' : 'rgba(255, 48, 73, 0.4)'};
+      props.isActive ? 'rgba(6, 214, 160, 0.4)' : 'rgba(255, 48, 73, 0.4)'};
   }
 `
 
 export function CustomToggleButton({ enabled, onToggle, OnIcon, OffIcon }) {
-
   const handleToggle = (e) => {
     e.stopPropagation()
     onToggle()
@@ -204,10 +200,10 @@ export function CustomToggleButton({ enabled, onToggle, OnIcon, OffIcon }) {
 }
 
 export default function UserDeviceSettings() {
-  const [micEnabled, setMicEnabled] = useState(false);
-  const [camEnabled, setCamEnabled] = useState(false);
+  const [micEnabled, setMicEnabled] = useState(false)
+  const [camEnabled, setCamEnabled] = useState(false)
 
-  const [hasSoundInput, setHasSoundInput] = useState(false);
+  const [hasSoundInput, setHasSoundInput] = useState(false)
 
   const [camMS, setCamMS] = useState<MediaStream | null>(null)
   const [micMS, setMicMS] = useState<MediaStream | null>(null)
@@ -215,27 +211,25 @@ export default function UserDeviceSettings() {
   // const [micId, setMidId] = useState<string>('');
   // const [camId, setCamId] = useState<string>('');
 
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null)
 
   const toggetMic = () => {
-    const nextState = !micEnabled;
+    const nextState = !micEnabled
     if (!nextState) {
-      if (micMS) micMS.getTracks().forEach(track => track.stop());
-      setMicEnabled(false);
-    }
-    else {
-      getMicMS();
+      if (micMS) micMS.getTracks().forEach((track) => track.stop())
+      setMicEnabled(false)
+    } else {
+      getMicMS()
     }
   }
 
   const toggetCam = () => {
-    const nextState = !camEnabled;
+    const nextState = !camEnabled
     if (!nextState) {
-      if (camMS) camMS.getTracks().forEach(track => track.stop());
-      setCamEnabled(false);
-    }
-    else {
-      getCamMS();
+      if (camMS) camMS.getTracks().forEach((track) => track.stop())
+      setCamEnabled(false)
+    } else {
+      getCamMS()
     }
   }
 
@@ -244,15 +238,17 @@ export default function UserDeviceSettings() {
       ?.getUserMedia({
         audio: false,
         video: true,
-      }).then((stream) => {
-        if (videoRef.current) videoRef.current.srcObject = stream;
-        setCamMS(stream);
-        setCamEnabled(true);
-      }).catch((error) => {
+      })
+      .then((stream) => {
+        if (videoRef.current) videoRef.current.srcObject = stream
+        setCamMS(stream)
+        setCamEnabled(true)
+      })
+      .catch((error) => {
         console.log(error)
         if (alertOnError) window.alert('No webcam found, or permission is blocked')
-        setCamMS(null);
-        setCamEnabled(false);
+        setCamMS(null)
+        setCamEnabled(false)
       })
   }
 
@@ -282,7 +278,8 @@ export default function UserDeviceSettings() {
       ?.getUserMedia({
         audio: true,
         video: false,
-      }).then(async (stream) => {
+      })
+      .then(async (stream) => {
         // if (!audioInitialized) {
         //   audioContext = new AudioContext();
         //   await audioContext.audioWorklet.addModule('/worklets/audioMeter.js');
@@ -310,12 +307,13 @@ export default function UserDeviceSettings() {
 
         // // Connect the audio pipeline - this will start the processing
         // audioSource.connect(audioWorkletNode!).connect(audioContext!.destination);
-        setMicMS(stream);
+        setMicMS(stream)
         setMicEnabled(true)
-      }).catch((error) => {
+      })
+      .catch((error) => {
         console.log(error)
         if (alertOnError) window.alert('No microphone found, or permission is blocked')
-        setMicMS(null);
+        setMicMS(null)
         setMicEnabled(false)
       })
   }
@@ -327,7 +325,7 @@ export default function UserDeviceSettings() {
     //   const trackPromises = micMS.getTracks().map(track => track.stop());
     //   await Promise.all(trackPromises);
     // }
-    micMS?.getTracks().forEach(track => track.stop());
+    micMS?.getTracks().forEach((track) => track.stop())
     // if (audioWorkletNode) {
     //   audioWorkletNode.port.close(); // Disconnect worklet port
     //   audioWorkletNode.disconnect(); // Disconnect worklet from pipeline
@@ -349,30 +347,30 @@ export default function UserDeviceSettings() {
     //   const trackPromises = camMS.getTracks().map(track => track.stop());
     //   await Promise.all(trackPromises);
     // }
-    camMS?.getTracks().forEach(track => track.stop());
-    if (videoRef && videoRef.current) videoRef.current.srcObject = null;
+    camMS?.getTracks().forEach((track) => track.stop())
+    if (videoRef && videoRef.current) videoRef.current.srcObject = null
   }
   useEffect(() => {
     const initialize = async () => {
-      getCamMS();
-      getMicMS();
-    };
+      getCamMS()
+      getMicMS()
+    }
 
-    initialize();
+    initialize()
 
     // Hàm dọn dẹp trước khi trang unload
     const handleBeforeUnload = async () => {
-      UnregisterMicrophoneEvents();
-      UnregisterCameraEvents();
+      UnregisterMicrophoneEvents()
+      UnregisterCameraEvents()
       // console.log("stop all")
-    };
+    }
 
     // addStopAllTrackBeforeUnloadEvent();
 
     return () => {
       // window.alert('No microphone found, or permission is blocked')
-      handleBeforeUnload();
-    };
+      handleBeforeUnload()
+    }
 
     // window.addEventListener('beforeunload', async (event) => {
     //   event.preventDefault(); // Prevent the default behavior (e.g., showing a confirmation dialog)
@@ -388,24 +386,16 @@ export default function UserDeviceSettings() {
       <CameraDisplay isActive={hasSoundInput}>
         <div className="video-display">
           <div>
-            <video
-              playsInline
-              webkit-playsinline=""
-              preload="auto"
-              autoPlay
-              ref={videoRef}
-            ></video>
+            <video playsInline webkit-playsinline="" preload="auto" autoPlay ref={videoRef}></video>
           </div>
         </div>
-        {
-          !camEnabled && (
-            <div className="camera-status-text">
-              <div>
-                <div>Your camera is off</div>
-              </div>
+        {!camEnabled && (
+          <div className="camera-status-text">
+            <div>
+              <div>Your camera is off</div>
             </div>
-          )
-        }
+          </div>
+        )}
       </CameraDisplay>
       <CameraOptionButtonGroup>
         <div>

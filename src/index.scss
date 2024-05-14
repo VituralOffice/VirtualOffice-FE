@@ -18,8 +18,8 @@ body {
     canvas {
         display: block;
     }
+    height: 92%;
 }
-
 .video-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, 160px);
@@ -75,4 +75,7 @@ body {
         background: rgba(#eee, 0.8);
         border-radius: 3px;
     }
+}
+.bg-color {
+   background-color:  rgb(32, 37, 64);
 }

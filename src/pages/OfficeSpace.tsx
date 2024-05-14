@@ -7,73 +7,78 @@ import Bootstrap from '../scenes/Bootstrap'
 import { GetRoomById } from '../apis/RoomApis'
 import { IRoomData } from '../types/Rooms'
 import { isApiSuccess } from '../apis/util'
+import Toolbar from '../components/toolbar/toolbar'
+import { User } from '../types'
 
 export const OfficeSpace = () => {
-    let { roomId } = useParams();
-    const lobbyJoined = useAppSelector((state) => state.room.lobbyJoined)
-    const navigate = useNavigate()
+  let { roomId } = useParams()
+  const lobbyJoined = useAppSelector((state) => state.room.lobbyJoined)
+  const navigate = useNavigate()
 
-    const [joinPageShow, setJoinPageShow] = useState(true);
-    const [room, setRoom] = useState<IRoomData | null>();
+  const [joinPageShow, setJoinPageShow] = useState(true)
+  const [room, setRoom] = useState<IRoomData | null>()
+  const user = useAppSelector((state) => state.user)
 
-    const handleJoinRoom = async () => {
+  const handleJoinRoom = async () => {
+    try {
+      await Bootstrap.getInstance()?.network.joinCustomById(room!._id)
+    } catch (e: any) {
+      if (e.message.includes('not found')) {
         try {
-            await Bootstrap.getInstance()?.network.joinCustomById(room!._id);
+          await Bootstrap.getInstance()?.network.createCustom({
+            name: room!.name,
+            id: room!._id,
+            map: room!.map,
+            autoDispose: room!.autoDispose,
+          } as any)
+        } catch (createError) {
+          console.log('Error creating room:', createError)
+          navigate('/')
         }
-        catch (e: any) {
-            if (e.message.includes("not found")) {
-                try {
-                    await Bootstrap.getInstance()?.network.createCustom({
-                        name: room!.name,
-                        id: room!._id,
-                        map: room!.map,
-                        autoDispose: room!.autoDispose,
-                    } as any);
-                } catch (createError) {
-                    console.log('Error creating room:', createError);
-                    navigate('/');
-                }
-                return;
-            }
-            console.log(e)
-            navigate('/')
-            return;
+        return
+      }
+      console.log(e)
+      navigate('/')
+      return
+    }
+    if (!lobbyJoined) {
+      navigate('/app')
+      return
+    }
+    setJoinPageShow(false)
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await GetRoomById({ _id: roomId! })
+
+        if (!isApiSuccess(response)) {
+          navigate('/app')
+          return
         }
-        if (!lobbyJoined) {
-            navigate('/app')
-            return
-        }
-        setJoinPageShow(false);
+
+        setRoom(response.result)
+      } catch (error) {
+        console.error(error)
+      }
+
+      await InitGame()
     }
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await GetRoomById({ _id: roomId! });
+    fetchData()
 
-                if (!isApiSuccess(response)) {
-                    navigate('/app')
-                    return
-                }
+    return () => {
+      DestroyGame()
+    }
+  }, [])
 
-                setRoom(response.result)
-            } catch (error) {
-                console.error(error);
-            }
-
-            await InitGame();
-        };
-
-        fetchData();
-
-        return () => {
-            DestroyGame();
-        };
-    }, []);
-
-    return <>
-        {
-            joinPageShow && <JoinOfficePage handleJoinRoom={handleJoinRoom} />
-        }
+  return (
+    <>
+      {joinPageShow && <JoinOfficePage handleJoinRoom={handleJoinRoom} />}
+      {!joinPageShow && (
+        <Toolbar user={user as User} handleOpenMic={() => { }} handleOpenVideo={() => { }}></Toolbar>
+      )}
     </>
+  )
 }

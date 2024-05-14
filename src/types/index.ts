@@ -1,3 +1,5 @@
+import { BackgroundMode } from "./BackgroundMode"
+
 export type UserData = {
     _id: string,
     email: string,
@@ -19,4 +21,24 @@ export type LoginResponse = {
         isVerified: boolean,
         createdAt: Date
     }
+}
+
+export type User = {
+    backgroundMode: BackgroundMode,
+    sessionId: string,
+    videoConnected: boolean,
+    playerNameMap: Map<string, string>,
+    showJoystick: boolean,
+
+    userId: string,
+    username: string,
+    email: string,
+    role: string,
+    character_id: number,
+    isVerified: false,
+    loggedIn: false,
+
+    playerName: string,
+    micDevideId: string,
+    cameraDeviceId: string,
 }
