@@ -38,7 +38,7 @@ export default class OtherPlayer extends Player {
       && this.connectionBufferTime >= 750
       && myPlayer.readyToConnect
       && this.readyToConnect
-      && myPlayer.videoConnected
+      && myPlayer.mediaConnected
       // && myPlayerId > this.playerId
     ) {
       console.log(myPlayer.name + " connect " + this.name);
@@ -80,9 +80,9 @@ export default class OtherPlayer extends Player {
         }
         break
 
-      case 'videoConnected':
+      case 'mediaConnected':
         if (typeof value === 'boolean') {
-          this.videoConnected = value
+          this.mediaConnected = value
         }
         break
     }

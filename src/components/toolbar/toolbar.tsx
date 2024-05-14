@@ -10,7 +10,7 @@ import MemberMenu from './menus/Member'
 import LeaveRoomMenu from './menus/LeaveRoom'
 import UserDeviceSettings from '../officeJoin/UserDeviceSettings'
 import store from '../../stores'
-import { setVideoConnected } from '../../stores/UserStore'
+import { setMediaConnected } from '../../stores/UserStore'
 import { User } from '../../types'
 
 const LayoutContainer = styled.div`
@@ -47,7 +47,7 @@ const Toolbar = ({ user: player }: ToolbarProps) => {
   const handleClickPlayerMenu = () => { }
   const handleClickMicMenu = () => { }
   const handleClickVideoMenu = () => {
-    store.dispatch(setVideoConnected(!player?.videoConnected))
+    store.dispatch(setMediaConnected(!player?.mediaConnected))
   }
   const handleClickChatMenu = () => { }
   const handleClickMemberMenu = () => { }
@@ -65,10 +65,10 @@ const Toolbar = ({ user: player }: ToolbarProps) => {
         <MainMenu onClick={handleClickMainMenu}></MainMenu>
         <PlayerMenu onClick={handleClickPlayerMenu} user={player}></PlayerMenu>
         <div style={{ display: 'flex', gap: 8 }} />
-        <MicMenu onClick={handleClickMicMenu} isMicConnected={player?.videoConnected || false}></MicMenu>
+        <MicMenu onClick={handleClickMicMenu} isMicConnected={player?.mediaConnected || false}></MicMenu>
         <VideoMenu
           onClick={handleClickVideoMenu}
-          isVideoConnected={player?.videoConnected || false}
+          isVideoConnected={player?.mediaConnected || false}
         ></VideoMenu>
       </div>
       <div

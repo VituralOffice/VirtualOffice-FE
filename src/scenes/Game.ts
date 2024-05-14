@@ -148,7 +148,7 @@ export default class Game extends Phaser.Scene {
     this.network.onPlayerJoined(this.handlePlayerJoined, this)
     this.network.onPlayerLeft(this.handlePlayerLeft, this)
     this.network.onMyPlayerReady(this.handleMyPlayerReady, this)
-    this.network.onMyPlayerVideoConnected(this.handleMyVideoConnected, this)
+    this.network.onMyPlayerMediaConnected(this.handleMyMediaConnected, this)
     this.network.onPlayerUpdated(this.handlePlayerUpdated, this)
     this.network.onItemUserAdded(this.handleItemUserAdded, this)
     this.network.onItemUserRemoved(this.handleItemUserRemoved, this)
@@ -232,8 +232,8 @@ export default class Game extends Phaser.Scene {
     this.myPlayer.readyToConnect = true
   }
 
-  private handleMyVideoConnected() {
-    this.myPlayer.videoConnected = true
+  private handleMyMediaConnected() {
+    this.myPlayer.mediaConnected = true
   }
 
   // function to update target position upon receiving player updates
