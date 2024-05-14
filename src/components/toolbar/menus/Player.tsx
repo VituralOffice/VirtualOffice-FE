@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react'
-import store from '../../../stores'
-import { setVideoConnected } from '../../../stores/UserStore'
-import { IPlayer } from '../../../types/ISpaceState'
+import MyPlayer from '../../../characters/MyPlayer'
+import { User } from '../../../types'
 
 interface PlayerMenuProps {
   onClick: () => void
-  player: IPlayer
+  user?: User
 }
-export const PlayerMenu = ({ onClick, player }: PlayerMenuProps) => {
+export const PlayerMenu = ({ onClick, user }: PlayerMenuProps) => {
   const [videoStream, setVideoStream] = useState<MediaStream | null>(null)
   const startVideoStream = () => {
     navigator.mediaDevices
@@ -46,12 +45,12 @@ export const PlayerMenu = ({ onClick, player }: PlayerMenuProps) => {
   }, [videoStream])
   useEffect(() => {
     console.log(`state change`)
-    if (player.videoConnected === true) startVideoStream()
+    if (user?.videoConnected === true) startVideoStream()
     else stopVideoStream()
-  }, [player.videoConnected])
+  }, [user?.videoConnected])
   return (
     <div className="user-menu" style={{ display: 'flex' }}>
-      {player.videoConnected ? (
+      {user?.videoConnected ? (
         <video
           style={{
             position: 'relative',
@@ -109,7 +108,6 @@ export const PlayerMenu = ({ onClick, player }: PlayerMenuProps) => {
               }}
             >
               <div
-                className="css-1gcv3qi"
                 style={{
                   width: '100%',
                   height: '100%',
@@ -121,7 +119,6 @@ export const PlayerMenu = ({ onClick, player }: PlayerMenuProps) => {
               >
                 <img
                   loading="lazy"
-                  size={24}
                   src="https://dynamic-assets.gather.town/v2/sprite-profile/avatar-XKiK1zaPbBlf0d3FJGoi.IxFn4Is3OJFEuIQqAEKY.6lc6LksrQBu_YmRwgodl.yzrkwnOBThC3VfHSlGQ0.UJy0fOWWJ9sdtdTfnVDz.kNxsCad0RQNKB2G0kOTb.png?d=."
                   style={{
                     objectFit: 'cover',
@@ -193,22 +190,20 @@ export const PlayerMenu = ({ onClick, player }: PlayerMenuProps) => {
                   style={{ display: 'flex', flexGrow: 1, minWidth: 0, gap: 2 }}
                 >
                   <span
-                    fontWeight={500}
-                    fontSize={12}
-                    fontFamily="DM Sans, sans-serif"
-                    color="white"
-                    className="css-1n1bhhn"
+                    style={{
+                      fontWeight: 500,
+                      fontSize: 12,
+                      color: "white",
+                    }}
                   >
                     HOÀNG ĐỨC
                   </span>
                 </div>
                 <span
-                  width="16px"
-                  color="#bdbdbd"
                   style={{
                     display: 'flex',
                     width: 16,
-                    color: 'rgb(189, 189, 189)',
+                    color: '#bdbdbd',
                     flexShrink: 0,
                   }}
                 >
@@ -223,10 +218,6 @@ export const PlayerMenu = ({ onClick, player }: PlayerMenuProps) => {
             </div>
             <div className="Layout" style={{ display: 'flex', maxWidth: '100%' }}>
               <span
-                fontWeight={500}
-                fontSize={12}
-                fontFamily="DM Sans, sans-serif"
-                color="#bdbdbd"
                 style={{
                   color: 'rgb(189, 189, 189)',
                   fontFamily: 'DM Sans, sans-serif',

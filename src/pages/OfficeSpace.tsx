@@ -8,7 +8,7 @@ import { GetRoomById } from '../apis/RoomApis'
 import { IRoomData } from '../types/Rooms'
 import { isApiSuccess } from '../apis/util'
 import Toolbar from '../components/toolbar/toolbar'
-import { useSelector } from 'react-redux'
+import { User } from '../types'
 
 export const OfficeSpace = () => {
   let { roomId } = useParams()
@@ -77,7 +77,7 @@ export const OfficeSpace = () => {
     <>
       {joinPageShow && <JoinOfficePage handleJoinRoom={handleJoinRoom} />}
       {!joinPageShow && (
-        <Toolbar player={user} handleOpenMic={() => {}} handleOpenVideo={() => {}}></Toolbar>
+        <Toolbar user={user as User} handleOpenMic={() => { }} handleOpenVideo={() => { }}></Toolbar>
       )}
     </>
   )

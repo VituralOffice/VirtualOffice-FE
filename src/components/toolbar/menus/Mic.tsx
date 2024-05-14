@@ -3,7 +3,7 @@ import MicOffRoundedIcon from '@mui/icons-material/MicOffRounded'
 interface MicMenuProps {
   isMicConnected: boolean
   onClick: () => void
-  toggle: () => void
+  toggle?: () => void
 }
 export const MicMenu = ({ isMicConnected, onClick }: MicMenuProps) => {
   return (
@@ -30,7 +30,6 @@ export const MicMenu = ({ isMicConnected, onClick }: MicMenuProps) => {
             position: 'relative',
           }}
           type="button"
-          className="css-oau38"
           aria-label="Microphone"
         >
           <span

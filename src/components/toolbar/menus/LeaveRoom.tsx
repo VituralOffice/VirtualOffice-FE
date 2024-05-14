@@ -34,8 +34,6 @@ export const LeaveRoomMenu = ({ onClick }: LeaveRoomMenuProps) => {
               color: 'rgb(255, 255, 255)',
               flexShrink: 0,
             }}
-            width="32px"
-            color="#ffffff"
           >
             <svg viewBox="0 0 33 18" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path

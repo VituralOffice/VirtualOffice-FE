@@ -1,4 +1,4 @@
-import { LegacyRef, RefObject, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { ButtonProps } from '../../interfaces/Interfaces'
 // import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded'
@@ -6,12 +6,6 @@ import MicRoundedIcon from '@mui/icons-material/MicRounded'
 import MicOffRoundedIcon from '@mui/icons-material/MicOffRounded'
 import VideocamRoundedIcon from '@mui/icons-material/VideocamRounded'
 import VideocamOffRoundedIcon from '@mui/icons-material/VideocamOffRounded'
-import store from '../../stores'
-import { setVideoConnected } from '../../stores/UserStore'
-
-import { MicToggleButton } from '../popups/MicOptionsPopup'
-import { CameraToggleButton } from '../popups/VideoOptionsPopup'
-import { addStopAllTrackBeforeUnloadEvent } from '../../utils/util'
 
 const BodyLeftContent = styled.div`
   width: 100%;

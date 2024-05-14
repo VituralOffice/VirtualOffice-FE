@@ -1,6 +1,6 @@
 import styled from 'styled-components'
-import { IPlayer } from '../../types/ISpaceState'
 import MainMenu from './menus/Main'
+import MainModal from './modals/Main'
 import { useState } from 'react'
 import { PlayerMenu } from './menus/Player'
 import MicMenu from './menus/Mic'
@@ -8,10 +8,10 @@ import VideoMenu from './menus/Video'
 import ChatMenu from './menus/Chat'
 import MemberMenu from './menus/Member'
 import LeaveRoomMenu from './menus/LeaveRoom'
-import MainModal from './modals/main'
 import UserDeviceSettings from '../officeJoin/UserDeviceSettings'
 import store from '../../stores'
 import { setVideoConnected } from '../../stores/UserStore'
+import { User } from '../../types'
 
 const LayoutContainer = styled.div`
 width: 100%;
@@ -30,11 +30,11 @@ position: absolute;
 }
 `
 interface ToolbarProps {
-  player: IPlayer
+  user?: User
   handleOpenMic: () => void
   handleOpenVideo: () => void
 }
-const Toolbar = ({ player }: ToolbarProps) => {
+const Toolbar = ({ user: player }: ToolbarProps) => {
   const [showModalMainMenu, setShowModalMainMenu] = useState(false)
   const [showModalPlayerMenu, setShowModalPlayerMenu] = useState(false)
   const [showModalMicMenu, setShowModalMicMenu] = useState(false)
@@ -44,14 +44,14 @@ const Toolbar = ({ player }: ToolbarProps) => {
   const handleClickMainMenu = () => {
     setShowModalMainMenu(true)
   }
-  const handleClickPlayerMenu = () => {}
-  const handleClickMicMenu = () => {}
+  const handleClickPlayerMenu = () => { }
+  const handleClickMicMenu = () => { }
   const handleClickVideoMenu = () => {
-    store.dispatch(setVideoConnected(!player.videoConnected))
+    store.dispatch(setVideoConnected(!player?.videoConnected))
   }
-  const handleClickChatMenu = () => {}
-  const handleClickMemberMenu = () => {}
-  const handleClickLeaveMenu = () => {}
+  const handleClickChatMenu = () => { }
+  const handleClickMemberMenu = () => { }
+  const handleClickLeaveMenu = () => { }
 
   return (
     <LayoutContainer>
@@ -63,12 +63,12 @@ const Toolbar = ({ player }: ToolbarProps) => {
         }}
       >
         <MainMenu onClick={handleClickMainMenu}></MainMenu>
-        <PlayerMenu onClick={handleClickPlayerMenu} player={player}></PlayerMenu>
+        <PlayerMenu onClick={handleClickPlayerMenu} user={player}></PlayerMenu>
         <div style={{ display: 'flex', gap: 8 }} />
-        <MicMenu onClick={handleClickMicMenu} isMicConnected={player.videoConnected}></MicMenu>
+        <MicMenu onClick={handleClickMicMenu} isMicConnected={player?.videoConnected || false}></MicMenu>
         <VideoMenu
           onClick={handleClickVideoMenu}
-          isVideoConnected={player.videoConnected}
+          isVideoConnected={player?.videoConnected || false}
         ></VideoMenu>
       </div>
       <div

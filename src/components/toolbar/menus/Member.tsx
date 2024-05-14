@@ -7,7 +7,7 @@ export const MemberMenu = ({ onClick }: MemberMenuProps) => {
       className="member-container"
       style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
     >
-      <span color="#ffffff" className="css-1uvrmvf">
+      <span color="#ffffff">
         <button
           style={{
             height: 40,
@@ -43,9 +43,6 @@ export const MemberMenu = ({ onClick }: MemberMenuProps) => {
                 color: 'rgb(255, 255, 255)',
                 flexShrink: 0,
               }}
-              width="24px"
-              color="#ffffff"
-              className="css-1uvrmvf"
             >
               <svg
                 style={{ width: '100%', height: 'auto' }}
@@ -67,9 +64,6 @@ export const MemberMenu = ({ onClick }: MemberMenuProps) => {
                   color: 'rgb(6, 214, 160)',
                   flexShrink: 0,
                 }}
-                width="12px"
-                color="#06d6a0"
-                className="css-p9ixv0"
               >
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
@@ -79,12 +73,12 @@ export const MemberMenu = ({ onClick }: MemberMenuProps) => {
                 </svg>
               </span>
               <span
-                fontWeight={700}
-                fontSize={12}
-                letterSpacing="0.03"
-                fontFamily="DM Sans, sans-serif"
-                color="#e0e0e0"
-                className="css-eqbyx9"
+                style={{
+                  fontWeight: 700,
+                  fontSize: 12,
+                  letterSpacing: "0.03",
+                  color: "#e0e0e0"
+                }}
               >
                 1
               </span>
