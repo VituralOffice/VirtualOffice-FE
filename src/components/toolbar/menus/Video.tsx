@@ -3,7 +3,7 @@ import VideocamOffRoundedIcon from '@mui/icons-material/VideocamOffRounded'
 interface VideoMenuProps {
   isVideoConnected: boolean
   onClick: () => void
-  toggle: () => void
+  toggle?: () => void
 }
 export const VideoMenu = ({ isVideoConnected, onClick, toggle }: VideoMenuProps) => {
   return (
@@ -30,7 +30,6 @@ export const VideoMenu = ({ isVideoConnected, onClick, toggle }: VideoMenuProps)
             position: 'relative',
           }}
           type="button"
-          className="css-oau38"
           aria-label="Microphone"
         >
           <span
@@ -81,7 +80,6 @@ export const VideoMenu = ({ isVideoConnected, onClick, toggle }: VideoMenuProps)
             color: isVideoConnected ? 'rgb(6, 214, 160)' : 'rgb(255, 48, 73)',
             flexShrink: 0,
           }}
-          width="16px"
         >
           <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path

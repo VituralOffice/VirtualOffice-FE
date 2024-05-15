@@ -1,6 +1,6 @@
 import styled from 'styled-components'
-import { IPlayer } from '../../types/ISpaceState'
 import MainMenu from './menus/Main'
+import MainModal from './modals/Main'
 import { useState } from 'react'
 import { PlayerMenu } from './menus/Player'
 import MicMenu from './menus/Mic'
@@ -8,10 +8,10 @@ import VideoMenu from './menus/Video'
 import ChatMenu from './menus/Chat'
 import MemberMenu from './menus/Member'
 import LeaveRoomMenu from './menus/LeaveRoom'
-import MainModal from './modals/main'
 import UserDeviceSettings from '../officeJoin/UserDeviceSettings'
 import store from '../../stores'
 import { setMicConnected, setVideoConnected } from '../../stores/UserStore'
+import { User } from '../../types'
 
 const LayoutContainer = styled.div`
 width: 100%;
@@ -30,11 +30,11 @@ position: absolute;
 }
 `
 interface ToolbarProps {
-  player: IPlayer
+  user?: User
   handleOpenMic: () => void
   handleOpenVideo: () => void
 }
-const Toolbar = ({ player }: ToolbarProps) => {
+const Toolbar = ({ user: player }: ToolbarProps) => {
   const [showModalMainMenu, setShowModalMainMenu] = useState(false)
   const [showModalPlayerMenu, setShowModalPlayerMenu] = useState(false)
   const [showModalMicMenu, setShowModalMicMenu] = useState(false)
@@ -46,10 +46,10 @@ const Toolbar = ({ player }: ToolbarProps) => {
   }
   const handleClickPlayerMenu = () => {}
   const handleClickMicMenu = () => {
-    store.dispatch(setMicConnected(!player.micConnected))
+    store.dispatch(setMicConnected(!player?.micConnected))
   }
   const handleClickVideoMenu = () => {
-    store.dispatch(setVideoConnected(!player.videoConnected))
+    store.dispatch(setVideoConnected(!player?.videoConnected))
   }
   const handleClickChatMenu = () => {}
   const handleClickMemberMenu = () => {}
@@ -65,12 +65,15 @@ const Toolbar = ({ player }: ToolbarProps) => {
         }}
       >
         <MainMenu onClick={handleClickMainMenu}></MainMenu>
-        <PlayerMenu onClick={handleClickPlayerMenu} player={player}></PlayerMenu>
+        <PlayerMenu onClick={handleClickPlayerMenu} user={player}></PlayerMenu>
         <div style={{ display: 'flex', gap: 8 }} />
-        <MicMenu onClick={handleClickMicMenu} isMicConnected={player.micConnected}></MicMenu>
+        <MicMenu
+          onClick={handleClickMicMenu}
+          isMicConnected={player?.micConnected || false}
+        ></MicMenu>
         <VideoMenu
           onClick={handleClickVideoMenu}
-          isVideoConnected={player.videoConnected}
+          isVideoConnected={player?.videoConnected || false}
         ></VideoMenu>
       </div>
       <div

@@ -36,12 +36,10 @@ export const ChatMenu = ({ onClick }: ChatMenuProps) => {
             <span
               style={{
                 display: 'flex',
-                width: 24,
-                color: 'rgb(255, 255, 255)',
+                width: '24px !important',
+                color: 'rgb(255, 255, 255) !important',
                 flexShrink: 0,
               }}
-              width="24px"
-              color="#ffffff"
             >
               <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
