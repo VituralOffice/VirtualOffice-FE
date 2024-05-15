@@ -11,7 +11,7 @@ import LeaveRoomMenu from './menus/LeaveRoom'
 import MainModal from './modals/main'
 import UserDeviceSettings from '../officeJoin/UserDeviceSettings'
 import store from '../../stores'
-import { setVideoConnected } from '../../stores/UserStore'
+import { setMicConnected, setVideoConnected } from '../../stores/UserStore'
 
 const LayoutContainer = styled.div`
 width: 100%;
@@ -45,7 +45,9 @@ const Toolbar = ({ player }: ToolbarProps) => {
     setShowModalMainMenu(true)
   }
   const handleClickPlayerMenu = () => {}
-  const handleClickMicMenu = () => {}
+  const handleClickMicMenu = () => {
+    store.dispatch(setMicConnected(!player.micConnected))
+  }
   const handleClickVideoMenu = () => {
     store.dispatch(setVideoConnected(!player.videoConnected))
   }
@@ -65,7 +67,7 @@ const Toolbar = ({ player }: ToolbarProps) => {
         <MainMenu onClick={handleClickMainMenu}></MainMenu>
         <PlayerMenu onClick={handleClickPlayerMenu} player={player}></PlayerMenu>
         <div style={{ display: 'flex', gap: 8 }} />
-        <MicMenu onClick={handleClickMicMenu} isMicConnected={player.videoConnected}></MicMenu>
+        <MicMenu onClick={handleClickMicMenu} isMicConnected={player.micConnected}></MicMenu>
         <VideoMenu
           onClick={handleClickVideoMenu}
           isVideoConnected={player.videoConnected}

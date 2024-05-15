@@ -8,6 +8,7 @@ export interface IPlayer extends IUser, Schema {
   anim: string
   readyToConnect: boolean
   videoConnected: boolean
+  micConnected: boolean
 }
 
 export interface IChatMessage extends Schema {

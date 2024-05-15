@@ -217,25 +217,30 @@ export default function UserDeviceSettings() {
   // const [micId, setMidId] = useState<string>('');
   // const [camId, setCamId] = useState<string>('');
 
-  const videoRef = useRef<HTMLVideoElement>(null)
+  //const videoRef = useRef<HTMLVideoElement>(null)
 
   const toggetMic = () => {
     const nextState = !micEnabled
     if (!nextState) {
       if (micMS) micMS.getTracks().forEach((track) => track.stop())
       setMicEnabled(false)
+      store.dispatch(setVideoConnected(false))
     } else {
       getMicMS()
+      store.dispatch(setVideoConnected(true))
     }
   }
 
   const toggetCam = () => {
     const nextState = !camEnabled
     if (!nextState) {
+      console.log({ camMS })
       if (camMS) camMS.getTracks().forEach((track) => track.stop())
       setCamEnabled(false)
+      store.dispatch(setVideoConnected(false))
     } else {
       getCamMS()
+      store.dispatch(setVideoConnected(true))
     }
   }
 
@@ -246,7 +251,7 @@ export default function UserDeviceSettings() {
         video: true,
       })
       .then((stream) => {
-        if (videoRef.current) videoRef.current.srcObject = stream
+        //if (videoRef.current) videoRef.current.srcObject = stream
         setCamMS(stream)
         setCamEnabled(true)
       })
@@ -354,7 +359,7 @@ export default function UserDeviceSettings() {
     //   await Promise.all(trackPromises);
     // }
     camMS?.getTracks().forEach((track) => track.stop())
-    if (videoRef && videoRef.current) videoRef.current.srcObject = null
+    setCamMS(null)
   }
   useEffect(() => {
     const initialize = async () => {
@@ -392,7 +397,15 @@ export default function UserDeviceSettings() {
       <CameraDisplay isActive={hasSoundInput}>
         <div className="video-display">
           <div>
-            <video playsInline webkit-playsinline="" preload="auto" autoPlay ref={videoRef}></video>
+            <video
+              playsInline
+              webkit-playsinline=""
+              preload="auto"
+              autoPlay
+              ref={(videoRef) => {
+                if (videoRef) videoRef.srcObject = camMS
+              }}
+            ></video>
           </div>
         </div>
         {!camEnabled && (

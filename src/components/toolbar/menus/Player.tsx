@@ -13,7 +13,6 @@ export const PlayerMenu = ({ onClick, player }: PlayerMenuProps) => {
     navigator.mediaDevices
       .enumerateDevices()
       .then((devices) => {
-        console.log({ devices })
         const videoDevices = devices.filter((device) => device.kind === 'videoinput')
         if (videoDevices.length === 0) {
           throw new Error('No video input devices found.')
@@ -45,7 +44,6 @@ export const PlayerMenu = ({ onClick, player }: PlayerMenuProps) => {
     return () => stopVideoStream()
   }, [videoStream])
   useEffect(() => {
-    console.log(`state change`)
     if (player.videoConnected === true) startVideoStream()
     else stopVideoStream()
   }, [player.videoConnected])

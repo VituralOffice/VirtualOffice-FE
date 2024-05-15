@@ -37,7 +37,7 @@ export const InitGame = async () => {
     scale: {
       mode: Phaser.Scale.ScaleModes.RESIZE,
       width: window.innerWidth,
-      height: '90%',
+      height: window.innerHeight,
     },
     physics: {
       default: 'arcade',
