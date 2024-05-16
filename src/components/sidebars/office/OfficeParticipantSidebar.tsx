@@ -110,15 +110,17 @@ const ParticipantContentLayout = styled.div`
     }
 `
 
+interface SidebarProps {
+    onClose: () => void,
+}
 
-
-export const OfficeParticipantSidebar = () => {
+export const OfficeParticipantSidebar = ({onClose} : SidebarProps) => {
     const [searchUserTxt, setSearchUserTxt] = useState<string>('');
     const user = useAppSelector((state) => state.user);
     return (
         <LayoutContainer>
             <CloseSidebarButton>
-                <button>
+                <button onClick={onClose}>
                     <CloseIcon />
                 </button>
             </CloseSidebarButton>
@@ -135,7 +137,8 @@ export const OfficeParticipantSidebar = () => {
                     <SearchBar search={searchUserTxt} setSearch={setSearchUserTxt} />
                 </div>
                 <ParticipantContentLayout>
-                    <ParticipantDropdown items={[]} />
+                    <ParticipantDropdown title="online members" items={[]} />
+                    <ParticipantDropdown title="offline members" items={[]} />
                 </ParticipantContentLayout>
             </ContentLayout>
         </LayoutContainer>

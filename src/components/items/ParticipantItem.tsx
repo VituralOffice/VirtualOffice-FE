@@ -1,67 +1,121 @@
-import styled from "styled-components"
+import styled from 'styled-components'
+import FiberManualRecordRoundedIcon from '@mui/icons-material/FiberManualRecordRounded'
+import { getAvatarById } from '../../utils/util'
+import { User } from '../../types'
+import { ButtonProps } from '../../interfaces/Interfaces'
 
-const LayoutContainer = styled.div`
-height: 56px;
-border-radius: 16px;
-display: flex;
--webkit-box-align: center;
-align-items: center;
-padding: 0px 10px 0px 8px;
-cursor: pointer;
-gap: 12px;
-position: relative;
+const LayoutContainer = styled.div<ButtonProps>`
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  padding: 0px 10px 0px 8px;
+  cursor: pointer;
+  gap: 12px;
+  position: relative;
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  opacity: ${(props) => (props.isActive ? '1' : '0.5')};
 `
 
 const Avatar = styled.div`
-    flex-shrink: 0;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  & > div {
     width: 40px;
     height: 40px;
-    &>div{
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        position: relative;
-        user-select: none;
-        .background{
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            overflow: hidden;
-            position: relative;
-            background-color: rgb(34, 34, 34);
-            &>img{
-                object-fit: cover;
-                object-position: 0px -23px;
-                width: 100%;
-                height: 200%;
-                transform: scale(1.25);
-                image-rendering: pixelated;
-            }
-        }
-        .status-dot{
-            display: flex;
-            position: absolute;
-            bottom: 0px;
-            right: 0px;
-            &>svg{
-                margin-bottom: -1px;
-                flex-shrink: 0;
-            }
-        }
+    border-radius: 50%;
+    position: relative;
+    user-select: none;
+    .background {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      overflow: hidden;
+      position: relative;
+      background-color: rgb(34, 34, 34);
+      & > img {
+        position: absolute;
+        object-position: 0px -2px;
+        object-fit: contain;
+        object-position: 0px 8px;
+        width: 100%;
+        height: 150%;
+        transform: scale(0.75);
+        image-rendering: pixelated;
+        top: -10px;
+      }
     }
+    .status-dot {
+      display: flex;
+      position: absolute;
+      bottom: 0px;
+      right: 0px;
+      & > svg {
+        width: 15px;
+        height: 15px;
+        margin-bottom: -1px;
+        flex-shrink: 0;
+      }
+    }
+  }
 `
 
-export const ParticipantItem = () => {
-    return(
-        <LayoutContainer>
-            <Avatar>
-                <div>
-                    <div className="background">
-                        <img src="" alt="" />
-                    </div>
-                    <div className="status-dot"></div>
-                </div>
-            </Avatar>
-        </LayoutContainer>
-    )
+const Username = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-grow: 1;
+  min-width: 0px;
+  & > div {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    & > span {
+      color: rgb(224, 224, 224);
+      font-weight: 500;
+      font-size: 13px;
+      line-height: 17px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    & > img {
+      width: 20px;
+      height: 20px;
+    }
+  }
+`
+
+interface Props {
+  user?: User
+  isOnline: boolean
+  isKing: boolean
+}
+
+export const ParticipantItem = ({ user, isOnline, isKing }: Props) => {
+  return (
+    <LayoutContainer isActive={isOnline}>
+      <Avatar>
+        <div>
+          <div className="background">
+            {/* <img src={'/' + getAvatarById(user.character_id).img} /> */}
+            <img src={'/' + getAvatarById(0).img} />
+          </div>
+          <div className="status-dot">
+            <FiberManualRecordRoundedIcon />
+          </div>
+        </div>
+      </Avatar>
+      <Username>
+        <div>
+          <span>hehe</span>
+          {isKing && <img src="/icons/crown.png" />}
+        </div>
+      </Username>
+    </LayoutContainer>
+  )
 }

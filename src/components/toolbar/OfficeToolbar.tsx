@@ -10,9 +10,9 @@ import MicRoundedIcon from '@mui/icons-material/MicRounded'
 import MicOffRoundedIcon from '@mui/icons-material/MicOffRounded'
 import VideocamRoundedIcon from '@mui/icons-material/VideocamRounded'
 import VideocamOffRoundedIcon from '@mui/icons-material/VideocamOffRounded'
-import ForumIcon from '@mui/icons-material/Forum';
-import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
+import ForumIcon from '@mui/icons-material/Forum'
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
+import MeetingRoomIcon from '@mui/icons-material/MeetingRoom'
 import OfficeLogoMenuPopup from '../popups/OfficeLogoMenuPopup'
 import { OfficeParticipantSidebar } from '../sidebars/office/OfficeParticipantSidebar'
 
@@ -36,8 +36,8 @@ const LogoButton = styled.button<ButtonProps>`
   height: 40px;
   width: 40px;
   border-radius: 8px;
-  background-color: ${(props) => props.isActive ? 'rgb(88, 130, 247)' : 'rgb(67, 88, 216)'};
-  border-color: ${(props) => props.isActive ? 'rgb(144, 173, 255)' : 'transparent'};
+  background-color: ${(props) => (props.isActive ? 'rgb(88, 130, 247)' : 'rgb(67, 88, 216)')};
+  border-color: ${(props) => (props.isActive ? 'rgb(144, 173, 255)' : 'transparent')};
   &:hover {
     background-color: rgb(88, 130, 247);
     border-color: rgb(144, 173, 255);
@@ -51,13 +51,13 @@ const LogoButton = styled.button<ButtonProps>`
   -webkit-box-pack: center;
   justify-content: center;
   cursor: pointer;
-  &>span {
+  & > span {
     display: flex;
     width: 28px;
     height: 28px;
     color: rgb(255, 255, 255);
     flex-shrink: 0;
-    &>svg {
+    & > svg {
       width: 100%;
       height: auto;
     }
@@ -74,23 +74,23 @@ const ToolbarButton = styled.button<ButtonProps>`
   justify-content: center;
   border: none;
   border-radius: 8px;
-  background-color: ${(props) => props.isActive ? 'rgb(51, 58, 100)' : 'transparent'};
+  background-color: ${(props) => (props.isActive ? 'rgb(51, 58, 100)' : 'transparent')};
   &:hover {
     background-color: rgb(51, 58, 100);
   }
   transition: background-color 200ms ease 0s;
   cursor: pointer;
   position: relative;
-  &>div {
+  & > div {
     display: flex;
     justify-content: center;
     align-items: center;
-    &>span {
+    & > span {
       display: flex;
       width: 24px;
       color: rgb(224, 224, 224);
       flex-shrink: 0;
-      &>svg {
+      & > svg {
         width: 100%;
         height: auto;
       }
@@ -107,7 +107,7 @@ const SeparateLine = styled.div`
 `
 
 const ExitButton = styled(ToolbarButton)`
-  background-color: ${(props) => props.isActive ? 'rgb(221, 41, 63)' : 'rgb(51, 58, 100)'};
+  background-color: ${(props) => (props.isActive ? 'rgb(221, 41, 63)' : 'rgb(51, 58, 100)')};
   &:hover {
     background-color: rgb(221, 41, 63);
   }
@@ -116,9 +116,9 @@ const ExitButton = styled(ToolbarButton)`
 const OfficeToolbar = () => {
   const [micEnabled, setMicEnabled] = useState(false)
   const [camEnabled, setCamEnabled] = useState(false)
-  const user = useAppSelector((state) => state.user);
-  const [showLogoMenu, setShowLogoMenu] = useState(false);
-  const [showParticipantSidebar, setShowParticipantSidebar] = useState(false);
+  const user = useAppSelector((state) => state.user)
+  const [showLogoMenu, setShowLogoMenu] = useState(false)
+  const [showParticipantSidebar, setShowParticipantSidebar] = useState(false)
 
   const toggetMic = () => {
     const nextState = !micEnabled
@@ -151,12 +151,10 @@ const OfficeToolbar = () => {
           }}
         >
           <LogoButton isActive={showLogoMenu} onClick={() => setShowLogoMenu(!showLogoMenu)}>
-            <span><img src="/logo_transparent.svg" alt="" /></span>
-            {
-              showLogoMenu && (
-                <OfficeLogoMenuPopup />
-              )
-            }
+            <span>
+              <img src="/logo_transparent.svg" alt="" />
+            </span>
+            {showLogoMenu && <OfficeLogoMenuPopup />}
           </LogoButton>
           <div
             style={{
@@ -178,20 +176,32 @@ const OfficeToolbar = () => {
               OffIcon={<VideocamOffRoundedIcon />}
             />
             <ToolbarButton>
-              <div><span><ForumIcon /></span></div>
+              <div>
+                <span>
+                  <ForumIcon />
+                </span>
+              </div>
             </ToolbarButton>
             <ToolbarButton onClick={() => setShowParticipantSidebar(!showParticipantSidebar)}>
-              <div><span><PeopleAltIcon /></span></div>
+              <div>
+                <span>
+                  <PeopleAltIcon />
+                </span>
+              </div>
             </ToolbarButton>
             <SeparateLine />
             <ExitButton>
-              <div><span><MeetingRoomIcon /></span></div>
+              <div>
+                <span>
+                  <MeetingRoomIcon />
+                </span>
+              </div>
             </ExitButton>
           </div>
         </div>
       </LayoutContainer>
       {showParticipantSidebar && (
-        <OfficeParticipantSidebar />
+        <OfficeParticipantSidebar onClose={() => setShowParticipantSidebar(false)} />
       )}
     </>
   )
