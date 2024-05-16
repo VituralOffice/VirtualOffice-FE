@@ -15,20 +15,23 @@ import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom'
 import OfficeLogoMenuPopup from '../popups/OfficeLogoMenuPopup'
 import { OfficeParticipantSidebar } from '../sidebars/office/OfficeParticipantSidebar'
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
-const LayoutContainer = styled.div`
+const LayoutContainer = styled.div<{ isExpanded: boolean }>`
   position: absolute;
   bottom: 10px;
   left: 10px;
   height: 60px;
   padding: 10px 10px;
   display: flex;
+  gap: 10px;
   -webkit-box-pack: justify;
   justify-content: flex-start;
   -webkit-box-align: center;
   align-items: center;
   background-color: rgb(32, 37, 64);
   border-radius: 8px;
+  width: fit-content;
 }
 `
 
@@ -114,12 +117,32 @@ const ExitButton = styled(ToolbarButton)`
   }
 `
 
+const ExpandMenu = styled(ToolbarButton) <{ expanded: boolean }>`
+  padding: 8px 2px;
+  &>div{
+    &>span{
+      transform: ${(props) => props.expanded ? 'rotate(180deg)' : 'rotate(0deg)'};
+    }
+  }
+  `
+
+const ExpandContentContainer = styled.div`
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  transform-origin: left;
+  gap: 8px;
+  height: 100%;
+  `
+// transition: width 1s ease-in-out;
+
 const OfficeToolbar = () => {
   const [micEnabled, setMicEnabled] = useState(false)
   const [camEnabled, setCamEnabled] = useState(false)
   const user = useAppSelector((state) => state.user)
   const [showLogoMenu, setShowLogoMenu] = useState(false)
   const [showParticipantSidebar, setShowParticipantSidebar] = useState(false)
+  const [isToolbarExpanded, setIsToolbarExpanded] = useState(true);
 
   const toggetMic = () => {
     const nextState = !micEnabled
@@ -143,63 +166,60 @@ const OfficeToolbar = () => {
 
   return (
     <>
-      <LayoutContainer>
-        <div
-          style={{
-            display: 'flex',
-            gap: '12px',
-            height: '100%',
-          }}
-        >
-          <LogoButton isActive={showLogoMenu} onClick={() => setShowLogoMenu(!showLogoMenu)}>
+      <LayoutContainer isExpanded={isToolbarExpanded}>
+        <LogoButton isActive={showLogoMenu} onClick={() => setShowLogoMenu(!showLogoMenu)}>
+          <span>
+            <img src="/logo_transparent.svg" alt="" />
+          </span>
+          {showLogoMenu && <OfficeLogoMenuPopup />}
+        </LogoButton>
+        {
+          isToolbarExpanded && (
+            <ExpandContentContainer>
+              <CustomToggleButton
+                enabled={micEnabled}
+                onToggle={toggetMic}
+                OnIcon={<MicRoundedIcon />}
+                OffIcon={<MicOffRoundedIcon />}
+              />
+              <CustomToggleButton
+                enabled={camEnabled}
+                onToggle={toggetCam}
+                OnIcon={<VideocamRoundedIcon />}
+                OffIcon={<VideocamOffRoundedIcon />}
+              />
+              <ToolbarButton>
+                <div>
+                  <span>
+                    <ForumIcon />
+                  </span>
+                </div>
+              </ToolbarButton>
+              <ToolbarButton isEnabled={showParticipantSidebar} onClick={() => setShowParticipantSidebar(!showParticipantSidebar)}>
+                <div>
+                  <span>
+                    <PeopleAltIcon />
+                  </span>
+                </div>
+              </ToolbarButton>
+              <SeparateLine />
+              <ExitButton>
+                <div>
+                  <span>
+                    <MeetingRoomIcon />
+                  </span>
+                </div>
+              </ExitButton>
+            </ExpandContentContainer>
+          )
+        }
+        <ExpandMenu expanded={isToolbarExpanded} onClick={() => setIsToolbarExpanded(!isToolbarExpanded)}>
+          <div>
             <span>
-              <img src="/logo_transparent.svg" alt="" />
+              <ArrowForwardIosIcon />
             </span>
-            {showLogoMenu && <OfficeLogoMenuPopup />}
-          </LogoButton>
-          <div
-            style={{
-              display: 'flex',
-              gap: '8px',
-              height: '100%',
-            }}
-          >
-            <CustomToggleButton
-              enabled={micEnabled}
-              onToggle={toggetMic}
-              OnIcon={<MicRoundedIcon />}
-              OffIcon={<MicOffRoundedIcon />}
-            />
-            <CustomToggleButton
-              enabled={camEnabled}
-              onToggle={toggetCam}
-              OnIcon={<VideocamRoundedIcon />}
-              OffIcon={<VideocamOffRoundedIcon />}
-            />
-            <ToolbarButton>
-              <div>
-                <span>
-                  <ForumIcon />
-                </span>
-              </div>
-            </ToolbarButton>
-            <ToolbarButton isEnabled={showParticipantSidebar} onClick={() => setShowParticipantSidebar(!showParticipantSidebar)}>
-              <div>
-                <span>
-                  <PeopleAltIcon />
-                </span>
-              </div>
-            </ToolbarButton>
-            <SeparateLine />
-            <ExitButton>
-              <div>
-                <span>
-                  <MeetingRoomIcon />
-                </span>
-              </div>
-            </ExitButton>
           </div>
-        </div>
+        </ExpandMenu>
       </LayoutContainer>
       {showParticipantSidebar && (
         <OfficeParticipantSidebar onClose={() => setShowParticipantSidebar(false)} />

@@ -17,7 +17,6 @@ const LayoutContainer = styled.div`
   padding: 10px 10px;
   background-color: rgb(32, 37, 64);
   border-radius: 8px;
-  transform 500ms ease 0s;
 }
 `
 
