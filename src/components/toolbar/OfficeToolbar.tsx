@@ -74,10 +74,11 @@ const ToolbarButton = styled.button<ButtonProps>`
   justify-content: center;
   border: none;
   border-radius: 8px;
-  background-color: ${(props) => (props.isActive ? 'rgb(51, 58, 100)' : 'transparent')};
-  &:hover {
-    background-color: rgb(51, 58, 100);
-  }
+  background-color: ${(props) => (props.isEnabled ? '' : 'transparent')};
+  ${(props) => (props.isEnabled ? 'background-color: rgb(84, 92, 143);' : `
+  background-color: transparent;
+  &:hover {background-color: rgb(51, 58, 100)};
+    `)}
   transition: background-color 200ms ease 0s;
   cursor: pointer;
   position: relative;
@@ -182,7 +183,7 @@ const OfficeToolbar = () => {
                 </span>
               </div>
             </ToolbarButton>
-            <ToolbarButton onClick={() => setShowParticipantSidebar(!showParticipantSidebar)}>
+            <ToolbarButton isEnabled={showParticipantSidebar} onClick={() => setShowParticipantSidebar(!showParticipantSidebar)}>
               <div>
                 <span>
                   <PeopleAltIcon />

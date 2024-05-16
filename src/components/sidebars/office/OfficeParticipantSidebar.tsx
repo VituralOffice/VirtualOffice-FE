@@ -4,6 +4,9 @@ import { useAppSelector } from "../../../hook";
 import { SearchBar } from "../../inputs/SearchBar";
 import { useState } from "react";
 import { ParticipantDropdown } from "../../dropdowns/ParticipantDropdown";
+import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
+import { ButtonProps } from "../../../interfaces/Interfaces";
+import { AddPeopleToOfficePopup } from "../../popups/AddPeopleToOfficePopup";
 
 const LayoutContainer = styled.div`
   position: absolute;
@@ -110,37 +113,82 @@ const ParticipantContentLayout = styled.div`
     }
 `
 
+const ToolbarButton = styled.button`
+  height: 40px;
+  padding: 8px;
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  background-color: transparent;
+  &:hover {background-color: rgb(51, 58, 100)};
+  transition: background-color 200ms ease 0s;
+  cursor: pointer;
+  position: relative;
+  & > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    & > span {
+      display: flex;
+      width: 24px;
+      color: rgb(224, 224, 224);
+      flex-shrink: 0;
+      & > svg {
+        width: 100%;
+        height: auto;
+      }
+    }
+  }
+`
+
 interface SidebarProps {
     onClose: () => void,
 }
 
-export const OfficeParticipantSidebar = ({onClose} : SidebarProps) => {
+export const OfficeParticipantSidebar = ({ onClose }: SidebarProps) => {
     const [searchUserTxt, setSearchUserTxt] = useState<string>('');
+    const [showAddPeoplePopup, setShowAddPeoplePopup] = useState(false);
     const user = useAppSelector((state) => state.user);
     return (
-        <LayoutContainer>
-            <CloseSidebarButton>
-                <button onClick={onClose}>
-                    <CloseIcon />
-                </button>
-            </CloseSidebarButton>
-            <ContentLayout>
-                <SidebarHeader>
-                    <div><span>{user.username}</span></div>
-                </SidebarHeader>
-                <div style={{
-                    display: 'flex',
-                    marginBottom: '16px',
-                    paddingLeft: '16px',
-                    paddingRight: '16px',
-                }}>
-                    <SearchBar search={searchUserTxt} setSearch={setSearchUserTxt} />
-                </div>
-                <ParticipantContentLayout>
-                    <ParticipantDropdown title="online members" items={[]} />
-                    <ParticipantDropdown title="offline members" items={[]} />
-                </ParticipantContentLayout>
-            </ContentLayout>
-        </LayoutContainer>
+        <>
+            <LayoutContainer>
+                <CloseSidebarButton>
+                    <button onClick={onClose}>
+                        <CloseIcon />
+                    </button>
+                </CloseSidebarButton>
+                <ContentLayout>
+                    <SidebarHeader>
+                        <div><span>{user.username}</span></div>
+                    </SidebarHeader>
+                    <div style={{
+                        display: 'flex',
+                        gap: '10px',
+                        marginBottom: '16px',
+                        paddingLeft: '16px',
+                        paddingRight: '16px',
+                    }}>
+                        <SearchBar search={searchUserTxt} setSearch={setSearchUserTxt} />
+                        <ToolbarButton onClick={() => setShowAddPeoplePopup(true)}>
+                            <div><span><PersonAddAlt1Icon /></span></div>
+                        </ToolbarButton>
+
+                    </div>
+                    <ParticipantContentLayout>
+                        <ParticipantDropdown title="online members" items={[]} />
+                        <ParticipantDropdown title="offline members" items={[]} />
+                    </ParticipantContentLayout>
+                </ContentLayout>
+            </LayoutContainer>
+            {
+                showAddPeoplePopup && (
+                    <AddPeopleToOfficePopup onClosePopup={() => setShowAddPeoplePopup(false)} />
+                )
+            }
+        </>
     )
 }
