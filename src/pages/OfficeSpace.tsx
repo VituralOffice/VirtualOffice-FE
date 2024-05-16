@@ -7,7 +7,7 @@ import Bootstrap from '../scenes/Bootstrap'
 import { GetRoomById } from '../apis/RoomApis'
 import { IRoomData } from '../types/Rooms'
 import { isApiSuccess } from '../apis/util'
-import Toolbar from '../components/toolbar/toolbar'
+import OfficeToolbar from '../components/toolbar/OfficeToolbar'
 import { User } from '../types'
 
 export const OfficeSpace = () => {
@@ -77,7 +77,7 @@ export const OfficeSpace = () => {
     <>
       {joinPageShow && <JoinOfficePage handleJoinRoom={handleJoinRoom} />}
       {!joinPageShow && (
-        <Toolbar user={user as User} handleOpenMic={() => { }} handleOpenVideo={() => { }}></Toolbar>
+        <OfficeToolbar></OfficeToolbar>
       )}
     </>
   )
