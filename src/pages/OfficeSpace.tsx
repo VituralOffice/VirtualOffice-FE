@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAppSelector } from '../hook'
 import { useNavigate, useParams } from 'react-router-dom'
-import { InitGame, DestroyGame } from '../PhaserGame'
+import { InitGame, DestroyGame, PhaserGameInstance, loadGameScene } from '../PhaserGame'
 import { JoinOfficePage } from './JoinOfficePage'
 import Bootstrap from '../scenes/Bootstrap'
 import { GetRoomById } from '../apis/RoomApis'
@@ -9,6 +9,7 @@ import { IRoomData } from '../types/Rooms'
 import { isApiSuccess } from '../apis/util'
 import Toolbar from '../components/toolbar/toolbar'
 import { User } from '../types'
+import Chat from '../components/chat/Chat'
 
 export const OfficeSpace = () => {
   let { roomId } = useParams()
@@ -77,8 +78,9 @@ export const OfficeSpace = () => {
     <>
       {joinPageShow && <JoinOfficePage handleJoinRoom={handleJoinRoom} />}
       {!joinPageShow && (
-        <Toolbar user={user as User} handleOpenMic={() => { }} handleOpenVideo={() => { }}></Toolbar>
+        <Toolbar user={user as User} handleOpenMic={() => {}} handleOpenVideo={() => {}}></Toolbar>
       )}
+      {!joinPageShow && <Chat></Chat>}
     </>
   )
 }

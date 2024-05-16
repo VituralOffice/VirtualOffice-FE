@@ -154,14 +154,22 @@ export default class Network {
     //     phaserEvents.emit(GameEvent.ITEM_USER_REMOVED, item, key, ItemType.MEETING)
     //   }
     // }
-
+    this.room.state.mapMessages.onChange = (item, key: string) => {
+      console.log(`mapMessages change`, item, key)
+    }
     // new instance added to the chatMessages ArraySchema
-    this.room.state.chatMessages.onAdd = (item, index) => {
-      store.dispatch(pushChatMessage(item))
+    this.room.state.mapMessages.onAdd = (item, key: string) => {
+      console.log(`mapMessages onAdd`, item, key)
+      item.onChange = (changes) => {
+        changes.forEach((change) => console.log({ change }))
+      }
+      store.dispatch(pushChatMessage({ chatId: key, message: item }))
     }
 
     // when the server sends room data
     this.room.onMessage(Message.SEND_ROOM_DATA, (content) => {
+      console.log(`// when the server sends room data`)
+      console.log({ content })
       store.dispatch(setJoinedRoomData(content))
     })
 
@@ -279,7 +287,8 @@ export default class Network {
     this.room?.send(Message.STOP_SCREEN_SHARE, { meetingId: id })
   }
 
-  addChatMessage(content: string) {
-    this.room?.send(Message.ADD_CHAT_MESSAGE, { content: content })
+  addChatMessage({ content, chatId }: { content: string; chatId: string }) {
+    console.log({ content, chatId })
+    this.room?.send(Message.ADD_CHAT_MESSAGE, { content, chatId })
   }
 }

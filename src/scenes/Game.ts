@@ -21,7 +21,7 @@ import { ItemType } from '../types/Items'
 import { avatars } from '../utils/util'
 
 export default class Game extends Phaser.Scene {
-  private static instance: Game | null = null; // Biến static instance
+  private static instance: Game | null = null // Biến static instance
 
   network!: Network
   private cursors!: NavKeys
@@ -36,12 +36,12 @@ export default class Game extends Phaser.Scene {
 
   constructor() {
     super('game')
-    console.log("Construct Game")
-    Game.instance = this;
+    console.log('Construct Game')
+    Game.instance = this
   }
 
   static getInstance(): Game | null {
-    return Game.instance;
+    return Game.instance
   }
 
   registerKeys() {
@@ -79,7 +79,7 @@ export default class Game extends Phaser.Scene {
     }
 
     createCharacterAnims(this.anims)
-    console.log("create character anims")
+    console.log('create character anims')
 
     this.map = this.make.tilemap({ key: 'tilemap' })
     const FloorAndGround = this.map.addTilesetImage('FloorAndGround', 'tiles_wall')
@@ -212,8 +212,13 @@ export default class Game extends Phaser.Scene {
 
   // function to add new player to the otherPlayer group
   private handlePlayerJoined(newPlayer: IPlayer, id: string) {
-    console.log("Other player join, name: " + newPlayer.playerName + " , id: " + id)
-    const otherPlayer = this.add.otherPlayer(newPlayer.x, newPlayer.y, 'adam', id, newPlayer.playerName)
+    const otherPlayer = this.add.otherPlayer(
+      newPlayer.x,
+      newPlayer.y,
+      'adam',
+      id,
+      newPlayer.playerName
+    )
     this.otherPlayers.add(otherPlayer)
     this.otherPlayerMap.set(id, otherPlayer)
   }

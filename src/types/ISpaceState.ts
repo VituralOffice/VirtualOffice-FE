@@ -15,6 +15,10 @@ export interface IChatMessage extends Schema {
   createdAt: number
   content: string
 }
+export interface IMapMessage extends Schema {
+  id: string
+  messages: IChatMessage[]
+}
 
 export interface IMeeting extends Schema {
   connectedUser: SetSchema<string>
@@ -23,5 +27,5 @@ export interface IMeeting extends Schema {
 export interface IOfficeState extends Schema {
   players: MapSchema<IPlayer>
   meetings: MapSchema<IMeeting>
-  chatMessages: ArraySchema<IChatMessage>
+  mapMessages: MapSchema<IChatMessage>
 }

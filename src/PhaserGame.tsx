@@ -5,7 +5,7 @@ const loadBootstrapScene = async () => {
   const BootstrapModule = await import('./scenes/Bootstrap')
   return BootstrapModule.default
 }
-const loadGameScene = async () => {
+export const loadGameScene = async () => {
   const GameModule = await import('./scenes/Game')
   return GameModule.default
 }
