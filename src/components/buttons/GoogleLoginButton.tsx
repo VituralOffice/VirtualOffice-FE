@@ -25,7 +25,7 @@ const GoogleLoginStyled = styled(GoogleLogin)`
     opacity: 1 !important;
     overflow: hidden !important;
     background-color: transparent !important;
-    border: 2px solid rgb(40, 45, 78) !important;
+    border: 2px solid rgb(151, 151, 151) !important;
     padding: 0px 16px !important;
     width: auto !important;
     min-width: min(104px, 100%) !important;
