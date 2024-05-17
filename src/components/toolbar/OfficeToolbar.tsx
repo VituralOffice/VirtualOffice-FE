@@ -15,7 +15,8 @@ import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom'
 import OfficeLogoMenuPopup from '../popups/OfficeLogoMenuPopup'
 import { OfficeParticipantSidebar } from '../sidebars/office/OfficeParticipantSidebar'
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
+import { setShowChat } from '../../stores/ChatStore'
 
 const LayoutContainer = styled.div<{ isExpanded: boolean }>`
   position: absolute;
@@ -78,10 +79,13 @@ const ToolbarButton = styled.button<ButtonProps>`
   border: none;
   border-radius: 8px;
   background-color: ${(props) => (props.isEnabled ? '' : 'transparent')};
-  ${(props) => (props.isEnabled ? 'background-color: rgb(84, 92, 143);' : `
+  ${(props) =>
+    props.isEnabled
+      ? 'background-color: rgb(84, 92, 143);'
+      : `
   background-color: transparent;
   &:hover {background-color: rgb(51, 58, 100)};
-    `)}
+    `}
   transition: background-color 200ms ease 0s;
   cursor: pointer;
   position: relative;
@@ -117,14 +121,14 @@ const ExitButton = styled(ToolbarButton)`
   }
 `
 
-const ExpandMenu = styled(ToolbarButton) <{ expanded: boolean }>`
+const ExpandMenu = styled(ToolbarButton)<{ expanded: boolean }>`
   padding: 8px 2px;
-  &>div{
-    &>span{
-      transform: ${(props) => props.expanded ? 'rotate(180deg)' : 'rotate(0deg)'};
+  & > div {
+    & > span {
+      transform: ${(props) => (props.expanded ? 'rotate(180deg)' : 'rotate(0deg)')};
     }
   }
-  `
+`
 
 const ExpandContentContainer = styled.div`
   overflow: hidden;
@@ -133,7 +137,7 @@ const ExpandContentContainer = styled.div`
   transform-origin: left;
   gap: 8px;
   height: 100%;
-  `
+`
 // transition: width 1s ease-in-out;
 
 const OfficeToolbar = () => {
@@ -142,8 +146,8 @@ const OfficeToolbar = () => {
   const user = useAppSelector((state) => state.user)
   const [showLogoMenu, setShowLogoMenu] = useState(false)
   const [showParticipantSidebar, setShowParticipantSidebar] = useState(false)
-  const [isToolbarExpanded, setIsToolbarExpanded] = useState(true);
-
+  const [isToolbarExpanded, setIsToolbarExpanded] = useState(true)
+  const showChat = useAppSelector((state) => state.chat.showChat)
   const toggetMic = () => {
     const nextState = !micEnabled
     if (!nextState) {
@@ -173,47 +177,51 @@ const OfficeToolbar = () => {
           </span>
           {showLogoMenu && <OfficeLogoMenuPopup />}
         </LogoButton>
-        {
-          isToolbarExpanded && (
-            <ExpandContentContainer>
-              <CustomToggleButton
-                enabled={micEnabled}
-                onToggle={toggetMic}
-                OnIcon={<MicRoundedIcon />}
-                OffIcon={<MicOffRoundedIcon />}
-              />
-              <CustomToggleButton
-                enabled={camEnabled}
-                onToggle={toggetCam}
-                OnIcon={<VideocamRoundedIcon />}
-                OffIcon={<VideocamOffRoundedIcon />}
-              />
-              <ToolbarButton>
-                <div>
-                  <span>
-                    <ForumIcon />
-                  </span>
-                </div>
-              </ToolbarButton>
-              <ToolbarButton isEnabled={showParticipantSidebar} onClick={() => setShowParticipantSidebar(!showParticipantSidebar)}>
-                <div>
-                  <span>
-                    <PeopleAltIcon />
-                  </span>
-                </div>
-              </ToolbarButton>
-              <SeparateLine />
-              <ExitButton>
-                <div>
-                  <span>
-                    <MeetingRoomIcon />
-                  </span>
-                </div>
-              </ExitButton>
-            </ExpandContentContainer>
-          )
-        }
-        <ExpandMenu expanded={isToolbarExpanded} onClick={() => setIsToolbarExpanded(!isToolbarExpanded)}>
+        {isToolbarExpanded && (
+          <ExpandContentContainer>
+            <CustomToggleButton
+              enabled={micEnabled}
+              onToggle={toggetMic}
+              OnIcon={<MicRoundedIcon />}
+              OffIcon={<MicOffRoundedIcon />}
+            />
+            <CustomToggleButton
+              enabled={camEnabled}
+              onToggle={toggetCam}
+              OnIcon={<VideocamRoundedIcon />}
+              OffIcon={<VideocamOffRoundedIcon />}
+            />
+            <ToolbarButton onClick={() => store.dispatch(setShowChat(!showChat))}>
+              <div>
+                <span>
+                  <ForumIcon />
+                </span>
+              </div>
+            </ToolbarButton>
+            <ToolbarButton
+              isEnabled={showParticipantSidebar}
+              onClick={() => setShowParticipantSidebar(!showParticipantSidebar)}
+            >
+              <div>
+                <span>
+                  <PeopleAltIcon />
+                </span>
+              </div>
+            </ToolbarButton>
+            <SeparateLine />
+            <ExitButton>
+              <div>
+                <span>
+                  <MeetingRoomIcon />
+                </span>
+              </div>
+            </ExitButton>
+          </ExpandContentContainer>
+        )}
+        <ExpandMenu
+          expanded={isToolbarExpanded}
+          onClick={() => setIsToolbarExpanded(!isToolbarExpanded)}
+        >
           <div>
             <span>
               <ArrowForwardIosIcon />

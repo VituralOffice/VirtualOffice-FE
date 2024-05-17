@@ -13,6 +13,7 @@ import WebRTC from '../web/WebRTC'
 import { GameEvent, phaserEvents } from '../events/EventCenter'
 import { IRoomData, RoomType } from '../types/Rooms'
 import {
+  loadMapChatMessage,
   pushChatMessage,
   pushPlayerJoinedMessage,
   pushPlayerLeftMessage,
@@ -33,7 +34,7 @@ export default class Network {
 
   constructor() {
     console.log('Construct Network')
-    const endpoint = API_URL.replace(`https`, `wss`)
+    const endpoint = API_URL.replace(`https`, `wss`).replace(`http`, `ws`)
     // const endpoint = API_URL.replace(`http`, `ws`)
     this.client = new Client(endpoint)
     this.client.auth.token = Cookies.get(ACCESS_TOKEN_KEY) as string
@@ -154,20 +155,39 @@ export default class Network {
     //     phaserEvents.emit(GameEvent.ITEM_USER_REMOVED, item, key, ItemType.MEETING)
     //   }
     // }
-
+    this.room.state.mapMessages.onChange = (item, key: string) => {
+      console.log(`mapMessages change`, item, key)
+    }
     // new instance added to the chatMessages ArraySchema
-    this.room.state.chatMessages.onAdd = (item, index) => {
-      store.dispatch(pushChatMessage(item))
+    this.room.state.mapMessages.onAdd = (item, key: string) => {
+      console.log(`mapMessages onAdd`, item, key)
+      item.onChange = (changes) => {
+        changes.forEach((change) => console.log({ change }))
+      }
+      store.dispatch(pushChatMessage({ chatId: key, message: item }))
     }
 
     // when the server sends room data
     this.room.onMessage(Message.SEND_ROOM_DATA, (content) => {
+      console.log(`// when the server sends room data`)
+      console.log({ content })
       store.dispatch(setJoinedRoomData(content))
     })
-
+    // when the server sends room data
+    this.room.onMessage(Message.LOAD_CHAT, ({ mapChatMessages }) => {
+      ///store.dispatch(setJoinedRoomData(content))
+      store.dispatch(loadMapChatMessage(mapChatMessages))
+    })
     // when a user sends a message
-    this.room.onMessage(Message.ADD_CHAT_MESSAGE, ({ clientId, content }) => {
-      phaserEvents.emit(GameEvent.UPDATE_DIALOG_BUBBLE, clientId, content)
+    this.room.onMessage(Message.ADD_CHAT_MESSAGE, ({ clientId, chatId, message }) => {
+      //
+      store.dispatch(
+        pushChatMessage({
+          chatId,
+          message,
+        })
+      )
+      phaserEvents.emit(GameEvent.UPDATE_DIALOG_BUBBLE, clientId, message.message.text)
     })
 
     // when a peer disconnects with myPeer
@@ -279,7 +299,11 @@ export default class Network {
     this.room?.send(Message.STOP_SCREEN_SHARE, { meetingId: id })
   }
 
-  addChatMessage(content: string) {
-    this.room?.send(Message.ADD_CHAT_MESSAGE, { content: content })
+  addChatMessage({ content, chatId }: { content: string; chatId: string }) {
+    console.log({ content, chatId })
+    this.room?.send(Message.ADD_CHAT_MESSAGE, { content, chatId })
+  }
+  loadChat() {
+    this.room?.send(Message.LOAD_CHAT)
   }
 }
