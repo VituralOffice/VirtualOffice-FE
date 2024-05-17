@@ -14,6 +14,7 @@ import { getLocalStorage, setLocalStorage } from './apis/util'
 import { OfficeSpace } from './pages/OfficeSpace'
 import { JoinOfficePage } from './pages/JoinOfficePage'
 import { GetUserProfile } from './apis/UserApis'
+import { JoinRoomByLink } from './pages/JoinRoomByLink'
 
 const Backdrop = styled.div`
   position: absolute;
@@ -23,8 +24,7 @@ const Backdrop = styled.div`
 `
 
 function App() {
-  const user = useAppSelector((state) => state.user);
-  
+  const user = useAppSelector((state) => state.user)
 
   return (
     <BrowserRouter>
@@ -42,15 +42,14 @@ function App() {
           />
 
           {/* private */}
-          {
-            user.loggedIn && (
-              <>
-                <Route path="/dashboard" element={<SpaceDashboardPage />} />
-                <Route path="/test-space" element={<TestSpace />} />
-                <Route path="/room/:roomId" element={<OfficeSpace />} />
-              </>
-            )
-          }
+          {user.loggedIn && (
+            <>
+              <Route path="/dashboard" element={<SpaceDashboardPage />} />
+              <Route path="/test-space" element={<TestSpace />} />
+              <Route path="/room/:roomId" element={<OfficeSpace />} />
+              <Route path="/rooms/:roomId/join" element={<JoinRoomByLink />} />
+            </>
+          )}
         </Routes>
       </Backdrop>
     </BrowserRouter>

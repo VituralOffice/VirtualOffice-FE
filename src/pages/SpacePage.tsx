@@ -160,7 +160,6 @@ const SpacesGrid = styled.div`
 export default function SpacePage() {
   const [activeSpaceItemId, setActiveSpaceItemId] = useState('')
   const [spaces, setSpaces] = useState<any[]>([])
-  const user = useAppSelector((state) => state.user)
 
   const handleOptionPopupShow = (itemId: SetStateAction<string>) => {
     if (activeSpaceItemId === itemId) {
@@ -169,26 +168,6 @@ export default function SpacePage() {
     }
     setActiveSpaceItemId(itemId)
   }
-
-  const [inviteRoomId, setInviteRoomId] = useState('')
-  const [inviteUserEmail, setInviteUserEmail] = useState('')
-  const [joinRoomId, setJoinRoomId] = useState('')
-  const [joinToken, setJoinToken] = useState('')
-
-  // const handleClickOutside = () => {
-  //   if (activeSpaceItemId !== '') {
-  //     handleOptionPopupShow('')
-  //     console.log(activeSpaceItemId)
-  //   }
-  // }
-
-  // useEffect(() => {
-  //   document.addEventListener('click', handleClickOutside)
-
-  //   return () => {
-  //     document.removeEventListener('click', handleClickOutside)
-  //   }
-  // }, [])
 
   useEffect(() => {
     const GetRoomsData = async () => {
@@ -204,14 +183,7 @@ export default function SpacePage() {
     <>
       <Header />
       <TopBar>
-        invite:
-        <input placeholder='roomId' value={inviteRoomId} onChange={(e) => setInviteRoomId(e.target.value)} type="text" />
-        <input placeholder='email' value={inviteUserEmail} onChange={(e) => setInviteUserEmail(e.target.value)} type="text" />
-        <button onClick={() => InviteUserToRoom({ roomId: inviteRoomId, email: inviteUserEmail })}>invite</button>
-        join:
-        <input placeholder='roomId' value={joinRoomId} onChange={(e) => setJoinRoomId(e.target.value)} type="text" />
-        <input placeholder='token' value={joinToken} onChange={(e) => setJoinToken(e.target.value)} type="text" />
-        <button onClick={() => JoinRoom({ roomId: joinRoomId, token: joinToken })}>join</button>
+        {/* <button onClick={() => JoinRoom({ roomId: joinRoomId, token: joinToken })}>join</button> */}
         <GroupedButtons />
         <SearchBarContainer>
           <SearchBarInner>

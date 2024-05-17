@@ -26,7 +26,7 @@ export type LoginResponse = {
 export type User = {
     backgroundMode: BackgroundMode,
     sessionId: string,
-    videoConnected: boolean,
+    mediaConnected: boolean,
     playerNameMap: Map<string, string>,
     showJoystick: boolean,
 
@@ -39,6 +39,6 @@ export type User = {
     loggedIn: false,
 
     playerName: string,
-    micDevideId: string,
-    cameraDeviceId: string,
+    microphoneON: boolean,
+    cameraON: boolean,
 }

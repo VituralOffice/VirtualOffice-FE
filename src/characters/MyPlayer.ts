@@ -12,7 +12,6 @@ import { NavKeys } from '../types/KeyboardState'
 import { ItemType } from '../types/Items'
 import Meeting from '../items/Meeting'
 import { PlayerBehavior } from '../types/PlayerBehaviour'
-import Game from '../scenes/Game'
 
 export default class MyPlayer extends Player {
   private playContainerBody: Phaser.Physics.Arcade.Body

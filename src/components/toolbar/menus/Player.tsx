@@ -45,12 +45,12 @@ export const PlayerMenu = ({ onClick, user }: PlayerMenuProps) => {
   }, [videoStream])
   useEffect(() => {
     console.log(`state change`)
-    if (user?.videoConnected === true) startVideoStream()
+    if (user?.mediaConnected === true) startVideoStream()
     else stopVideoStream()
-  }, [user?.videoConnected])
+  }, [user?.mediaConnected])
   return (
     <div className="user-menu" style={{ display: 'flex' }}>
-      {user?.videoConnected ? (
+      {user?.mediaConnected ? (
         <video
           style={{
             position: 'relative',
