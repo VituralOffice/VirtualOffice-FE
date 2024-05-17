@@ -1,10 +1,12 @@
 import Peer, { MediaConnection } from 'peerjs'
 import Network from '../services/Network'
 import store from '../stores'
-import { setVideoConnected } from '../stores/UserStore'
+import { setMediaConnected } from '../stores/UserStore'
 import { PEER_CONNECT_OPTIONS } from '../constant'
 
 export default class WebRTC {
+  private static instance: WebRTC | null = null; // Biến static instance
+
   private myPeer: Peer
   private peers = new Map<string, { call: MediaConnection; video: HTMLVideoElement }>()
   private onCalledPeers = new Map<string, { call: MediaConnection; video: HTMLVideoElement }>()
@@ -15,6 +17,8 @@ export default class WebRTC {
   private network: Network
 
   constructor(userId: string, network: Network) {
+    console.log("Construct WebRTC")
+    WebRTC.instance = this;
     const sanitizedId = this.replaceInvalidId(userId)
     this.myPeer = new Peer(sanitizedId, PEER_CONNECT_OPTIONS)
     this.network = network
@@ -30,6 +34,10 @@ export default class WebRTC {
 
     // config peerJS
     this.initialize()
+  }
+
+  static getInstance(): WebRTC | null {
+    return WebRTC.instance;
   }
 
   // PeerJS throws invalid_id error if it contains some characters such as that colyseus generates.
@@ -86,8 +94,8 @@ export default class WebRTC {
         this.myStream = stream
         this.addVideoStream(this.myVideo, this.myStream)
         this.setUpButtons()
-        store.dispatch(setVideoConnected(true))
-        this.network.videoConnected()
+        store.dispatch(setMediaConnected(true))
+        this.network.mediaConnected()
       })
       .catch((error) => {
         if (alertOnError) window.alert('No webcam or microphone found, or permission is blocked')

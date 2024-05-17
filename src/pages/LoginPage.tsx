@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import GoogleLoginButton from '../components/GoogleLoginButton'
+import GoogleLoginButton from '../components/buttons/GoogleLoginButton'
 import { useEffect, useRef, useState } from 'react'
 import { LoginByEmail, VerifyOtpLogin } from '../apis/AuthApis'
 import { useNavigate } from 'react-router-dom'

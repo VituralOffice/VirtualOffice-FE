@@ -14,7 +14,7 @@ export const userSlice = createSlice({
     initialState: {
         backgroundMode: getInitialBackgroundMode(),
         sessionId: '',
-        videoConnected: false,
+        mediaConnected: false,
         playerNameMap: new Map<string, string>(),
         showJoystick: window.innerWidth < 650,
         
@@ -28,8 +28,8 @@ export const userSlice = createSlice({
         loggedIn: false,
 
         playerName: 'Anonymous',
-        micDevideId: '',
-        cameraDeviceId: '',
+        microphoneON: false,
+        cameraON: false,
     },
     reducers: {
         toggleBackgroundMode: (state) => {
@@ -43,8 +43,8 @@ export const userSlice = createSlice({
         setSessionId: (state, action: PayloadAction<string>) => {
             state.sessionId = action.payload
         },
-        setVideoConnected: (state, action: PayloadAction<boolean>) => {
-            state.videoConnected = action.payload
+        setMediaConnected: (state, action: PayloadAction<boolean>) => {
+            state.mediaConnected = action.payload
         },
         setLoggedIn: (state, action: PayloadAction<boolean>) => {
             state.loggedIn = action.payload
@@ -77,11 +77,11 @@ export const userSlice = createSlice({
         setPlayerName: (state, action: PayloadAction<string>) => {
             state.playerName = action.payload
         },
-        setMicDeviceId: (state, action: PayloadAction<string>) => {
-            state.micDevideId = action.payload
+        setMicrophoneON: (state, action: PayloadAction<boolean>) => {
+            state.microphoneON = action.payload
         },
-        setCameraDeviceId: (state, action: PayloadAction<string>) => {
-            state.cameraDeviceId = action.payload
+        setCameraON: (state, action: PayloadAction<boolean>) => {
+            state.cameraON = action.payload
         },
 
         setUserInfo: (state, action: PayloadAction<UserData>) => {
@@ -99,7 +99,7 @@ export const userSlice = createSlice({
         resetUserState: (state) => {
             state.backgroundMode = getInitialBackgroundMode();
             state.sessionId = '';
-            state.videoConnected = false;
+            state.mediaConnected = false;
             state.loggedIn = false;
             state.playerNameMap = new Map<string, string>();
             state.showJoystick = window.innerWidth < 650;
@@ -112,8 +112,8 @@ export const userSlice = createSlice({
             state.isVerified = false;
 
             state.playerName = state.username;
-            state.micDevideId = '';
-            state.cameraDeviceId = '';
+            state.microphoneON = false;
+            state.cameraON = false;
         },
     },
 })
@@ -121,7 +121,7 @@ export const userSlice = createSlice({
 export const {
     toggleBackgroundMode,
     setSessionId,
-    setVideoConnected,
+    setMediaConnected,
     setLoggedIn,
     setPlayerNameMap,
     removePlayerNameMap,
@@ -132,8 +132,8 @@ export const {
     setEmail,
     setCharacterId,
     setIsVerified,
-    setMicDeviceId,
-    setCameraDeviceId,
+    setMicrophoneON,
+    setCameraON,
     setUserInfo,
     resetUserState,
 } = userSlice.actions

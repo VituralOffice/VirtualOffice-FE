@@ -268,12 +268,9 @@ export default function Chat() {
     const val = inputValue.trim()
     setInputValue('')
     if (val) {
-      console.log({ game })
-      if (!game) {
-        await loadPhaserGame()
-        game.network.addChatMessage({ content: val, chatId: currentChat?._id })
-        game.myPlayer.updateDialogBubble(val)
-      }
+      if (!game) await loadPhaserGame()
+      game.network?.addChatMessage({ content: val, chatId: currentChat?._id || '' })
+      game.myPlayer?.updateDialogBubble(val)
     }
   }
   const getListChats = async () => {
@@ -299,7 +296,7 @@ export default function Chat() {
   }, [focused])
   useEffect(() => {
     scrollToBottom()
-  }, [mapMessages.get(currentChat?._id)?.messages, showChat])
+  }, [mapMessages.get(currentChat?._id || '')?.messages, showChat])
   return (
     <Backdrop>
       <Wrapper>
@@ -349,7 +346,7 @@ export default function Chat() {
                 </IconButton>
               </ChatHeader>
               <ChatBox>
-                {mapMessages.get(currentChat?._id)?.messages?.map((message, index) => (
+                {mapMessages.get(currentChat?._id || '')?.messages?.map((message, index) => (
                   <Message chatMessage={message} key={index} />
                 ))}
                 <div ref={messagesEndRef} />
@@ -428,18 +425,7 @@ export default function Chat() {
             </div>
           </div>
         ) : (
-          <FabWrapper>
-            <Fab
-              color="secondary"
-              aria-label="showChat"
-              onClick={() => {
-                dispatch(setShowChat(true))
-                dispatch(setFocused(true))
-              }}
-            >
-              <ChatBubbleOutlineIcon />
-            </Fab>
-          </FabWrapper>
+          <></>
         )}
       </Wrapper>
     </Backdrop>
