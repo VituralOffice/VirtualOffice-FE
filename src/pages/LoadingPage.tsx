@@ -96,27 +96,25 @@ export default function LoadingPage() {
     useEffect(() => {
         setLoading(true);
 
-        const stopAllTracks = async () => {
-            const stream = await navigator.mediaDevices
-                ?.getUserMedia({
-                    audio: true,
-                    video: true,
-                })
-                console.log(stream.getTracks().length)
-            stream.getTracks().forEach((t) => t.stop());
-            stream.getAudioTracks().forEach((t) => t.stop());
-            stream.getVideoTracks().forEach((t) => t.stop());
-        }
-
+        // const stopAllTracks = async () => {
+        //     const stream = await navigator.mediaDevices
+        //         ?.getUserMedia({
+        //             audio: true,
+        //             video: true,
+        //         })
+        //         console.log(stream.getTracks().length)
+        //     stream.getTracks().forEach((t) => t.stop());
+        //     stream.getAudioTracks().forEach((t) => t.stop());
+        //     stream.getVideoTracks().forEach((t) => t.stop());
+        // }
         
-
         const promise = new Promise<void>((resolve) => {
             setTimeout(resolve, 500);
         });
 
         promise.then(() => {
             setLoading(false)
-            stopAllTracks();
+            // stopAllTracks();
         });
 
         return () => setLoading(false);
