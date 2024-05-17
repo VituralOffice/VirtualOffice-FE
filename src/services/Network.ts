@@ -34,7 +34,7 @@ export default class Network {
 
   constructor() {
     console.log('Construct Network')
-    const endpoint = API_URL.replace(`https`, `wss`).replace(`http`, `ws`)
+    const endpoint = API_URL.replace('https', `wss`).replace('http', `ws`)
     // const endpoint = API_URL.replace(`http`, `ws`)
     this.client = new Client(endpoint)
     this.client.auth.token = Cookies.get(ACCESS_TOKEN_KEY) as string
