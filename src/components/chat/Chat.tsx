@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useRef, useState, useEffect, ChangeEvent, ClipboardEvent } from 'react'
 import styled from 'styled-components'
 import Box from '@mui/material/Box'
 import Fab from '@mui/material/Fab'
@@ -19,12 +19,13 @@ import { useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import ApiService from '../../apis/ApiService'
 import { IChat } from '../../interfaces/chat'
+import { IChatMessage } from '../../types/ISpaceState'
 
 const Backdrop = styled.div`
   position: fixed;
-  bottom: 60px;
+  bottom: 150px;
   left: 0;
-  height: 400px;
+  height: 700px;
   width: 700px;
   max-height: 50%;
   max-width: 100%;
@@ -44,10 +45,7 @@ const FabWrapper = styled.div`
 
 const ChatHeader = styled.div`
   position: relative;
-  height: 35px;
   background: #000000a7;
-  border-radius: 0 0 0px 0px;
-
   h3 {
     color: #fff;
     margin: 7px;
@@ -69,7 +67,18 @@ const ChatBox = styled(Box)`
   background: #2c2c2c;
   border: 1px solid #00000029;
 `
-
+const ListChat = styled(Box)`
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+  background: #2c2c2c;
+  border: 1px solid #00000029;
+`
+const ChatContainer = styled.div`
+  border: '1px solid white';
+  margin: 14px;
+  cursor: 'pointer';
+`
 const MessageWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -102,33 +111,35 @@ const MessageWrapper = styled.div`
 const InputWrapper = styled.form`
   box-shadow: 10px 10px 10px #00000018;
   border: 1px solid #42eacb;
-  border-radius: 0px 0px 10px 10px;
+  border-radius: 0px 0px 10px 0;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   background: linear-gradient(180deg, #000000c1, #242424c0);
 `
-
 const InputTextField = styled(InputBase)`
   border-radius: 0px 0px 10px 10px;
   input {
     padding: 5px;
   }
 `
-
 const EmojiPickerWrapper = styled.div`
   position: absolute;
   bottom: 54px;
   right: 16px;
 `
-
 const dateFormatter = new Intl.DateTimeFormat('en', {
   timeStyle: 'short',
   dateStyle: 'short',
 })
-
-const Message = ({ chatMessage, messageType }) => {
+interface MessageProps {
+  chatMessage: IChatMessage
+}
+interface PasteItem {
+  file: File
+  preview: string
+}
+const Message = ({ chatMessage }: MessageProps) => {
   const [tooltipOpen, setTooltipOpen] = useState(false)
-
   return (
     <MessageWrapper
       onMouseEnter={() => {
@@ -140,23 +151,17 @@ const Message = ({ chatMessage, messageType }) => {
     >
       <Tooltip
         open={tooltipOpen}
-        title={dateFormatter.format(chatMessage.createdAt)}
+        title={chatMessage?.createdAt?.toString()}
         placement="right"
         arrow
       >
-        {messageType === MessageType.REGULAR_MESSAGE ? (
-          <p
-            style={{
-              color: getColorByString(chatMessage.author),
-            }}
-          >
-            {chatMessage.author}: <span>{chatMessage.content}</span>
-          </p>
-        ) : (
-          <p className="notification">
-            {chatMessage.author} {chatMessage.content}
-          </p>
-        )}
+        <p
+          style={{
+            color: getColorByString(chatMessage.user?.fullname || ''),
+          }}
+        >
+          {chatMessage.user?.fullname}: <span>{chatMessage.message?.text}</span>
+        </p>
       </Tooltip>
     </MessageWrapper>
   )
@@ -172,8 +177,10 @@ export default function Chat() {
   const focused = useAppSelector((state) => state.chat.focused)
   const showChat = useAppSelector((state) => state.chat.showChat)
   const mapMessages = useAppSelector((state) => state.chat.mapMessages)
-  const [currentChat, setCurrentChat] = useState<IChat>(null)
-  let chatMessages = []
+  const [currentChat, setCurrentChat] = useState<IChat | null>(null)
+  const [inputType, setInputType] = useState<'text' | 'image'>('text')
+  const [images, setImages] = useState<PasteItem[]>([])
+  const [error, setError] = useState<string | null>(null)
   const dispatch = useAppDispatch()
   let game: Game
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -181,6 +188,7 @@ export default function Chat() {
   }
   const loadPhaserGame = async () => {
     game = (await PhaserGameInstance())?.scene.keys.game as Game
+    game.network?.loadChat()
   }
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Escape') {
@@ -191,6 +199,57 @@ export default function Chat() {
   }
   const handleChangeChat = (chat: IChat) => {
     setCurrentChat(chat)
+  }
+  const handleTextChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setInputType('text')
+    setInputValue(e.target.value)
+  }
+  const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
+    const items = e?.clipboardData?.items
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].kind === 'file' && items[i].type.startsWith('image/')) {
+        const file = items[i].getAsFile()
+        if (file) {
+          const reader = new FileReader()
+          reader.onloadend = () => {
+            setInputType('image')
+            setImages([
+              ...images,
+              {
+                file,
+                preview: reader.result as string,
+              },
+            ])
+          }
+          reader.readAsDataURL(file)
+          setError(null)
+          return
+        }
+      }
+    }
+    setError('Pasted content is not an image.')
+  }
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setInputType('image')
+        //setImage(file)
+        ///setImagePreviewUrl(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+      setError(null)
+    } else {
+      setError('Selected file is not an image.')
+    }
+  }
+  const handleReset = () => {
+    setInputType('text')
+    setInputValue('')
+    //setImage(null)
+    //setImagePreviewUrl(null)
+    setError(null)
   }
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -212,7 +271,7 @@ export default function Chat() {
       console.log({ game })
       if (!game) {
         await loadPhaserGame()
-        game.network.addChatMessage({ content: val, chatId: currentChat._id })
+        game.network.addChatMessage({ content: val, chatId: currentChat?._id })
         game.myPlayer.updateDialogBubble(val)
       }
     }
@@ -234,45 +293,51 @@ export default function Chat() {
     getListChats()
   }, [])
   useEffect(() => {
-    chatMessages = mapMessages[currentChat?._id]?.messages || []
-  }, [currentChat])
-  useEffect(() => {
     if (focused) {
       inputRef.current?.focus()
     }
   }, [focused])
   useEffect(() => {
     scrollToBottom()
-  }, [chatMessages, showChat])
-  console.log({ mapMessages, chatMessages })
+  }, [mapMessages.get(currentChat?._id)?.messages, showChat])
   return (
     <Backdrop>
       <Wrapper>
         {showChat ? (
           <div style={{ height: '100%', display: 'flex' }}>
             {
-              <div style={{ width: '25%', cursor: 'pointer' }}>
-                <ChatHeader>
+              <div
+                style={{
+                  width: '25%',
+                  cursor: 'pointer',
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <ChatHeader style={{ borderRadius: '10px 0 0 0' }}>
                   <h3>Chats</h3>
                 </ChatHeader>
-                <ChatBox>
+                <ListChat style={{ borderRadius: '0 0 0 10px' }}>
                   {listChats.map((chat) => (
-                    <p
-                      key={chat.id}
-                      onClick={() => {
-                        console.log({ chat })
-                        setCurrentChat(chat)
-                      }}
-                    >
-                      {chat.name}
-                    </p>
+                    <ChatContainer key={chat._id}>
+                      <p
+                        style={{ color: 'white' }}
+                        key={chat._id}
+                        onClick={() => {
+                          console.log({ chat })
+                          setCurrentChat(chat)
+                        }}
+                      >
+                        {chat.name}
+                      </p>
+                    </ChatContainer>
                   ))}
-                </ChatBox>
-                <h1></h1>
+                </ListChat>
               </div>
             }
-            <div style={{ width: '75%' }}>
-              <ChatHeader>
+            <div style={{ width: '75%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <ChatHeader style={{ borderRadius: '0 10px 0 0' }}>
                 <h3>{currentChat?.name || ''}</h3>
                 <IconButton
                   aria-label="close dialog"
@@ -284,8 +349,8 @@ export default function Chat() {
                 </IconButton>
               </ChatHeader>
               <ChatBox>
-                {chatMessages.map(({ messageType, chatMessage }, index) => (
-                  <Message chatMessage={chatMessage} messageType={messageType} key={index} />
+                {mapMessages.get(currentChat?._id)?.messages?.map((message, index) => (
+                  <Message chatMessage={message} key={index} />
                 ))}
                 <div ref={messagesEndRef} />
                 {showEmojiPicker && (
@@ -305,28 +370,60 @@ export default function Chat() {
                 )}
               </ChatBox>
               <InputWrapper onSubmit={handleSubmit}>
-                <InputTextField
-                  inputRef={inputRef}
-                  autoFocus={focused}
-                  fullWidth
-                  placeholder="Press Enter to chat"
-                  value={inputValue}
-                  onKeyDown={handleKeyDown}
-                  onChange={handleChange}
-                  onFocus={() => {
-                    if (!focused) {
-                      dispatch(setFocused(true))
-                      setReadyToSubmit(true)
-                    }
-                  }}
-                  onBlur={() => {
-                    dispatch(setFocused(false))
-                    setReadyToSubmit(false)
-                  }}
-                />
-                <IconButton aria-label="emoji" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
-                  <InsertEmoticonIcon />
-                </IconButton>
+                {inputType === 'image' && images.length > 0 && (
+                  <div style={{ width: '100%', display: 'flex' }}>
+                    {images.map((image, idx) => (
+                      <div
+                        style={{
+                          width: '100px',
+                          height: '100px',
+                          margin: '10px',
+                          position: 'relative',
+                        }}
+                      >
+                        <img src={image.preview} alt="Preview" style={{ width: '100%' }} />
+                        <IconButton
+                          aria-label="close dialog"
+                          className="close"
+                          onClick={() => setImages([...images.filter((_, i) => i !== idx)])}
+                          size="small"
+                          style={{ position: 'absolute', right: '0' }}
+                        >
+                          <CloseIcon />
+                        </IconButton>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div style={{ display: 'flex' }}>
+                  <InputTextField
+                    inputRef={inputRef}
+                    autoFocus={focused}
+                    fullWidth
+                    placeholder="Press Enter to chat"
+                    value={inputValue}
+                    onKeyDown={handleKeyDown}
+                    onChange={handleChange}
+                    onPaste={handlePaste}
+                    inputProps={{ accept: 'image/*' }}
+                    onFocus={() => {
+                      if (!focused) {
+                        dispatch(setFocused(true))
+                        setReadyToSubmit(true)
+                      }
+                    }}
+                    onBlur={() => {
+                      dispatch(setFocused(false))
+                      setReadyToSubmit(false)
+                    }}
+                  />
+                  <IconButton
+                    aria-label="emoji"
+                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  >
+                    <InsertEmoticonIcon />
+                  </IconButton>
+                </div>
               </InputWrapper>
             </div>
           </div>

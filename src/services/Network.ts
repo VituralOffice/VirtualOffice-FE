@@ -13,6 +13,7 @@ import WebRTC from '../web/WebRTC'
 import { GameEvent, phaserEvents } from '../events/EventCenter'
 import { IRoomData, RoomType } from '../types/Rooms'
 import {
+  loadMapChatMessage,
   pushChatMessage,
   pushPlayerJoinedMessage,
   pushPlayerLeftMessage,
@@ -172,10 +173,21 @@ export default class Network {
       console.log({ content })
       store.dispatch(setJoinedRoomData(content))
     })
-
+    // when the server sends room data
+    this.room.onMessage(Message.LOAD_CHAT, ({ mapChatMessages }) => {
+      ///store.dispatch(setJoinedRoomData(content))
+      store.dispatch(loadMapChatMessage(mapChatMessages))
+    })
     // when a user sends a message
-    this.room.onMessage(Message.ADD_CHAT_MESSAGE, ({ clientId, content }) => {
-      phaserEvents.emit(GameEvent.UPDATE_DIALOG_BUBBLE, clientId, content)
+    this.room.onMessage(Message.ADD_CHAT_MESSAGE, ({ clientId, chatId, message }) => {
+      //
+      store.dispatch(
+        pushChatMessage({
+          chatId,
+          message,
+        })
+      )
+      phaserEvents.emit(GameEvent.UPDATE_DIALOG_BUBBLE, clientId, message.message.text)
     })
 
     // when a peer disconnects with myPeer
@@ -290,5 +302,8 @@ export default class Network {
   addChatMessage({ content, chatId }: { content: string; chatId: string }) {
     console.log({ content, chatId })
     this.room?.send(Message.ADD_CHAT_MESSAGE, { content, chatId })
+  }
+  loadChat() {
+    this.room?.send(Message.LOAD_CHAT)
   }
 }

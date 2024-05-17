@@ -9,11 +9,18 @@ export interface IPlayer extends IUser, Schema {
   readyToConnect: boolean
   videoConnected: boolean
 }
-
+export interface IMessage extends Schema {
+  type: string
+  text: string
+  filename: string
+  fileType: string
+  path: string
+}
 export interface IChatMessage extends Schema {
-  author: string
-  createdAt: number
-  content: string
+  createdAt: string
+  chat: string
+  user: IPlayer
+  message: IMessage
 }
 export interface IMapMessage extends Schema {
   id: string
