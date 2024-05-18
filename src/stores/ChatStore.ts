@@ -13,7 +13,7 @@ export const chatSlice = createSlice({
   name: 'chat',
   initialState: {
     focused: false,
-    showChat: true,
+    showChat: false,
     listChats: [] as IChat[],
     mapMessages: new Map<string, IMapMessage>(),
   },
