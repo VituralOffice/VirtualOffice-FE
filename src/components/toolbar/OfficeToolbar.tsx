@@ -18,6 +18,7 @@ import { OfficeParticipantSidebar } from '../sidebars/office/OfficeParticipantSi
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import WebRTC from '../../web/WebRTC'
 import { useDispatch } from 'react-redux'
+import { setShowChat } from '../../stores/ChatStore'
 import { useToggleCamera, useToggleMicrophone } from '../../web/utils'
 
 const LayoutContainer = styled.div<{ isExpanded: boolean }>`
@@ -81,10 +82,13 @@ const ToolbarButton = styled.button<ButtonProps>`
   border: none;
   border-radius: 8px;
   background-color: ${(props) => (props.isEnabled ? '' : 'transparent')};
-  ${(props) => (props.isEnabled ? 'background-color: rgb(84, 92, 143);' : `
+  ${(props) =>
+    props.isEnabled
+      ? 'background-color: rgb(84, 92, 143);'
+      : `
   background-color: transparent;
   &:hover {background-color: rgb(51, 58, 100)};
-    `)}
+    `}
   transition: background-color 200ms ease 0s;
   cursor: pointer;
   position: relative;
@@ -120,7 +124,7 @@ const ExitButton = styled(ToolbarButton)`
   }
 `
 
-const ExpandMenu = styled(ToolbarButton) <{ expanded: boolean }>`
+const ExpandMenu = styled(ToolbarButton)<{ expanded: boolean }>`
   padding: 8px 2px;
   outline: none;
   &>div{
@@ -128,7 +132,7 @@ const ExpandMenu = styled(ToolbarButton) <{ expanded: boolean }>`
       transform: ${(props) => props.expanded ? 'rotate(180deg)' : 'rotate(0deg)'};
     }
   }
-  `
+`
 
 const ExpandContentContainer = styled.div`
   overflow: hidden;
@@ -137,7 +141,7 @@ const ExpandContentContainer = styled.div`
   transform-origin: left;
   gap: 8px;
   height: 100%;
-  `
+`
 // transition: width 1s ease-in-out;
 
 const OfficeToolbar = () => {
@@ -147,6 +151,7 @@ const OfficeToolbar = () => {
   const [isToolbarExpanded, setIsToolbarExpanded] = useState(true);
   const toggleMic = useToggleMicrophone();
   const toggleCam = useToggleCamera();
+  const showChat = useAppSelector((state) => state.chat.showChat)
 
   const toggetMic = () => {
     const nextState = !user.microphoneON;
@@ -182,13 +187,13 @@ const OfficeToolbar = () => {
                 OnIcon={<VideocamRoundedIcon />}
                 OffIcon={<VideocamOffRoundedIcon />}
               />
-              <ToolbarButton>
-                <div>
-                  <span>
-                    <ForumIcon />
-                  </span>
-                </div>
-              </ToolbarButton>
+              <ToolbarButton onClick={() => store.dispatch(setShowChat(!showChat))}>
+              <div>
+                <span>
+                  <ForumIcon />
+                </span>
+              </div>
+            </ToolbarButton>
               <ToolbarButton isEnabled={showParticipantSidebar} onClick={() => setShowParticipantSidebar(!showParticipantSidebar)}>
                 <div>
                   <span>

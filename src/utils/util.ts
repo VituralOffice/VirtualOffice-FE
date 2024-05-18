@@ -1,4 +1,4 @@
-import Cookies from "js-cookie"
+import Cookies from 'js-cookie'
 
 export function sanitizeId(id: string) {
   let sanitized = id
@@ -34,14 +34,26 @@ export function getCookie(name: string): string | undefined {
 
 export async function addStopAllTrackBeforeUnloadEvent() {
   const func = async () => {
-    console.log("unload")
-    const stream = await navigator.mediaDevices
-      ?.getUserMedia({
-        audio: true,
-        video: true,
-      })
-    stream.getTracks().forEach((t) => t.stop());
-    window.removeEventListener('unload', func);
+    console.log('unload')
+    const stream = await navigator.mediaDevices?.getUserMedia({
+      audio: true,
+      video: true,
+    })
+    stream.getTracks().forEach((t) => t.stop())
+    window.removeEventListener('unload', func)
   }
-  window.addEventListener('unload', func);
+  window.addEventListener('unload', func)
+}
+const colorArr = [
+  '#7bf1a8',
+  '#ff7e50',
+  '#9acd32',
+  '#daa520',
+  '#ff69b4',
+  '#c085f6',
+  '#1e90ff',
+  '#5f9da0',
+]
+export function getColorByString(string: string) {
+  return colorArr[Math.floor(string.charCodeAt(0) % colorArr.length)]
 }
