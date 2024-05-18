@@ -3,6 +3,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { BackgroundMode } from '../types/BackgroundMode'
 import { sanitizeId } from '../utils/util'
 import { UserData } from '../types'
+import WebRTC from '../web/WebRTC'
 
 export function getInitialBackgroundMode() {
     const currentHour = new Date().getHours()
@@ -17,7 +18,7 @@ export const userSlice = createSlice({
         mediaConnected: false,
         playerNameMap: new Map<string, string>(),
         showJoystick: window.innerWidth < 650,
-        
+
         //user info
         userId: '',
         username: 'Anonymous',

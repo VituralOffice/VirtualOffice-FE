@@ -22,7 +22,8 @@ export const OfficeSpace = () => {
 
   const handleJoinRoom = async () => {
     try {
-      await Bootstrap.getInstance()?.network.joinCustomById(room!._id)
+      await Bootstrap.getInstance()?.network.joinCustomById(room!._id);
+      setJoinPageShow(false);
     } catch (e: any) {
       if (e.message.includes('not found')) {
         try {
@@ -32,21 +33,21 @@ export const OfficeSpace = () => {
             map: room!.map,
             autoDispose: room!.autoDispose,
           } as any)
+          setJoinPageShow(false);
         } catch (createError) {
           console.log('Error creating room:', createError)
           navigate('/')
         }
-        return
+        return;
       }
       console.log(e)
       navigate('/')
-      return
+      return;
     }
     if (!lobbyJoined) {
       navigate('/app')
-      return
+      return;
     }
-    setJoinPageShow(false)
   }
 
   useEffect(() => {

@@ -28,6 +28,11 @@ export default class MyPlayer extends Player {
     this.playContainerBody = this.playerContainer.body as Phaser.Physics.Arcade.Body
   }
 
+  getPlayerId() {
+    if(this.playerId) return this.playerId;
+    return Network.getInstance()?.mySessionId;
+  }
+
   setPlayerName(name: string) {
     this.playerNameText.setText(name)
     phaserEvents.emit(GameEvent.MY_PLAYER_NAME_CHANGE, name)

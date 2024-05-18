@@ -1,17 +1,19 @@
 import Peer, { MediaConnection } from 'peerjs'
 import Network from '../services/Network'
 import store from '../stores'
-import { setMediaConnected } from '../stores/UserStore'
+import { setCameraON, setMediaConnected, setMicrophoneON } from '../stores/UserStore'
 import { PEER_CONNECT_OPTIONS } from '../constant'
+import Game from '../scenes/Game'
 
 export default class WebRTC {
   private static instance: WebRTC | null = null; // Biến static instance
 
   private myPeer: Peer
-  private peers = new Map<string, { call: MediaConnection; video: HTMLVideoElement }>()
-  private onCalledPeers = new Map<string, { call: MediaConnection; video: HTMLVideoElement }>()
-  private videoGrid = document.querySelector('.video-grid')
-  private buttonGrid = document.querySelector('.button-grid')
+  private peers = new Map<string, { call: MediaConnection; uiBlock: HTMLElement; video: HTMLVideoElement }>()
+  private onCalledPeers = new Map<string, { call: MediaConnection; uiBlock: HTMLElement; video: HTMLVideoElement }>()
+  private myVideoGrid = document.querySelector('.my-video-grid')
+  private othersVideoGrid = document.querySelector('.others-video-grid')
+  // private buttonGrid = document.querySelector('.button-grid')
   private myVideo = document.createElement('video')
   private myStream?: MediaStream
   private network: Network
@@ -49,12 +51,23 @@ export default class WebRTC {
   initialize() {
     this.myPeer.on('call', (call) => {
       if (!this.onCalledPeers.has(call.peer)) {
+        console.log('answer call from ', call.metadata?.username)
         call.answer(this.myStream)
-        const video = document.createElement('video')
-        this.onCalledPeers.set(call.peer, { call, video })
+
+        // Access username from call metadata
+        const username = call.metadata?.username || 'Unknown User';
+
+        // Create elements
+        const uiBlock = document.createElement('div');
+        const video = document.createElement('video');
+        const p = document.createElement('p');
+        p.textContent = username;
+        uiBlock.appendChild(video);
+        uiBlock.appendChild(p);
+        this.onCalledPeers.set(call.peer, { call, uiBlock, video })
 
         call.on('stream', (userVideoStream) => {
-          this.addVideoStream(video, userVideoStream)
+          this.addVideoStream(uiBlock, video, userVideoStream, false)
         })
       }
       // on close is triggered manually with deleteOnCalledVideoStream()
@@ -64,13 +77,15 @@ export default class WebRTC {
   disconnect() {
     this.peers.forEach((peer) => {
       peer.call.close()
-      peer.video.remove()
+      // peer.video.remove()
+      peer?.uiBlock.remove()
     })
     this.peers.clear()
 
     this.onCalledPeers.forEach((onCalledPeer) => {
       onCalledPeer.call.close()
-      onCalledPeer.video.remove()
+      // onCalledPeer.video.remove()
+      onCalledPeer?.uiBlock.remove()
     })
     this.onCalledPeers.clear()
   }
@@ -92,8 +107,9 @@ export default class WebRTC {
       })
       .then((stream) => {
         this.myStream = stream
-        this.addVideoStream(this.myVideo, this.myStream)
-        this.setUpButtons()
+        this.addVideoStream(this.myVideo, this.myVideo, this.myStream, true)
+        store.dispatch(setMicrophoneON(stream.getAudioTracks().length > 0))
+        store.dispatch(setCameraON(stream.getVideoTracks().length > 0))
         store.dispatch(setMediaConnected(true))
         this.network.mediaConnected()
       })
@@ -103,17 +119,23 @@ export default class WebRTC {
   }
 
   // method to call a peer
-  connectToNewUser(userId: string) {
+  connectToNewUser(userId: string, username: string) {
     if (this.myStream) {
       const sanitizedId = this.replaceInvalidId(userId)
       if (!this.peers.has(sanitizedId)) {
-        console.log('calling', sanitizedId)
-        const call = this.myPeer.call(sanitizedId, this.myStream)
-        const video = document.createElement('video')
-        this.peers.set(sanitizedId, { call, video })
+        console.log('calling', username)
+        const call = this.myPeer.call(sanitizedId, this.myStream, { metadata: { username: store.getState().user.playerName } })
+        // Create elements
+        const uiBlock = document.createElement('div');
+        const video = document.createElement('video');
+        const p = document.createElement('p');
+        p.textContent = username;
+        uiBlock.appendChild(video);
+        uiBlock.appendChild(p);
+        this.peers.set(sanitizedId, { call, uiBlock, video })
 
         call.on('stream', (userVideoStream) => {
-          this.addVideoStream(video, userVideoStream)
+          this.addVideoStream(uiBlock, video, userVideoStream, false)
         })
 
         // on close is triggered manually with deleteVideoStream()
@@ -122,13 +144,14 @@ export default class WebRTC {
   }
 
   // method to add new video stream to videoGrid div
-  addVideoStream(video: HTMLVideoElement, stream: MediaStream) {
+  addVideoStream(block: HTMLElement, video: HTMLVideoElement, stream: MediaStream, isMe: boolean) {
     video.srcObject = stream
     video.playsInline = true
     video.addEventListener('loadedmetadata', () => {
       video.play()
     })
-    if (this.videoGrid) this.videoGrid.append(video)
+    if (isMe && this.myVideoGrid) this.myVideoGrid.append(video)
+    if (!isMe && this.othersVideoGrid) this.othersVideoGrid.append(block)
   }
 
   // method to remove video stream (when we are the host of the call)
@@ -137,7 +160,8 @@ export default class WebRTC {
     if (this.peers.has(sanitizedId)) {
       const peer = this.peers.get(sanitizedId)
       peer?.call.close()
-      peer?.video.remove()
+      // peer?.video.remove()
+      peer?.uiBlock.remove()
       this.peers.delete(sanitizedId)
     }
   }
@@ -148,42 +172,58 @@ export default class WebRTC {
     if (this.onCalledPeers.has(sanitizedId)) {
       const onCalledPeer = this.onCalledPeers.get(sanitizedId)
       onCalledPeer?.call.close()
-      onCalledPeer?.video.remove()
+      // onCalledPeer?.video.remove()
+      onCalledPeer?.uiBlock.remove()
       this.onCalledPeers.delete(sanitizedId)
     }
   }
 
-  // method to set up mute/unmute and video on/off buttons
-  setUpButtons() {
-    const audioButton = document.createElement('button')
-    audioButton.innerText = 'Mute'
-    audioButton.addEventListener('click', () => {
-      if (this.myStream) {
-        const audioTrack = this.myStream.getAudioTracks()[0]
-        if (audioTrack.enabled) {
-          audioTrack.enabled = false
-          audioButton.innerText = 'Unmute'
-        } else {
-          audioTrack.enabled = true
-          audioButton.innerText = 'Mute'
-        }
-      }
-    })
-    const videoButton = document.createElement('button')
-    videoButton.innerText = 'Video off'
-    videoButton.addEventListener('click', () => {
-      if (this.myStream) {
-        const audioTrack = this.myStream.getVideoTracks()[0]
-        if (audioTrack.enabled) {
-          audioTrack.enabled = false
-          videoButton.innerText = 'Video on'
-        } else {
-          audioTrack.enabled = true
-          videoButton.innerText = 'Video off'
-        }
-      }
-    })
-    this.buttonGrid?.append(audioButton)
-    this.buttonGrid?.append(videoButton)
+  turnMic(isOn: boolean): boolean {
+    if (!this.myStream) return false;
+    let tracks = this.myStream.getAudioTracks()
+    if (tracks.length == 0) return false;
+    tracks.forEach((track) => track.enabled = isOn)
+    return true;
   }
+  turnCam(isOn: boolean): boolean {
+    if (!this.myStream) return false;
+    let tracks = this.myStream.getVideoTracks()
+    if (tracks.length == 0) return false;
+    tracks.forEach((track) => track.enabled = isOn)
+    return true;
+  }
+
+  // // method to set up mute/unmute and video on/off buttons
+  // setUpButtons() {
+  //   const audioButton = document.createElement('button')
+  //   audioButton.innerText = 'Mute'
+  //   audioButton.addEventListener('click', () => {
+  //     if (this.myStream) {
+  //       const audioTrack = this.myStream.getAudioTracks()[0]
+  //       if (audioTrack.enabled) {
+  //         audioTrack.enabled = false
+  //         audioButton.innerText = 'Unmute'
+  //       } else {
+  //         audioTrack.enabled = true
+  //         audioButton.innerText = 'Mute'
+  //       }
+  //     }
+  //   })
+  //   const videoButton = document.createElement('button')
+  //   videoButton.innerText = 'Video off'
+  //   videoButton.addEventListener('click', () => {
+  //     if (this.myStream) {
+  //       const audioTrack = this.myStream.getVideoTracks()[0]
+  //       if (audioTrack.enabled) {
+  //         audioTrack.enabled = false
+  //         videoButton.innerText = 'Video on'
+  //       } else {
+  //         audioTrack.enabled = true
+  //         videoButton.innerText = 'Video off'
+  //       }
+  //     }
+  //   })
+  //   this.buttonGrid?.append(audioButton)
+  //   this.buttonGrid?.append(videoButton)
+  // }
 }

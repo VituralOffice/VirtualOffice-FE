@@ -32,17 +32,17 @@ export default class OtherPlayer extends Player {
 
   makeCall(myPlayer: MyPlayer, webRTC: WebRTC) {
     this.myPlayer = myPlayer
-    // const myPlayerId = myPlayer.playerId
     if (
       !this.connected
       && this.connectionBufferTime >= 750
       && myPlayer.readyToConnect
       && this.readyToConnect
       && myPlayer.mediaConnected
-      // && myPlayerId > this.playerId
+      && myPlayer.getPlayerId()! > this.playerId
     ) {
-      console.log(myPlayer.name + " connect " + this.name);
-      webRTC.connectToNewUser(this.playerId)
+      // console.log(myPlayer.getPlayerId() + " ------- " + this.playerId)
+      console.log(myPlayer.playerNameText.text + " connect " + this.playerNameText.text);
+      webRTC.connectToNewUser(this.playerId, this.playerNameText.text)
       this.connected = true
       this.connectionBufferTime = 0
     }

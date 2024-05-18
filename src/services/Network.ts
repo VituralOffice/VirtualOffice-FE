@@ -25,6 +25,8 @@ import { API_URL } from '../constant'
 import Cookies from 'js-cookie'
 
 export default class Network {
+  private static instance: Network | null = null; // Biến static instance
+
   private client: Client
   private room?: Room<IOfficeState>
   private lobby!: Room
@@ -33,8 +35,9 @@ export default class Network {
   mySessionId!: string
 
   constructor() {
+    Network.instance = this;
     console.log('Construct Network')
-    const endpoint = API_URL.replace('https', `wss`).replace('http', `ws`)
+    const endpoint = API_URL.replace('https', `wss`)
     // const endpoint = API_URL.replace(`http`, `ws`)
     this.client = new Client(endpoint)
     this.client.auth.token = Cookies.get(ACCESS_TOKEN_KEY) as string
@@ -46,6 +49,10 @@ export default class Network {
     phaserEvents.on(GameEvent.MY_PLAYER_NAME_CHANGE, this.updatePlayerName, this)
     phaserEvents.on(GameEvent.MY_PLAYER_TEXTURE_CHANGE, this.updatePlayer, this)
     phaserEvents.on(GameEvent.PLAYER_DISCONNECTED, this.playerStreamDisconnect, this)
+  }
+
+  static getInstance(): Network | null {
+    return Network.instance;
   }
 
   public disconnectClient() {
