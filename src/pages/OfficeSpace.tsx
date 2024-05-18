@@ -79,7 +79,6 @@ export const OfficeSpace = () => {
     <>
       {joinPageShow && <JoinOfficePage handleJoinRoom={handleJoinRoom} />}
       {!joinPageShow && <OfficeToolbar></OfficeToolbar>}
-      {!joinPageShow && <Chat></Chat>}
     </>
   )
 }

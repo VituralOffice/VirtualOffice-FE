@@ -20,6 +20,7 @@ import WebRTC from '../../web/WebRTC'
 import { useDispatch } from 'react-redux'
 import { setShowChat } from '../../stores/ChatStore'
 import { useToggleCamera, useToggleMicrophone } from '../../web/utils'
+import Chat from '../chat/Chat'
 
 const LayoutContainer = styled.div<{ isExpanded: boolean }>`
   position: absolute;
@@ -124,7 +125,7 @@ const ExitButton = styled(ToolbarButton)`
   }
 `
 
-const ExpandMenu = styled(ToolbarButton)<{ expanded: boolean }>`
+const ExpandMenu = styled(ToolbarButton) <{ expanded: boolean }>`
   padding: 8px 2px;
   outline: none;
   &>div{
@@ -188,12 +189,12 @@ const OfficeToolbar = () => {
                 OffIcon={<VideocamOffRoundedIcon />}
               />
               <ToolbarButton onClick={() => store.dispatch(setShowChat(!showChat))}>
-              <div>
-                <span>
-                  <ForumIcon />
-                </span>
-              </div>
-            </ToolbarButton>
+                <div>
+                  <span>
+                    <ForumIcon />
+                  </span>
+                </div>
+              </ToolbarButton>
               <ToolbarButton isEnabled={showParticipantSidebar} onClick={() => setShowParticipantSidebar(!showParticipantSidebar)}>
                 <div>
                   <span>
@@ -222,6 +223,9 @@ const OfficeToolbar = () => {
       </LayoutContainer>
       {showParticipantSidebar && (
         <OfficeParticipantSidebar onClose={() => setShowParticipantSidebar(false)} />
+      )}
+      {showChat && (
+        <Chat />
       )}
     </>
   )
