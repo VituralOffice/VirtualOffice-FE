@@ -18,26 +18,66 @@ body {
     canvas {
         display: block;
     }
+
     // height: 92%;
 }
-.video-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 160px);
-    grid-gap: 5px;
-    grid-auto-rows: 160px;
+
+.my-video-grid {
+    display: flex;
     position: absolute;
-    top: 35px;
+    bottom: 10px;
     right: 10px;
     max-height: calc(100% - 100px);
     overflow-y: auto;
+
+    &>video {
+        width: 160px;
+        height: 160px;
+        object-fit: cover;
+        border-radius: 5px;
+        border: 1px groove rgb(229, 251, 255);
+    }
 }
 
-.video-grid video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 5px;
-    border: 1px groove rgb(229, 251, 255);
+.others-video-grid {
+    display: flex;
+    position: absolute;
+    gap: 10px;
+    top: 10px;
+    right: 10px;
+    max-height: calc(100% - 100px);
+    overflow-y: visible;
+
+    &>div {
+        width: 160px;
+        height: 160px;
+        position: relative;
+
+        &>video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 1px groove rgb(229, 251, 255);
+        }
+
+        &>p {
+            position: absolute;
+            margin: 0;
+            bottom: -20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            color: white;
+            text-shadow: 
+                -1px -1px 0 #000,  
+                 1px -1px 0 #000,
+                -1px  1px 0 #000,
+                 1px  1px 0 #000;
+        }
+    }
 }
 
 .button-grid {
@@ -76,6 +116,7 @@ body {
         border-radius: 3px;
     }
 }
+
 .bg-color {
-   background-color:  rgb(32, 37, 64);
+    background-color: rgb(32, 37, 64);
 }

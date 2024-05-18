@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { useState } from 'react'
 import store from '../../stores'
-import { setMediaConnected } from '../../stores/UserStore'
+import { setCameraON, setMediaConnected, setMicrophoneON } from '../../stores/UserStore'
 import { User } from '../../types'
 import { useAppSelector } from '../../hook'
 import { ButtonProps } from '../../interfaces/Interfaces'
@@ -16,6 +16,9 @@ import MeetingRoomIcon from '@mui/icons-material/MeetingRoom'
 import OfficeLogoMenuPopup from '../popups/OfficeLogoMenuPopup'
 import { OfficeParticipantSidebar } from '../sidebars/office/OfficeParticipantSidebar'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import WebRTC from '../../web/WebRTC'
+import { useDispatch } from 'react-redux'
+import { useToggleCamera, useToggleMicrophone } from '../../web/utils'
 
 const LayoutContainer = styled.div<{ isExpanded: boolean }>`
   position: absolute;
@@ -119,6 +122,7 @@ const ExitButton = styled(ToolbarButton)`
 
 const ExpandMenu = styled(ToolbarButton) <{ expanded: boolean }>`
   padding: 8px 2px;
+  outline: none;
   &>div{
     &>span{
       transform: ${(props) => props.expanded ? 'rotate(180deg)' : 'rotate(0deg)'};
@@ -137,31 +141,21 @@ const ExpandContentContainer = styled.div`
 // transition: width 1s ease-in-out;
 
 const OfficeToolbar = () => {
-  const [micEnabled, setMicEnabled] = useState(false)
-  const [camEnabled, setCamEnabled] = useState(false)
   const user = useAppSelector((state) => state.user)
   const [showLogoMenu, setShowLogoMenu] = useState(false)
   const [showParticipantSidebar, setShowParticipantSidebar] = useState(false)
   const [isToolbarExpanded, setIsToolbarExpanded] = useState(true);
+  const toggleMic = useToggleMicrophone();
+  const toggleCam = useToggleCamera();
 
   const toggetMic = () => {
-    const nextState = !micEnabled
-    if (!nextState) {
-      setMicEnabled(false)
-    } else {
-      // getMicMS()
-      setMicEnabled(true)
-    }
+    const nextState = !user.microphoneON;
+    toggleMic(nextState);
   }
 
   const toggetCam = () => {
-    const nextState = !camEnabled
-    if (!nextState) {
-      setCamEnabled(false)
-    } else {
-      // getCamMS()
-      setCamEnabled(true)
-    }
+    const nextState = !user.cameraON;
+    toggleCam(nextState);
   }
 
   return (
@@ -177,13 +171,13 @@ const OfficeToolbar = () => {
           isToolbarExpanded && (
             <ExpandContentContainer>
               <CustomToggleButton
-                enabled={micEnabled}
+                enabled={user.microphoneON}
                 onToggle={toggetMic}
                 OnIcon={<MicRoundedIcon />}
                 OffIcon={<MicOffRoundedIcon />}
               />
               <CustomToggleButton
-                enabled={camEnabled}
+                enabled={user.cameraON}
                 onToggle={toggetCam}
                 OnIcon={<VideocamRoundedIcon />}
                 OffIcon={<VideocamOffRoundedIcon />}
