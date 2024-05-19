@@ -8,8 +8,6 @@ import { GetRoomById } from '../apis/RoomApis'
 import { IRoomData } from '../types/Rooms'
 import { isApiSuccess } from '../apis/util'
 import OfficeToolbar from '../components/toolbar/OfficeToolbar'
-import { User } from '../types'
-import Chat from '../components/chat/Chat'
 
 export const OfficeSpace = () => {
   let { roomId } = useParams()
