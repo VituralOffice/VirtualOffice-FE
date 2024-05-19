@@ -88,6 +88,8 @@ export default class WebRTC {
       onCalledPeer?.uiBlock.remove()
     })
     this.onCalledPeers.clear()
+
+    this.myVideo.remove();
   }
 
   // check if permission has been granted before
