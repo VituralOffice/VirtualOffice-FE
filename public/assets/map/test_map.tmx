@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="40" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="17" nextobjectid="1389">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="40" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="18" nextobjectid="1389">
  <editorsettings>
   <export target="test_map.json" format="json"/>
  </editorsettings>
@@ -12861,50 +12861,6 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,85,217,217,217,217,217,217,217,217,217,217,217,217,217,217,218
 </data>
  </layer>
- <objectgroup id="3" name="Wall">
-  <object id="134" gid="149" x="608" y="512" width="32" height="32"/>
-  <object id="135" gid="930" x="576" y="512" width="32" height="32"/>
-  <object id="136" gid="930" x="544" y="512" width="32" height="32"/>
-  <object id="137" gid="930" x="512" y="512" width="32" height="32"/>
-  <object id="138" gid="930" x="480" y="512" width="32" height="32"/>
-  <object id="139" gid="930" x="448" y="512" width="32" height="32"/>
-  <object id="140" gid="929" x="416" y="512" width="32" height="32"/>
-  <object id="148" gid="931" x="352" y="512" width="32" height="32"/>
-  <object id="149" gid="930" x="320" y="512" width="32" height="32"/>
-  <object id="150" gid="930" x="288" y="512" width="32" height="32"/>
-  <object id="151" gid="930" x="256" y="512" width="32" height="32"/>
-  <object id="152" gid="930" x="224" y="512" width="32" height="32"/>
-  <object id="153" gid="930" x="192" y="512" width="32" height="32"/>
-  <object id="159" gid="722" x="192" y="352" width="32" height="32"/>
-  <object id="160" gid="722" x="224" y="352" width="32" height="32"/>
-  <object id="161" gid="722" x="256" y="352" width="32" height="32"/>
-  <object id="162" gid="722" x="288" y="352" width="32" height="32"/>
-  <object id="163" gid="722" x="320" y="352" width="32" height="32"/>
-  <object id="164" gid="723" x="352" y="352" width="32" height="32"/>
-  <object id="171" gid="721" x="416" y="352" width="32" height="32"/>
-  <object id="172" gid="722" x="448" y="352" width="32" height="32"/>
-  <object id="173" gid="722" x="480" y="352" width="32" height="32"/>
-  <object id="174" gid="722" x="512" y="352" width="32" height="32"/>
-  <object id="175" gid="722" x="544" y="352" width="32" height="32"/>
-  <object id="176" gid="722" x="576" y="352" width="32" height="32"/>
-  <object id="220" gid="723" x="640" y="288" width="32" height="32"/>
-  <object id="222" gid="721" x="704" y="288" width="32" height="32"/>
-  <object id="224" gid="722" x="736" y="288" width="32" height="32"/>
-  <object id="226" gid="28" x="768" y="288" width="32" height="32"/>
-  <object id="231" gid="722" x="800" y="288" width="32" height="32"/>
-  <object id="232" gid="722" x="832" y="288" width="32" height="32"/>
-  <object id="233" gid="722" x="864" y="288" width="32" height="32"/>
-  <object id="234" gid="722" x="896" y="288" width="32" height="32"/>
-  <object id="235" gid="722" x="928" y="288" width="32" height="32"/>
-  <object id="236" gid="722" x="960" y="288" width="32" height="32"/>
-  <object id="237" gid="722" x="992" y="288" width="32" height="32"/>
-  <object id="238" gid="722" x="1024" y="288" width="32" height="32"/>
-  <object id="318" gid="149" x="768" y="480" width="32" height="32"/>
-  <object id="1295" gid="722" x="160" y="352" width="32" height="32"/>
-  <object id="1298" gid="930" x="160" y="512" width="32" height="32"/>
-  <object id="1303" gid="722" x="128" y="352" width="32" height="32"/>
-  <object id="1304" gid="930" x="128" y="512" width="32" height="32"/>
- </objectgroup>
  <objectgroup id="4" name="Chair">
   <object id="334" gid="2562" x="320" y="672" width="32" height="64">
    <properties>
@@ -13072,7 +13028,51 @@
    </properties>
   </object>
  </objectgroup>
- <objectgroup id="5" name="Objects">
+ <objectgroup id="3" name="Wall">
+  <object id="134" gid="149" x="608" y="512" width="32" height="32"/>
+  <object id="135" gid="930" x="576" y="512" width="32" height="32"/>
+  <object id="136" gid="930" x="544" y="512" width="32" height="32"/>
+  <object id="137" gid="930" x="512" y="512" width="32" height="32"/>
+  <object id="138" gid="930" x="480" y="512" width="32" height="32"/>
+  <object id="139" gid="930" x="448" y="512" width="32" height="32"/>
+  <object id="140" gid="929" x="416" y="512" width="32" height="32"/>
+  <object id="148" gid="931" x="352" y="512" width="32" height="32"/>
+  <object id="149" gid="930" x="320" y="512" width="32" height="32"/>
+  <object id="150" gid="930" x="288" y="512" width="32" height="32"/>
+  <object id="151" gid="930" x="256" y="512" width="32" height="32"/>
+  <object id="152" gid="930" x="224" y="512" width="32" height="32"/>
+  <object id="153" gid="930" x="192" y="512" width="32" height="32"/>
+  <object id="159" gid="722" x="192" y="352" width="32" height="32"/>
+  <object id="160" gid="722" x="224" y="352" width="32" height="32"/>
+  <object id="161" gid="722" x="256" y="352" width="32" height="32"/>
+  <object id="162" gid="722" x="288" y="352" width="32" height="32"/>
+  <object id="163" gid="722" x="320" y="352" width="32" height="32"/>
+  <object id="164" gid="723" x="352" y="352" width="32" height="32"/>
+  <object id="171" gid="721" x="416" y="352" width="32" height="32"/>
+  <object id="172" gid="722" x="448" y="352" width="32" height="32"/>
+  <object id="173" gid="722" x="480" y="352" width="32" height="32"/>
+  <object id="174" gid="722" x="512" y="352" width="32" height="32"/>
+  <object id="175" gid="722" x="544" y="352" width="32" height="32"/>
+  <object id="176" gid="722" x="576" y="352" width="32" height="32"/>
+  <object id="220" gid="723" x="640" y="288" width="32" height="32"/>
+  <object id="222" gid="721" x="704" y="288" width="32" height="32"/>
+  <object id="224" gid="722" x="736" y="288" width="32" height="32"/>
+  <object id="226" gid="28" x="768" y="288" width="32" height="32"/>
+  <object id="231" gid="722" x="800" y="288" width="32" height="32"/>
+  <object id="232" gid="722" x="832" y="288" width="32" height="32"/>
+  <object id="233" gid="722" x="864" y="288" width="32" height="32"/>
+  <object id="234" gid="722" x="896" y="288" width="32" height="32"/>
+  <object id="235" gid="722" x="928" y="288" width="32" height="32"/>
+  <object id="236" gid="722" x="960" y="288" width="32" height="32"/>
+  <object id="237" gid="722" x="992" y="288" width="32" height="32"/>
+  <object id="238" gid="722" x="1024" y="288" width="32" height="32"/>
+  <object id="318" gid="149" x="768" y="480" width="32" height="32"/>
+  <object id="1295" gid="722" x="160" y="352" width="32" height="32"/>
+  <object id="1298" gid="930" x="160" y="512" width="32" height="32"/>
+  <object id="1303" gid="722" x="128" y="352" width="32" height="32"/>
+  <object id="1304" gid="930" x="128" y="512" width="32" height="32"/>
+ </objectgroup>
+ <objectgroup id="5" name="Objects" visible="0">
   <object id="372" gid="2776" x="704" y="288" width="32" height="32"/>
   <object id="373" gid="2777" x="736" y="288" width="32" height="32"/>
   <object id="374" gid="2792" x="704" y="320" width="32" height="32"/>
@@ -13155,7 +13155,7 @@
   <object id="1267" gid="2836" x="576" y="160" width="32" height="32"/>
   <object id="1268" gid="2852" x="576" y="192" width="32" height="32"/>
  </objectgroup>
- <objectgroup id="7" name="ObjectsOnCollide">
+ <objectgroup id="7" name="ObjectsOnCollide" visible="0">
   <object id="418" gid="2613" x="480" y="704" width="32" height="32"/>
   <object id="419" gid="2612" x="448" y="704" width="32" height="32"/>
   <object id="426" gid="2612" x="416" y="704" width="32" height="32"/>
@@ -13342,38 +13342,5 @@
  <objectgroup id="14" name="VendingMachine">
   <object id="1262" gid="5488" x="378" y="209" width="48" height="72"/>
  </objectgroup>
- <layer id="16" name="Meeting" width="40" height="30">
-  <data encoding="csv">
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,1611,1611,1611,1611,1611,1611,1611,1611,1611,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,1611,1611,1611,1611,1611,1611,1611,1611,1611,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,1611,1611,1611,1611,1611,1611,1611,1611,1611,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,1611,1611,1611,1611,1611,1611,1611,1611,1611,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-</data>
- </layer>
+ <objectgroup id="17" name="Meeting"/>
 </map>

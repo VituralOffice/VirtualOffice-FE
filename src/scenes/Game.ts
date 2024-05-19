@@ -101,16 +101,16 @@ export default class Game extends Phaser.Scene {
       item.itemDirection = chairObj.properties[0].value
     })
 
-    // import meetings objects from Tiled map to Phaser
-    const meetings = this.physics.add.staticGroup({ classType: Meeting })
-    const meetingLayer = this.map.getObjectLayer('Meeting')
-    meetingLayer!.objects.forEach((obj, i) => {
-      const item = this.addObjectFromTiled(meetings, obj, 'meetings', 'meeting') as Meeting
-      item.setDepth(item.y + item.height * 0.27)
-      const id = `${i}`
-      item.id = id
-      this.meetingMap.set(id, item)
-    })
+    // // import meetings objects from Tiled map to Phaser
+    // const meetings = this.physics.add.staticGroup({ classType: Meeting })
+    // const meetingLayer = this.map.getObjectLayer('Meeting')
+    // meetingLayer!.objects.forEach((obj, i) => {
+    //   const item = this.addObjectFromTiled(meetings, obj, 'meetings', 'meeting') as Meeting
+    //   item.setDepth(item.y + item.height * 0.27)
+    //   const id = `${i}`
+    //   item.id = id
+    //   this.meetingMap.set(id, item)
+    // })
 
     // import other objects from Tiled map to Phaser
     this.addGroupFromTiled('Wall', 'tiles_wall', 'FloorAndGround', false)
