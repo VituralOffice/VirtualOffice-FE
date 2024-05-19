@@ -152,16 +152,17 @@ export default class Network {
       store.dispatch(removePlayerNameMap(key))
     }
 
-    // // new instance added to the computers MapSchema
-    // this.room.state.meetings.onAdd = (meeting: IMeeting, key: string) => {
-    //   // track changes on every child object's connectedUser
-    //   meeting.connectedUser.onAdd = (item, index) => {
-    //     phaserEvents.emit(GameEvent.ITEM_USER_ADDED, item, key, ItemType.MEETING)
-    //   }
-    //   meeting.connectedUser.onRemove = (item, index) => {
-    //     phaserEvents.emit(GameEvent.ITEM_USER_REMOVED, item, key, ItemType.MEETING)
-    //   }
-    // }
+    // new instance added to the computers MapSchema
+    this.room.state.meetings.onAdd = (meeting: IMeeting, key: string) => {
+      // track changes on every child object's connectedUser
+      meeting.connectedUser.onAdd = (item, index) => {
+        phaserEvents.emit(GameEvent.ITEM_USER_ADDED, item, key, ItemType.MEETING)
+      }
+      meeting.connectedUser.onRemove = (item, index) => {
+        phaserEvents.emit(GameEvent.ITEM_USER_REMOVED, item, key, ItemType.MEETING)
+      }
+    }
+    
     this.room.state.mapMessages.onChange = (item, key: string) => {
       console.log(`mapMessages change`, item, key)
     }

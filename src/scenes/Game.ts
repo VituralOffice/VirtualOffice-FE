@@ -102,15 +102,15 @@ export default class Game extends Phaser.Scene {
     })
 
     // import meetings objects from Tiled map to Phaser
-    // const meetings = this.physics.add.staticGroup({ classType: Meeting })
-    // const meetingLayer = this.map.getObjectLayer('Meeting')
-    // meetingLayer!.objects.forEach((obj, i) => {
-    //   const item = this.addObjectFromTiled(meetings, obj, 'meetings', 'meeting') as Meeting
-    //   item.setDepth(item.y + item.height * 0.27)
-    //   const id = `${i}`
-    //   item.id = id
-    //   this.meetingMap.set(id, item)
-    // })
+    const meetings = this.physics.add.staticGroup({ classType: Meeting })
+    const meetingLayer = this.map.getObjectLayer('Meeting')
+    meetingLayer!.objects.forEach((obj, i) => {
+      const item = this.addObjectFromTiled(meetings, obj, 'meetings', 'meeting') as Meeting
+      item.setDepth(item.y + item.height * 0.27)
+      const id = `${i}`
+      item.id = id
+      this.meetingMap.set(id, item)
+    })
 
     // import other objects from Tiled map to Phaser
     this.addGroupFromTiled('Wall', 'tiles_wall', 'FloorAndGround', false)
@@ -272,8 +272,8 @@ export default class Game extends Phaser.Scene {
 
   update(t: number, dt: number) {
     if (this.myPlayer && this.network) {
-      this.playerSelector.update(this.myPlayer, this.cursors)
-      this.myPlayer.update(this.playerSelector, this.cursors, this.keyE, this.keyR, this.network)
+      this.playerSelector.update(this.myPlayer, this.cursors);
+      this.myPlayer.update(this.playerSelector, this.cursors, this.keyE, this.keyR, this.network);
     }
   }
 }
