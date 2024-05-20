@@ -8,7 +8,7 @@ import MyPlayer from '../characters/MyPlayer'
 import OtherPlayer from '../characters/OtherPlayer'
 import PlayerSelector from '../characters/PlayerSelector'
 import Network from '../services/Network'
-import Meeting from '../items/Meeting'
+// import Meeting from '../items/Meeting'
 
 import store from '../stores'
 import { setFocused, setShowChat } from '../stores/ChatStore'
@@ -18,7 +18,7 @@ import Item from '../items/Item'
 import { PlayerBehavior } from '../types/PlayerBehaviour'
 import { IPlayer } from '../types/ISpaceState'
 import { ItemType } from '../types/Items'
-import { avatars } from '../utils/util'
+import { Meeting } from '../web/Meeting'
 
 export default class Game extends Phaser.Scene {
   private static instance: Game | null = null // Biến static instance
@@ -104,14 +104,20 @@ export default class Game extends Phaser.Scene {
 
     chairLayer!.objects.forEach((chairObj) => {
       const item = this.addObjectFromTiled(chairs, chairObj, 'chairs', 'chair') as Chair;
-      const chairGroupID = chairObj.properties.find(prop => prop.name === 'chairGroupID').value;
+      const chairGroupID = chairObj.properties[0].value;
       item.groupId = chairGroupID;
-    
+      item.itemDirection = chairObj.properties[1].value
+
       if (!this.chairGroups.has(chairGroupID)) {
         this.chairGroups.set(chairGroupID, []);
       }
       this.chairGroups.get(chairGroupID)!.push(item);
     });
+
+    // init meeting manager
+    for (let i = 0; i < 5; i++) {
+      this.meetingMap.set(String(i), new Meeting(String(i)))
+    }
 
     // // import meetings objects from Tiled map to Phaser
     // const meetings = this.physics.add.staticGroup({ classType: Meeting })
@@ -289,8 +295,7 @@ export default class Game extends Phaser.Scene {
     otherPlayer?.updateDialogBubble(content)
   }
 
-  async handleSitOnChair(chair: Chair)
-  {
+  async handleSitOnChair(chair: Chair) {
     // const chairGroupID = chair.groupId!;
 
     // if (!this.meetingMap.has(chairGroupID)) {

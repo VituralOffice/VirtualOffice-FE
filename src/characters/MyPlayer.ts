@@ -10,9 +10,10 @@ import store from '../stores'
 import { pushPlayerJoinedMessage } from '../stores/ChatStore'
 import { NavKeys } from '../types/KeyboardState'
 import { ItemType } from '../types/Items'
-import Meeting from '../items/Meeting'
+// import Meeting from '../items/Meeting'
 import { PlayerBehavior } from '../types/PlayerBehaviour'
 import Game from '../scenes/Game'
+import { Meeting } from '../web/Meeting'
 
 export default class MyPlayer extends Player {
   private playContainerBody: Phaser.Physics.Arcade.Body
@@ -30,7 +31,7 @@ export default class MyPlayer extends Player {
   }
 
   getPlayerId() {
-    if(this.playerId) return this.playerId;
+    if (this.playerId) return this.playerId;
     return Network.getInstance()?.mySessionId;
   }
 
@@ -56,15 +57,6 @@ export default class MyPlayer extends Player {
     if (!cursors) return
 
     const item = playerSelector.selectedItem
-
-    if (Phaser.Input.Keyboard.JustDown(keyR)) {
-      switch (item?.itemType) {
-        case ItemType.MEETING:
-          const me = item as Meeting
-          me.openDialog(this.playerId, network)
-          break
-      }
-    }
 
     switch (this.playerBehavior) {
       case PlayerBehavior.IDLE:
@@ -96,7 +88,7 @@ export default class MyPlayer extends Player {
               }
 
               this.play(`${this.playerTexture}_sit_${chairItem.itemDirection}`, true)
-              playerSelector.selectedItem = undefined
+              // playerSelector.selectedItem = undefined
               if (chairItem.itemDirection === 'up') {
                 playerSelector.setPosition(this.x, this.y - this.height)
               } else {
@@ -112,7 +104,7 @@ export default class MyPlayer extends Player {
 
           // set up new dialog as player sits down
           chairItem.clearDialogBox()
-          chairItem.setDialogBox('Press E to leave\n Press R to join meeting')
+          chairItem.setDialogBox('Press E to leave\nPress R to join meeting')
           this.chairOnSit = chairItem
           this.playerBehavior = PlayerBehavior.SITTING
           return
@@ -178,6 +170,19 @@ export default class MyPlayer extends Player {
           playerSelector.setPosition(this.x, this.y)
           playerSelector.update(this, cursors)
           network.updatePlayer(this.x, this.y, this.anims.currentAnim!.key)
+          break
+        }
+
+        if (Phaser.Input.Keyboard.JustDown(keyR)) {
+          switch (item?.itemType) {
+            case ItemType.CHAIR:
+              const chair = item as Chair
+              console.log(chair.groupId!)
+              console.log(Game.getInstance()?.meetingMap.get(chair.groupId!))
+              const meeting = Game.getInstance()?.meetingMap.get(chair.groupId!) as Meeting
+              meeting.openDialog(this.getPlayerId()!, network)
+              break
+          }
         }
         break
     }

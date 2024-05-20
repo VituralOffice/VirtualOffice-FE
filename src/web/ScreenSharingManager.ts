@@ -40,6 +40,7 @@ export default class ShareScreenManager {
   // https://peerjs.com/docs.html#peer-id
   // Also for screen sharing ID add a `-ss` at the end.
   private makeId(id: string) {
+    console.log(id)
     return `${id.replace(/[^0-9a-z]/gi, 'G')}-ss`
   }
 
