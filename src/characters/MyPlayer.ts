@@ -12,6 +12,7 @@ import { NavKeys } from '../types/KeyboardState'
 import { ItemType } from '../types/Items'
 import Meeting from '../items/Meeting'
 import { PlayerBehavior } from '../types/PlayerBehaviour'
+import Game from '../scenes/Game'
 
 export default class MyPlayer extends Player {
   private playContainerBody: Phaser.Physics.Arcade.Body
@@ -106,9 +107,12 @@ export default class MyPlayer extends Player {
             },
             loop: false,
           })
+
+          // Game?.getInstance()!.handleSitOnChair(chairItem);
+
           // set up new dialog as player sits down
           chairItem.clearDialogBox()
-          chairItem.setDialogBox('Press E to leave')
+          chairItem.setDialogBox('Press E to leave\n Press R to join meeting')
           this.chairOnSit = chairItem
           this.playerBehavior = PlayerBehavior.SITTING
           return
