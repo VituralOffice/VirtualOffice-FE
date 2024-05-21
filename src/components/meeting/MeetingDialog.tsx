@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
@@ -22,6 +22,8 @@ import { MeetingNormalView } from './MeetingNormalView'
 import { MeetingScreenShareView } from './MeetingScreenShareView'
 import WidgetsRoundedIcon from '@mui/icons-material/WidgetsRounded'
 import ScreenshotMonitorRoundedIcon from '@mui/icons-material/ScreenshotMonitorRounded'
+import PresentToAllIcon from '@mui/icons-material/PresentToAll';
+import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
 
 const Backdrop = styled.div`
   position: fixed;
@@ -53,42 +55,7 @@ const Wrapper = styled.div`
   }
 `
 
-const VideoGrid = styled.div`
-  flex: 1;
-  min-height: 0;
-  display: grid;
-  grid-gap: 10px;
-  grid-template-columns: repeat(auto-fit, minmax(40%, 1fr));
 
-  .video-container {
-    position: relative;
-    background: black;
-    border-radius: 8px;
-    overflow: hidden;
-
-    video {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      min-width: 0;
-      min-height: 0;
-      object-fit: contain;
-    }
-
-    .player-name {
-      position: absolute;
-      bottom: 16px;
-      left: 16px;
-      color: #fff;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      text-shadow: 0 1px 2px rgb(0 0 0 / 60%), 0 0 2px rgb(0 0 0 / 30%);
-      white-space: nowrap;
-    }
-  }
-`
 
 const SeparateLine = styled.div`
   height: 32px;
@@ -98,25 +65,10 @@ const SeparateLine = styled.div`
   border-radius: 8px;
 `
 
-function VideoContainer({ playerName, stream }) {
-  return (
-    <div className="video-container">
-      <Video srcObject={stream} autoPlay></Video>
-      {playerName && <div className="player-name">{playerName}</div>}
-    </div>
-  )
-}
-
 // <Button
 //             variant="contained"
 //             color="secondary"
-//             // onClick={() => {
-//             //   if (shareScreenManager?.myStream) {
-//             //     shareScreenManager?.stopScreenShare()
-//             //   } else {
-//             //     shareScreenManager?.startScreenShare()
-//             //   }
-//             // }}
+//             
 //           >
 //             {shareScreenManager?.myStream ? 'Stop sharing' : 'Share Screen'}
 //           </Button>
@@ -168,11 +120,9 @@ const MeetingView = styled.div`
 `
 
 export default function MeetingDialog() {
-  // const dispatch = useAppDispatch()
-  // const playerNameMap = useAppSelector((state) => state.user.playerNameMap)
-  // const shareScreenManager = useAppSelector((state) => state.meeting.shareScreenManager)
-  // const myStream = useAppSelector((state) => state.meeting.myStream)
-  // const peerStreams = useAppSelector((state) => state.meeting.peerStreams)
+  const dispatch = useAppDispatch()
+  const shareScreenManager = useAppSelector((state) => state.meeting.shareScreenManager)
+
   const user = useAppSelector((state) => state.user)
   const toggleMic = useToggleMicrophone()
   const toggleCam = useToggleCamera()
@@ -180,15 +130,27 @@ export default function MeetingDialog() {
     const nextState = !user.microphoneON
     toggleMic(nextState)
   }
+  const peerDisplayStreams = useAppSelector((state) => state.meeting.peerDisplayStreams)
+  const myPeerDisplayStream = useAppSelector((state) => state.meeting.myDisplayStream)
 
   const [showChat, setShowChat] = useState(true)
   const [showMeetingInfo, setShowMeetingInfo] = useState(false)
-  const [isNormalView, setIsNormalView] = useState(true)
+  const [activeMeetingView, setActiveMeetingView] = useState(0)
+  const [shareScreenAvailable, setShareScreenAvailable] = useState(false)
 
   const toggetCam = () => {
     const nextState = !user.cameraON
     toggleCam(nextState)
   }
+
+  useEffect(() => {
+    if (peerDisplayStreams.size == 0 && myPeerDisplayStream == null) {
+      setShareScreenAvailable(false);
+    }
+    else {
+      setShareScreenAvailable(true);
+    }
+  }, [peerDisplayStreams, myPeerDisplayStream])
 
   return (
     <Backdrop>
@@ -196,7 +158,7 @@ export default function MeetingDialog() {
         {/* <IconButton
           aria-label="close dialog"
           className="close"
-          // onClick={() => dispatch(closeMeetingDialog())}
+          // 
         >
           <CloseIcon />
         </IconButton> */}
@@ -204,21 +166,51 @@ export default function MeetingDialog() {
         <MeetingHeader>
           <MeetingTitle>Meeting title</MeetingTitle>
           <ToolbarContainer>
-            <ToolbarButton isEnabled={!isNormalView} onClick={() => setIsNormalView(false)}>
+            {
+              shareScreenAvailable && (
+                <ToolbarButton isEnabled={activeMeetingView == 1} onClick={() => setActiveMeetingView(1)}>
+                  <div>
+                    <span>
+                      <ScreenshotMonitorRoundedIcon />
+                    </span>
+                  </div>
+                </ToolbarButton>
+              )
+            }
+            {
+              shareScreenAvailable && (
+                <ToolbarButton isEnabled={activeMeetingView == 0} onClick={() => setActiveMeetingView(0)}>
+                  <div>
+                    <span>
+                      <WidgetsRoundedIcon />
+                    </span>
+                  </div>
+                </ToolbarButton>
+              )
+            }
+            {
+              shareScreenAvailable && (
+                <SeparateLine />
+              )
+            }
+            <ToolbarButton onClick={() => {
+              if (shareScreenManager?.myStream) {
+                shareScreenManager?.stopScreenShare()
+              } else {
+                shareScreenManager?.startScreenShare()
+                setActiveMeetingView(1);
+              }
+            }}>
               <div>
                 <span>
-                  <ScreenshotMonitorRoundedIcon />
+                  {
+                    myPeerDisplayStream ?
+                      <CancelPresentationIcon />
+                      : <PresentToAllIcon />
+                  }
                 </span>
               </div>
             </ToolbarButton>
-            <ToolbarButton isEnabled={isNormalView} onClick={() => setIsNormalView(true)}>
-              <div>
-                <span>
-                  <WidgetsRoundedIcon />
-                </span>
-              </div>
-            </ToolbarButton>
-            <SeparateLine />
             <CustomToggleButton
               enabled={user.microphoneON}
               onToggle={toggetMic}
@@ -231,7 +223,11 @@ export default function MeetingDialog() {
               OnIcon={<VideocamRoundedIcon />}
               OffIcon={<VideocamOffRoundedIcon />}
             />
-            <ToolbarButton onClick={() => setShowChat(!showChat)}>
+            <SeparateLine />
+            <ToolbarButton isEnabled={showChat} onClick={() => {
+              if (!showChat) setShowMeetingInfo(false)
+              setShowChat(!showChat)
+            }}>
               <div>
                 <span>
                   <ForumIcon />
@@ -240,7 +236,10 @@ export default function MeetingDialog() {
             </ToolbarButton>
             <ToolbarButton
               isEnabled={showMeetingInfo}
-              onClick={() => setShowMeetingInfo(!showMeetingInfo)}
+              onClick={() => {
+                if (!showMeetingInfo) setShowChat(false)
+                setShowMeetingInfo(!showMeetingInfo)
+              }}
             >
               <div>
                 <span>
@@ -251,11 +250,7 @@ export default function MeetingDialog() {
             <SeparateLine />
             <ToolbarExitButton
               onClick={() => {
-                if (shareScreenManager?.myStream) {
-                  shareScreenManager?.stopScreenShare()
-                } else {
-                  shareScreenManager?.startScreenShare()
-                }
+                dispatch(closeMeetingDialog());
               }}
             >
               <div>
@@ -269,7 +264,7 @@ export default function MeetingDialog() {
 
         <MeetingBody>
           <MeetingView>
-            {isNormalView ? <MeetingNormalView /> : <MeetingScreenShareView />}
+            {activeMeetingView == 0 ? <MeetingNormalView /> : (activeMeetingView == 1 && <MeetingScreenShareView />)}
           </MeetingView>
           {showChat ? (
             <MeetingSidebarContainer>
@@ -283,16 +278,7 @@ export default function MeetingDialog() {
             )
           )}
         </MeetingBody>
-
-        {/* <VideoGrid>
-          {myStream && <VideoContainer stream={myStream} playerName="You" />}
-
-          {[...peerStreams.entries()].map(([id, { stream }]) => {
-            const playerName = playerNameMap.get(id)
-            return <VideoContainer key={id} playerName={playerName} stream={stream} />
-          })}
-        </VideoGrid> */}
       </Wrapper>
-    </Backdrop>
+    </Backdrop >
   )
 }

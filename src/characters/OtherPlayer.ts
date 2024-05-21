@@ -39,6 +39,7 @@ export default class OtherPlayer extends Player {
       && this.readyToConnect
       && myPlayer.mediaConnected
       && myPlayer.getPlayerId()! > this.playerId
+      && !myPlayer.isPlayerInMeeting()
     ) {
       // console.log(myPlayer.getPlayerId() + " ------- " + this.playerId)
       console.log(myPlayer.playerNameText.text + " connect " + this.playerNameText.text);

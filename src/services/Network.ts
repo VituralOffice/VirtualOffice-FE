@@ -289,6 +289,7 @@ export default class Network {
 
   connectToMeeting(id: string) {
     this.room?.send(Message.CONNECT_TO_MEETING, { meetingId: id })
+    this.webRTC?.disconnect();
   }
 
   disconnectFromMeeting(id: string) {

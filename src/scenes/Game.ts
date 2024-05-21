@@ -8,7 +8,6 @@ import MyPlayer from '../characters/MyPlayer'
 import OtherPlayer from '../characters/OtherPlayer'
 import PlayerSelector from '../characters/PlayerSelector'
 import Network from '../services/Network'
-// import Meeting from '../items/Meeting'
 
 import store from '../stores'
 import { setFocused, setShowChat } from '../stores/ChatStore'
@@ -18,7 +17,7 @@ import Item from '../items/Item'
 import { PlayerBehavior } from '../types/PlayerBehaviour'
 import { IPlayer } from '../types/ISpaceState'
 import { ItemType } from '../types/Items'
-import { Meeting } from '../web/Meeting'
+import { Meeting } from '../web/meeting/Meeting'
 
 export default class Game extends Phaser.Scene {
   private static instance: Game | null = null // Biến static instance

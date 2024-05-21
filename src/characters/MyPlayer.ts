@@ -13,7 +13,7 @@ import { ItemType } from '../types/Items'
 // import Meeting from '../items/Meeting'
 import { PlayerBehavior } from '../types/PlayerBehaviour'
 import Game from '../scenes/Game'
-import { Meeting } from '../web/Meeting'
+import { Meeting } from '../web/meeting/Meeting'
 
 export default class MyPlayer extends Player {
   private playContainerBody: Phaser.Physics.Arcade.Body
@@ -45,6 +45,10 @@ export default class MyPlayer extends Player {
     this.playerTexture = texture
     this.anims.play(`${this.playerTexture}_idle_down`, true)
     phaserEvents.emit(GameEvent.MY_PLAYER_TEXTURE_CHANGE, this.x, this.y, this.anims.currentAnim!.key)
+  }
+
+  isPlayerInMeeting() {
+    return store.getState().meeting.meetingDialogOpen;
   }
 
   update(

@@ -1,6 +1,6 @@
-import Network from '../services/Network'
-import store from '../stores'
-import { openMeetingDialog } from '../stores/MeetingStore'
+import Network from "../../services/Network";
+import store from "../../stores";
+import { openMeetingDialog } from "../../stores/MeetingStore";
 
 export class Meeting {
     id?: string
