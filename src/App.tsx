@@ -15,6 +15,7 @@ import { OfficeSpace } from './pages/OfficeSpace'
 import { JoinOfficePage } from './pages/JoinOfficePage'
 import { GetUserProfile } from './apis/UserApis'
 import { JoinRoomByLink } from './pages/JoinRoomByLink'
+import MeetingDialog from './components/meeting/MeetingDialog'
 
 const Backdrop = styled.div`
   position: absolute;
@@ -29,27 +30,27 @@ function App() {
   return (
     <BrowserRouter>
       <Backdrop>
-        <LoadingPage />
+        {/* <LoadingPage /> */}
         {/* Wrap Header and Routes in a Fragment since they're both siblings */}
         <Routes>
           {/* public */}
           <Route path="/" element={<Navigate to="/app" replace />} />
-          <Route path="/app" element={<SpacePage />} />
-          <Route path="/appp" element={<></>} />
-          <Route
+          <Route path="/app" element={<MeetingDialog />} />
+          {/* <Route path="/app" element={<SpacePage />} /> */}
+          {/* <Route
             path="/signin"
             element={user.loggedIn ? <Navigate to="/app" replace /> : <LoginPage />}
-          />
+          /> */}
 
           {/* private */}
-          {user.loggedIn && (
+          {/* {user.loggedIn && (
             <>
               <Route path="/dashboard" element={<SpaceDashboardPage />} />
               <Route path="/test-space" element={<TestSpace />} />
               <Route path="/room/:roomId" element={<OfficeSpace />} />
               <Route path="/rooms/:roomId/join" element={<JoinRoomByLink />} />
             </>
-          )}
+          )} */}
         </Routes>
       </Backdrop>
     </BrowserRouter>

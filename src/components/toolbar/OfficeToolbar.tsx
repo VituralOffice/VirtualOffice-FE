@@ -1,8 +1,6 @@
 import styled from 'styled-components'
 import { useState } from 'react'
 import store from '../../stores'
-import { setCameraON, setMediaConnected, setMicrophoneON } from '../../stores/UserStore'
-import { User } from '../../types'
 import { useAppSelector } from '../../hook'
 import { ButtonProps } from '../../interfaces/Interfaces'
 import { CustomToggleButton } from '../buttons/CustomToggleButton'
@@ -16,11 +14,10 @@ import MeetingRoomIcon from '@mui/icons-material/MeetingRoom'
 import OfficeLogoMenuPopup from '../popups/OfficeLogoMenuPopup'
 import { OfficeParticipantSidebar } from '../sidebars/office/OfficeParticipantSidebar'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import WebRTC from '../../web/WebRTC'
-import { useDispatch } from 'react-redux'
 import { setShowChat } from '../../stores/ChatStore'
 import { useToggleCamera, useToggleMicrophone } from '../../web/utils'
 import Chat from '../chat/Chat'
+import { ToolbarButton, ToolbarExitButton } from '../buttons'
 
 const LayoutContainer = styled.div<{ isExpanded: boolean }>`
   position: absolute;
@@ -72,57 +69,12 @@ const LogoButton = styled.button<ButtonProps>`
   }
 `
 
-const ToolbarButton = styled.button<ButtonProps>`
-  height: 40px;
-  padding: 8px;
-  display: flex;
-  -webkit-box-align: center;
-  align-items: center;
-  -webkit-box-pack: center;
-  justify-content: center;
-  border: none;
-  border-radius: 8px;
-  background-color: ${(props) => (props.isEnabled ? '' : 'transparent')};
-  ${(props) =>
-    props.isEnabled
-      ? 'background-color: rgb(84, 92, 143);'
-      : `
-  background-color: transparent;
-  &:hover {background-color: rgb(51, 58, 100)};
-    `}
-  transition: background-color 200ms ease 0s;
-  cursor: pointer;
-  position: relative;
-  & > div {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    & > span {
-      display: flex;
-      width: 24px;
-      color: rgb(224, 224, 224);
-      flex-shrink: 0;
-      & > svg {
-        width: 100%;
-        height: auto;
-      }
-    }
-  }
-`
-
 const SeparateLine = styled.div`
   height: 32px;
   width: 2px;
   margin: auto 4px;
   background-color: rgb(51, 58, 100);
   border-radius: 8px;
-`
-
-const ExitButton = styled(ToolbarButton)`
-  background-color: ${(props) => (props.isActive ? 'rgb(221, 41, 63)' : 'rgb(51, 58, 100)')};
-  &:hover {
-    background-color: rgb(221, 41, 63);
-  }
 `
 
 const ExpandMenu = styled(ToolbarButton) <{ expanded: boolean }>`
@@ -203,13 +155,13 @@ const OfficeToolbar = () => {
                 </div>
               </ToolbarButton>
               <SeparateLine />
-              <ExitButton>
+              <ToolbarExitButton>
                 <div>
                   <span>
                     <MeetingRoomIcon />
                   </span>
                 </div>
-              </ExitButton>
+              </ToolbarExitButton>
             </ExpandContentContainer>
           )
         }
