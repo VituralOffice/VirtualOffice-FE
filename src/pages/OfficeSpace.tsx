@@ -8,6 +8,7 @@ import { GetRoomById } from '../apis/RoomApis'
 import { IRoomData } from '../types/Rooms'
 import { isApiSuccess } from '../apis/util'
 import OfficeToolbar from '../components/toolbar/OfficeToolbar'
+import MeetingDialog from '../components/meeting/MeetingDialog'
 
 export const OfficeSpace = () => {
   let { roomId } = useParams()
@@ -16,12 +17,12 @@ export const OfficeSpace = () => {
 
   const [joinPageShow, setJoinPageShow] = useState(true)
   const [room, setRoom] = useState<IRoomData | null>()
-  const user = useAppSelector((state) => state.user)
+  const store = useAppSelector((state) => state)
 
   const handleJoinRoom = async () => {
     try {
-      await Bootstrap.getInstance()?.network.joinCustomById(room!._id);
-      setJoinPageShow(false);
+      await Bootstrap.getInstance()?.network.joinCustomById(room!._id)
+      setJoinPageShow(false)
     } catch (e: any) {
       if (e.message.includes('not found')) {
         try {
@@ -31,20 +32,20 @@ export const OfficeSpace = () => {
             map: room!.map,
             autoDispose: room!.autoDispose,
           } as any)
-          setJoinPageShow(false);
+          setJoinPageShow(false)
         } catch (createError) {
           console.log('Error creating room:', createError)
           navigate('/')
         }
-        return;
+        return
       }
       console.log(e)
       navigate('/')
-      return;
+      return
     }
     if (!lobbyJoined) {
       navigate('/app')
-      return;
+      return
     }
   }
 
@@ -77,6 +78,8 @@ export const OfficeSpace = () => {
     <>
       {joinPageShow && <JoinOfficePage handleJoinRoom={handleJoinRoom} />}
       {!joinPageShow && <OfficeToolbar></OfficeToolbar>}
+      {store.meeting.meetingDialogOpen && <MeetingDialog />}
+      {/* <MeetingDialog /> */}
     </>
   )
 }

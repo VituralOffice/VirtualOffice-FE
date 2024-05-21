@@ -37,8 +37,8 @@ export default class Network {
   constructor() {
     Network.instance = this;
     console.log('Construct Network')
-    const endpoint = API_URL.replace('https', `wss`)
-    // const endpoint = API_URL.replace(`http`, `ws`)
+    // const endpoint = API_URL.replace('https', `wss`)
+    const endpoint = API_URL.replace(`http`, `ws`)
     this.client = new Client(endpoint)
     this.client.auth.token = Cookies.get(ACCESS_TOKEN_KEY) as string
     this.joinLobbyRoom().then(() => {
@@ -152,7 +152,7 @@ export default class Network {
       store.dispatch(removePlayerNameMap(key))
     }
 
-    // new instance added to the computers MapSchema
+    // new instance added to the meetings MapSchema
     this.room.state.meetings.onAdd = (meeting: IMeeting, key: string) => {
       // track changes on every child object's connectedUser
       meeting.connectedUser.onAdd = (item, index) => {
@@ -289,6 +289,7 @@ export default class Network {
 
   connectToMeeting(id: string) {
     this.room?.send(Message.CONNECT_TO_MEETING, { meetingId: id })
+    this.webRTC?.disconnect();
   }
 
   disconnectFromMeeting(id: string) {
