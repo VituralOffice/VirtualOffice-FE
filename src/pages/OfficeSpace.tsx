@@ -11,75 +11,75 @@ import OfficeToolbar from '../components/toolbar/OfficeToolbar'
 import MeetingDialog from '../components/meeting/MeetingDialog'
 
 export const OfficeSpace = () => {
-  // let { roomId } = useParams()
-  // const lobbyJoined = useAppSelector((state) => state.room.lobbyJoined)
-  // const navigate = useNavigate()
+  let { roomId } = useParams()
+  const lobbyJoined = useAppSelector((state) => state.room.lobbyJoined)
+  const navigate = useNavigate()
 
-  // const [joinPageShow, setJoinPageShow] = useState(true)
-  // const [room, setRoom] = useState<IRoomData | null>()
-  // const store = useAppSelector((state) => state)
+  const [joinPageShow, setJoinPageShow] = useState(true)
+  const [room, setRoom] = useState<IRoomData | null>()
+  const store = useAppSelector((state) => state)
 
-  // const handleJoinRoom = async () => {
-  //   try {
-  //     await Bootstrap.getInstance()?.network.joinCustomById(room!._id)
-  //     setJoinPageShow(false)
-  //   } catch (e: any) {
-  //     if (e.message.includes('not found')) {
-  //       try {
-  //         await Bootstrap.getInstance()?.network.createCustom({
-  //           name: room!.name,
-  //           id: room!._id,
-  //           map: room!.map,
-  //           autoDispose: room!.autoDispose,
-  //         } as any)
-  //         setJoinPageShow(false)
-  //       } catch (createError) {
-  //         console.log('Error creating room:', createError)
-  //         navigate('/')
-  //       }
-  //       return
-  //     }
-  //     console.log(e)
-  //     navigate('/')
-  //     return
-  //   }
-  //   if (!lobbyJoined) {
-  //     navigate('/app')
-  //     return
-  //   }
-  // }
+  const handleJoinRoom = async () => {
+    try {
+      await Bootstrap.getInstance()?.network.joinCustomById(room!._id)
+      setJoinPageShow(false)
+    } catch (e: any) {
+      if (e.message.includes('not found')) {
+        try {
+          await Bootstrap.getInstance()?.network.createCustom({
+            name: room!.name,
+            id: room!._id,
+            map: room!.map,
+            autoDispose: room!.autoDispose,
+          } as any)
+          setJoinPageShow(false)
+        } catch (createError) {
+          console.log('Error creating room:', createError)
+          navigate('/')
+        }
+        return
+      }
+      console.log(e)
+      navigate('/')
+      return
+    }
+    if (!lobbyJoined) {
+      navigate('/app')
+      return
+    }
+  }
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await GetRoomById({ _id: roomId! })
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await GetRoomById({ _id: roomId! })
 
-  //       if (!isApiSuccess(response)) {
-  //         navigate('/app')
-  //         return
-  //       }
+        if (!isApiSuccess(response)) {
+          navigate('/app')
+          return
+        }
 
-  //       setRoom(response.result)
-  //     } catch (error) {
-  //       console.error(error)
-  //     }
+        setRoom(response.result)
+      } catch (error) {
+        console.error(error)
+      }
 
-  //     await InitGame()
-  //   }
+      await InitGame()
+    }
 
-  //   fetchData()
+    fetchData()
 
-  //   return () => {
-  //     DestroyGame()
-  //   }
-  // }, [])
+    return () => {
+      DestroyGame()
+    }
+  }, [])
 
   return (
     <>
-      {/* {joinPageShow && <JoinOfficePage handleJoinRoom={handleJoinRoom} />} */}
-      {/* {!joinPageShow && <OfficeToolbar></OfficeToolbar>} */}
-      {/* {store.meeting.meetingDialogOpen && <MeetingDialog />} */}
-      <MeetingDialog />
+      {joinPageShow && <JoinOfficePage handleJoinRoom={handleJoinRoom} />}
+      {!joinPageShow && <OfficeToolbar></OfficeToolbar>}
+      {store.meeting.meetingDialogOpen && <MeetingDialog />}
+      {/* <MeetingDialog /> */}
     </>
   )
 }

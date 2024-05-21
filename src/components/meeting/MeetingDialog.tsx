@@ -204,20 +204,14 @@ export default function MeetingDialog() {
         <MeetingHeader>
           <MeetingTitle>Meeting title</MeetingTitle>
           <ToolbarContainer>
-            <ToolbarButton
-              isEnabled={!isNormalView}
-              onClick={() => setIsNormalView(false)}
-            >
+            <ToolbarButton isEnabled={!isNormalView} onClick={() => setIsNormalView(false)}>
               <div>
                 <span>
                   <ScreenshotMonitorRoundedIcon />
                 </span>
               </div>
             </ToolbarButton>
-            <ToolbarButton
-              isEnabled={isNormalView}
-              onClick={() => setIsNormalView(true)}
-            >
+            <ToolbarButton isEnabled={isNormalView} onClick={() => setIsNormalView(true)}>
               <div>
                 <span>
                   <WidgetsRoundedIcon />
@@ -255,7 +249,15 @@ export default function MeetingDialog() {
               </div>
             </ToolbarButton>
             <SeparateLine />
-            <ToolbarExitButton>
+            <ToolbarExitButton
+              onClick={() => {
+                if (shareScreenManager?.myStream) {
+                  shareScreenManager?.stopScreenShare()
+                } else {
+                  shareScreenManager?.startScreenShare()
+                }
+              }}
+            >
               <div>
                 <span>
                   <MeetingRoomIcon />
