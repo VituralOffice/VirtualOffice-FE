@@ -8,7 +8,7 @@ import {
   addAvailableRooms,
   removeAvailableRooms,
 } from '../stores/RoomStore'
-import { IMeeting, IOfficeState, IPlayer } from '../types/ISpaceState'
+import { IChair, IMeeting, IOfficeState, IPlayer } from '../types/ISpaceState'
 import WebRTC from '../web/WebRTC'
 import { GameEvent, phaserEvents } from '../events/EventCenter'
 import { IRoomData, RoomType } from '../types/Rooms'
@@ -25,7 +25,7 @@ import { API_URL } from '../constant'
 import Cookies from 'js-cookie'
 
 export default class Network {
-  private static instance: Network | null = null; // Biến static instance
+  private static instance: Network | null = null // Biến static instance
 
   private client: Client
   private room?: Room<IOfficeState>
@@ -35,7 +35,7 @@ export default class Network {
   mySessionId!: string
 
   constructor() {
-    Network.instance = this;
+    Network.instance = this
     console.log('Construct Network')
     // const endpoint = API_URL.replace('https', `wss`)
     const endpoint = API_URL.replace(`http`, `ws`)
@@ -52,7 +52,7 @@ export default class Network {
   }
 
   static getInstance(): Network | null {
-    return Network.instance;
+    return Network.instance
   }
 
   public disconnectClient() {
@@ -152,6 +152,17 @@ export default class Network {
       store.dispatch(removePlayerNameMap(key))
     }
 
+    this.room.state.chairs.onAdd = (chair: IChair, key: string) => {
+      chair.onChange = (changes) => {
+        changes.forEach((change) => {
+          const { field, value } = change
+          if (field === 'connectedUser') {
+            phaserEvents.emit(GameEvent.CHAIR_CONNECT_USER_CHANGE, value, key, ItemType.CHAIR)
+          }
+        })
+      }
+    }
+
     // new instance added to the meetings MapSchema
     this.room.state.meetings.onAdd = (meeting: IMeeting, key: string) => {
       // track changes on every child object's connectedUser
@@ -162,7 +173,7 @@ export default class Network {
         phaserEvents.emit(GameEvent.ITEM_USER_REMOVED, item, key, ItemType.MEETING)
       }
     }
-    
+
     this.room.state.mapMessages.onChange = (item, key: string) => {
       console.log(`mapMessages change`, item, key)
     }
@@ -213,6 +224,13 @@ export default class Network {
   // method to register event listener and call back function when a item user added
   onChatMessageAdded(callback: (playerId: string, content: string) => void, context?: any) {
     phaserEvents.on(GameEvent.UPDATE_DIALOG_BUBBLE, callback, context)
+  }
+
+  onChairConnectedUserChange(
+    callback: (playerId: string, key: string, itemType: ItemType) => void,
+    context?: any
+  ) {
+    phaserEvents.on(GameEvent.CHAIR_CONNECT_USER_CHANGE, callback, context)
   }
 
   // method to register event listener and call back function when a item user added
@@ -287,9 +305,17 @@ export default class Network {
     this.webRTC?.deleteVideoStream(id)
   }
 
+  connectToChair(id: string) {
+    this.room?.send(Message.CONNECT_TO_CHAIR, { chairId: id })
+  }
+
+  disconnectFromChair(id: string) {
+    this.room?.send(Message.DISCONNECT_FROM_CHAIR, { chairId: id })
+  }
+
   connectToMeeting(id: string) {
     this.room?.send(Message.CONNECT_TO_MEETING, { meetingId: id })
-    this.webRTC?.disconnect();
+    this.webRTC?.disconnect()
   }
 
   disconnectFromMeeting(id: string) {

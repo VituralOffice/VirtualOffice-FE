@@ -32,6 +32,7 @@ export default class Game extends Phaser.Scene {
   private otherPlayers!: Phaser.Physics.Arcade.Group
   private otherPlayerMap = new Map<string, OtherPlayer>()
   meetingMap = new Map<string, Meeting>()
+  chairMap = new Map<string, Chair>()
   chairGroups = new Map<string, Array<Chair>>()
 
   constructor() {
@@ -101,11 +102,14 @@ export default class Game extends Phaser.Scene {
     //   item.itemDirection = chairObj.properties[0].value
     // })
 
-    chairLayer!.objects.forEach((chairObj) => {
+    chairLayer!.objects.forEach((chairObj, index) => {
       const item = this.addObjectFromTiled(chairs, chairObj, 'chairs', 'chair') as Chair;
       const chairGroupID = chairObj.properties[0].value;
       item.groupId = chairGroupID;
       item.itemDirection = chairObj.properties[1].value
+      item.chairId = index.toString();
+
+      this.chairMap.set(String(index), item);
 
       if (!this.chairGroups.has(chairGroupID)) {
         this.chairGroups.set(chairGroupID, []);
@@ -177,6 +181,7 @@ export default class Game extends Phaser.Scene {
     this.network.onItemUserAdded(this.handleItemUserAdded, this)
     this.network.onItemUserRemoved(this.handleItemUserRemoved, this)
     this.network.onChatMessageAdded(this.handleChatMessageAdded, this)
+    this.network.onChairConnectedUserChange(this.handleChairUserConnectedChange, this)
 
     // this.registerKeys();
     // this.myPlayer.setPlayerName(store.getState().user.playerName);
@@ -279,6 +284,15 @@ export default class Game extends Phaser.Scene {
     if (itemType === ItemType.MEETING) {
       const meeting = this.meetingMap.get(itemId)
       meeting?.addCurrentUser(playerId)
+    }
+  }
+
+  private handleChairUserConnectedChange(playerId: string, itemId: string, itemType: ItemType)
+  {
+    if (itemType === ItemType.CHAIR) {
+      const chair = this.chairMap.get(itemId)
+      console.log(chair == null)
+      chair?.setConnectedUser(playerId)
     }
   }
 
