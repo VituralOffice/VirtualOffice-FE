@@ -17,6 +17,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   playerBehavior = PlayerBehavior.IDLE
   readyToConnect = false
   mediaConnected = false
+  isInMeeting = false
   playerNameText: Phaser.GameObjects.Text
   playerContainer: Phaser.GameObjects.Container
   private playerDialogBubble: Phaser.GameObjects.Container

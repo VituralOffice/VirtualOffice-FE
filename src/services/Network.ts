@@ -23,6 +23,8 @@ import { Message } from '../types/Messages'
 import { ACCESS_TOKEN_KEY } from '../utils/util'
 import { API_URL } from '../constant'
 import Cookies from 'js-cookie'
+import { closeMeetingDialog, disconnectMeeting } from '../stores/MeetingStore'
+import Game from '../scenes/Game'
 
 export default class Network {
   private static instance: Network | null = null // Biến static instance
@@ -47,6 +49,7 @@ export default class Network {
     })
 
     phaserEvents.on(GameEvent.MY_PLAYER_NAME_CHANGE, this.updatePlayerName, this)
+    phaserEvents.on(GameEvent.MY_PLAYER_MEETING_STATUS_CHANGE, this.updatePlayerMeetingStatus, this)
     phaserEvents.on(GameEvent.MY_PLAYER_TEXTURE_CHANGE, this.updatePlayer, this)
     phaserEvents.on(GameEvent.PLAYER_DISCONNECTED, this.playerStreamDisconnect, this)
   }
@@ -54,6 +57,11 @@ export default class Network {
   static getInstance(): Network | null {
     return Network.instance
   }
+
+  // public disconnectPlayer() {
+  //   console.log('Disconnecting my player')
+  //   Game.getInstance()?.myPlayer.disconnectPlayer(this)
+  // }
 
   public disconnectClient() {
     console.log('Disconnecting client')
@@ -63,6 +71,11 @@ export default class Network {
   public disconnectWebRTC() {
     console.log('Disconnecting webRTC')
     this.webRTC?.disconnect()
+  }
+
+  public disconnectMeeting() {
+    console.log('Disconnecting meeting')
+    store.dispatch(disconnectMeeting);
   }
 
   /**
@@ -285,6 +298,11 @@ export default class Network {
   // method to send player name to Colyseus server
   updatePlayerName(currentName: string) {
     this.room?.send(Message.UPDATE_PLAYER_NAME, { name: currentName })
+  }
+
+  // method to send player name to Colyseus server
+  updatePlayerMeetingStatus(isInMeeting: boolean) {
+    this.room?.send(Message.UPDATE_PLAYER_MEETING_STATUS, { isInMeeting: isInMeeting })
   }
 
   // method to send ready-to-connect signal to Colyseus server

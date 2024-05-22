@@ -52,6 +52,13 @@ export default class MyPlayer extends Player {
     )
   }
 
+  setPlayerIsInMeeting(isInMeeting: boolean) {
+    phaserEvents.emit(
+      GameEvent.MY_PLAYER_MEETING_STATUS_CHANGE,
+      isInMeeting
+    )
+  }
+
   isPlayerInMeeting() {
     return store.getState().meeting.meetingDialogOpen
   }
@@ -176,26 +183,41 @@ export default class MyPlayer extends Player {
           this.play(parts.join('_'), true)
           this.playerBehavior = PlayerBehavior.IDLE
           this.chairOnSit?.leave(network)
+          this.chairOnSit = undefined
           playerSelector.setPosition(this.x, this.y)
           playerSelector.update(this, cursors)
           network.updatePlayer(this.x, this.y, this.anims.currentAnim!.key)
           break
         }
 
-        if (Phaser.Input.Keyboard.JustDown(keyR)) {
-          switch (item?.itemType) {
-            case ItemType.CHAIR:
-              const chair = item as Chair
-              console.log(chair.groupId!)
-              console.log(Game.getInstance()?.meetingMap.get(chair.groupId!))
-              const meeting = Game.getInstance()?.meetingMap.get(chair.groupId!) as Meeting
-              meeting.openDialog(this.getPlayerId()!, network)
-              break
-          }
+        if (Phaser.Input.Keyboard.JustDown(keyR) && this.chairOnSit) {
+          console.log(this.chairOnSit.groupId!)
+          console.log(Game.getInstance()?.meetingMap.get(this.chairOnSit.groupId!))
+          const meeting = Game.getInstance()?.meetingMap.get(this.chairOnSit.groupId!) as Meeting
+          meeting.openDialog(this.getPlayerId()!, network)
+          break
         }
-        break
+
+      // if (Phaser.Input.Keyboard.JustDown(keyR)) {
+      //   switch (item?.itemType) {
+      //     case ItemType.CHAIR:
+      //       const chair = item as Chair
+      //       console.log(chair.groupId!)
+      //       console.log(Game.getInstance()?.meetingMap.get(chair.groupId!))
+      //       const meeting = Game.getInstance()?.meetingMap.get(chair.groupId!) as Meeting
+      //       meeting.openDialog(this.getPlayerId()!, network)
+      //       break
+      //   }
+      // }
+      // break
     }
   }
+
+  // disconnectPlayer(network: Network) {
+  //   if (this.chairOnSit) {
+  //     network.disconnectFromChair(this.chairOnSit.chairId!);
+  //   }
+  // }
 }
 
 declare global {
