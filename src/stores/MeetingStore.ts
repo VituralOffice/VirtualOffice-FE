@@ -55,6 +55,7 @@ export const meetingSlice = createSlice({
       if (!state.userMediaManager) {
         state.userMediaManager = new UserMediaManager(action.payload.myUserId)
       }
+      Game.getInstance()?.myPlayer.setPlayerIsInMeeting(true);
       Game.getInstance()?.disableKeys()
       state.shareScreenManager.onOpen()
       state.userMediaManager.onOpen()
@@ -65,6 +66,7 @@ export const meetingSlice = createSlice({
       // Tell server the meeting dialog is closed.
       Game.getInstance()?.enableKeys()
       Game.getInstance()?.network.disconnectFromMeeting(state.meetingId!)
+      Game.getInstance()?.myPlayer.setPlayerIsInMeeting(false);
       WebRTC?.getInstance()?.checkPreviousPermission();
       for (const { call } of state.peerDisplayStreams.values()) {
         call.close()
@@ -111,6 +113,23 @@ export const meetingSlice = createSlice({
     removeCameraStream: (state, action: PayloadAction<string>) => {
       state.peerCameraStreams.delete(sanitizeId(action.payload))
     },
+    disconnectMeeting: (state) => {
+      Game.getInstance()?.network.disconnectFromMeeting(state.meetingId!)
+      for (const { call } of state.peerDisplayStreams.values()) {
+        call.close()
+      }
+      for (const { call } of state.peerCameraStreams.values()) {
+        call.close()
+      }
+      state.shareScreenManager?.onClose()
+      state.userMediaManager?.onClose()
+      state.meetingDialogOpen = false
+      state.myDisplayStream = null
+      state.myCameraStream = null
+      state.meetingId = null
+      state.peerDisplayStreams.clear()
+      state.peerCameraStreams.clear()
+    }
   },
 })
 
@@ -123,6 +142,7 @@ export const {
   setMyCameraStream,
   addCameraStream,
   removeCameraStream,
+  disconnectMeeting,
 } = meetingSlice.actions
 
 export default meetingSlice.reducer

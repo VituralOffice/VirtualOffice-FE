@@ -38,8 +38,9 @@ export default class OtherPlayer extends Player {
       && myPlayer.readyToConnect
       && this.readyToConnect
       && myPlayer.mediaConnected
-      && myPlayer.getPlayerId()! > this.playerId
       && !myPlayer.isPlayerInMeeting()
+      && !this.isInMeeting
+      && myPlayer.getPlayerId()! > this.playerId
     ) {
       // console.log(myPlayer.getPlayerId() + " ------- " + this.playerId)
       console.log(myPlayer.playerNameText.text + " connect " + this.playerNameText.text);
@@ -84,6 +85,11 @@ export default class OtherPlayer extends Player {
       case 'mediaConnected':
         if (typeof value === 'boolean') {
           this.mediaConnected = value
+        }
+        break
+      case 'isInMeeting':
+        if (typeof value === 'boolean') {
+          this.isInMeeting = value
         }
         break
     }

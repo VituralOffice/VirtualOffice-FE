@@ -8,6 +8,7 @@ export interface IPlayer extends IUser, Schema {
   anim: string
   readyToConnect: boolean
   mediaConnected: boolean
+  isInMeeting: boolean
 }
 export interface IMessage extends Schema {
   type: string
