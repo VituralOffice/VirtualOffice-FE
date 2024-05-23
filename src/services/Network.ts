@@ -63,8 +63,8 @@ export default class Network {
   //   Game.getInstance()?.myPlayer.disconnectPlayer(this)
   // }
 
-  public disconnectClient() {
-    console.log('Disconnecting client')
+  public disconnectNetwork() {
+    console.log('Disconnecting network')
     this.room?.leave()
   }
 

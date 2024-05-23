@@ -21,6 +21,10 @@ export function getAvatarById(id: number) {
   return avatars[Math.max(0, Math.min(id, avatars.length - 1))]
 }
 
+export function getAvatarByTexture(texture: string) {
+  return avatars.find((a) => a.name == texture.toLowerCase())
+}
+
 export function setTokenToCookie(tokenName: string, tokenValue: any) {
   Cookies.set(tokenName, tokenValue)
 }
