@@ -52,6 +52,14 @@ export default class MyPlayer extends Player {
     )
   }
 
+  setCharacterId(id: number) {
+    this.characterId = id
+    phaserEvents.emit(
+      GameEvent.MY_PLAYER_CHARACTER_ID_CHANGE,
+      id
+    )
+  }
+
   setPlayerIsInMeeting(isInMeeting: boolean) {
     phaserEvents.emit(
       GameEvent.MY_PLAYER_MEETING_STATUS_CHANGE,

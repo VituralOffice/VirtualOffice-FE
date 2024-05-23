@@ -13,7 +13,7 @@ const VideoGrid = styled.div`
   min-height: 0;
   display: grid;
   grid-gap: 10px;
-  grid-template-columns: repeat(auto-fit, minmax(40%, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(30%, 1fr));
 `
 
 const VideoContainerComponent = styled.div<ButtonProps>`
@@ -69,8 +69,10 @@ const VideoContainerComponent = styled.div<ButtonProps>`
 `
 
 const AvatarContainer = styled.div`
-  width: 32px;
-  height: 32px;
+  max-width: 100%;
+  max-height: 100%;
+  width: 50%;
+  aspect-ratio: 1 / 1;
   border-radius: 50%;
   position: relative;
   user-select: none;
@@ -120,13 +122,14 @@ function VideoContainer({
       {stream.getVideoTracks()[0] ? (
         <Video srcObject={stream} autoPlay></Video>
       ) : (
-        <AvatarContainer>
-          <AvatarBackground>
-            <AvatarImg src={'/' + avatarLink} />
-          </AvatarBackground>
-        </AvatarContainer>
+        <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <AvatarContainer>
+            <AvatarBackground>
+              <AvatarImg src={'/' + avatarLink} />
+            </AvatarBackground>
+          </AvatarContainer>
+        </div>
       )}
-      <Video srcObject={stream} autoPlay></Video>
       {playerName && <div className="player-name">{playerName}</div>}
       {canInteract && (canZoomIn ? <ZoomInMapIcon /> : <ZoomOutMapIcon />)}
     </VideoContainerComponent>
@@ -137,6 +140,7 @@ export const MeetingNormalView = () => {
   const myStream = useAppSelector((state) => state.meeting.myCameraStream)
   const peerStreams = useAppSelector((state) => state.meeting.peerCameraStreams)
   const playerNameMap = useAppSelector((state) => state.user.playerNameMap)
+  const playerAvatarMap = useAppSelector((state) => state.user.playerAvatarMap)
   const user = useAppSelector((state) => state.user)
 
   const [activeScreenIndex, setActiveScreenIndex] = useState(-1)
@@ -160,12 +164,13 @@ export const MeetingNormalView = () => {
       )}
       {[...peerStreams.entries()].map(([id, { stream }], index) => {
         const playerName = playerNameMap.get(id)
+        console.log(Game.getInstance()?.otherPlayerMap.get(id)?.playerNameText.text)
         return (
           <VideoContainer
             key={id}
             playerName={playerName!}
             avatarLink={
-              getAvatarByTexture(Game.getInstance()?.otherPlayerMap.get(id)!.playerTexture!)!.img
+              getAvatarById(playerAvatarMap.get(id)!).img
             }
             stream={stream}
             onClick={() => handleVideoContainerClick(index + 1)}
@@ -202,7 +207,7 @@ export const MeetingNormalView = () => {
               key={id}
               playerName={playerName!}
               avatarLink={
-                getAvatarByTexture(Game.getInstance()?.otherPlayerMap.get(id)!.playerTexture!)!.img
+                getAvatarById(playerAvatarMap.get(id)!).img
               }
               stream={stream}
               canInteract={totalDisplays > 1}
@@ -225,13 +230,5 @@ export const MeetingNormalView = () => {
 
   return (
     <>{activeScreenIndex === -1 ? renderAllVideos() : renderSingleVideo()}</>
-    // <VideoGrid>
-    //   {/* {myStream && <VideoContainer stream={myStream} playerName="You" />}
-
-    //   {[...peerStreams.entries()].map(([id, { stream }]) => {
-    //     const playerName = playerNameMap.get(id)
-    //     return <VideoContainer key={id} playerName={playerName!} stream={stream} />
-    //   })} */}
-    // </VideoGrid>
   )
 }

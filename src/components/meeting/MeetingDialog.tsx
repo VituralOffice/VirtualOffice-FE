@@ -17,13 +17,13 @@ import ForumIcon from '@mui/icons-material/Forum'
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom'
 import store from '../../stores'
-import { MeetingChatSidebar } from './chat/MeetingChatSidebar'
 import { MeetingNormalView } from './MeetingNormalView'
 import { MeetingScreenShareView } from './MeetingScreenShareView'
 import WidgetsRoundedIcon from '@mui/icons-material/WidgetsRounded'
 import ScreenshotMonitorRoundedIcon from '@mui/icons-material/ScreenshotMonitorRounded'
 import PresentToAllIcon from '@mui/icons-material/PresentToAll';
 import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
+import MeetingChatSidebar from './chat/MeetingChatSidebar'
 
 const Backdrop = styled.div`
   position: fixed;
@@ -122,6 +122,7 @@ const MeetingView = styled.div`
 export default function MeetingDialog() {
   const dispatch = useAppDispatch()
   const shareScreenManager = useAppSelector((state) => state.meeting.shareScreenManager)
+  const userMediaManager = useAppSelector((state) => state.meeting.userMediaManager)
 
   const user = useAppSelector((state) => state.user)
   const toggleMic = useToggleMicrophone()
@@ -151,6 +152,11 @@ export default function MeetingDialog() {
       setShareScreenAvailable(true);
     }
   }, [peerDisplayStreams, myPeerDisplayStream])
+
+  useEffect(() => {
+    if (!user.microphoneON && !user.cameraON) userMediaManager!.stopCameraShare();
+    userMediaManager!.startCameraShare(user.cameraON, user.microphoneON);
+  }, [user.microphoneON, user.cameraON])
 
   return (
     <Backdrop>
@@ -268,7 +274,7 @@ export default function MeetingDialog() {
           </MeetingView>
           {showChat ? (
             <MeetingSidebarContainer>
-              <MeetingChatSidebar />
+              {/* <MeetingChatSidebar /> */}
             </MeetingSidebarContainer>
           ) : (
             showMeetingInfo && (

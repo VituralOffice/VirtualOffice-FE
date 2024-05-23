@@ -1,6 +1,6 @@
 import { Client, Room } from 'colyseus.js'
 import store from '../stores'
-import { setSessionId, setPlayerNameMap, removePlayerNameMap } from '../stores/UserStore'
+import { setSessionId, setPlayerNameMap, removePlayerNameMap, setPlayerAvatarMap, removePlayerAvatarMap } from '../stores/UserStore'
 import {
   setLobbyJoined,
   setJoinedRoomData,
@@ -51,6 +51,7 @@ export default class Network {
     phaserEvents.on(GameEvent.MY_PLAYER_NAME_CHANGE, this.updatePlayerName, this)
     phaserEvents.on(GameEvent.MY_PLAYER_MEETING_STATUS_CHANGE, this.updatePlayerMeetingStatus, this)
     phaserEvents.on(GameEvent.MY_PLAYER_TEXTURE_CHANGE, this.updatePlayer, this)
+    phaserEvents.on(GameEvent.MY_PLAYER_CHARACTER_ID_CHANGE, this.updatePlayerCharacterId, this)
     phaserEvents.on(GameEvent.PLAYER_DISCONNECTED, this.playerStreamDisconnect, this)
   }
 
@@ -152,6 +153,10 @@ export default class Network {
             store.dispatch(setPlayerNameMap({ id: key, name: value }))
             store.dispatch(pushPlayerJoinedMessage(value))
           }
+
+          if (field === 'characterId' && value) {
+            store.dispatch(setPlayerAvatarMap({ id: key, characterId: value }))
+          }
         })
       }
     }
@@ -163,6 +168,7 @@ export default class Network {
       this.webRTC?.deleteOnCalledVideoStream(key)
       store.dispatch(pushPlayerLeftMessage(player.playerName))
       store.dispatch(removePlayerNameMap(key))
+      store.dispatch(removePlayerAvatarMap(key))
     }
 
     this.room.state.chairs.onAdd = (chair: IChair, key: string) => {
@@ -225,6 +231,12 @@ export default class Network {
     // when a peer disconnects with myPeer
     this.room.onMessage(Message.DISCONNECT_STREAM, (clientId: string) => {
       this.webRTC?.deleteOnCalledVideoStream(clientId)
+    })
+
+    // when a meeting user stops sharing screen
+    this.room.onMessage(Message.MEETING_STOP_CAMERA_SHARE, (clientId: string) => {
+      const meetingState = store.getState().meeting
+      meetingState.userMediaManager?.onUserLeft(clientId)
     })
 
     // when a meeting user stops sharing screen
@@ -300,6 +312,10 @@ export default class Network {
     this.room?.send(Message.UPDATE_PLAYER_NAME, { name: currentName })
   }
 
+  updatePlayerCharacterId(id: number) {
+    this.room?.send(Message.UPDATE_PLAYER_CHARACTER_ID, { id })
+  }
+
   // method to send player name to Colyseus server
   updatePlayerMeetingStatus(isInMeeting: boolean) {
     this.room?.send(Message.UPDATE_PLAYER_MEETING_STATUS, { isInMeeting: isInMeeting })
@@ -350,6 +366,10 @@ export default class Network {
 
   onStopScreenShare(id: string) {
     this.room?.send(Message.STOP_SCREEN_SHARE, { meetingId: id })
+  }
+
+  onStopCameraShare(id: string) {
+    this.room?.send(Message.MEETING_STOP_CAMERA_SHARE, { meetingId: id })
   }
 
   addChatMessage({ content, chatId }: { content: string; chatId: string }) {

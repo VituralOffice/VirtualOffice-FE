@@ -16,4 +16,5 @@ export enum GameEvent {
   ITEM_USER_REMOVED = 'item-user-removed',
   UPDATE_DIALOG_BUBBLE = 'update-dialog-bubble',
   CHAIR_CONNECT_USER_CHANGE = 'chair-connected-user-change',
+  MY_PLAYER_CHARACTER_ID_CHANGE = 'my-player-character-id-change',
 }

@@ -92,6 +92,10 @@ export default class OtherPlayer extends Player {
           this.isInMeeting = value
         }
         break
+      case 'playerTexture':
+        if (typeof value === 'string') {
+          this.playerTexture = value
+        }
     }
   }
 

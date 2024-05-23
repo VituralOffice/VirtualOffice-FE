@@ -16,6 +16,7 @@ export class Meeting {
         const meetingState = store.getState().meeting
         if (meetingState.meetingId === this.id) {
             meetingState.shareScreenManager?.onUserJoined(userId)
+            meetingState.userMediaManager?.onUserJoined(userId)
         }
     }
 
@@ -25,6 +26,7 @@ export class Meeting {
         const meetingState = store.getState().meeting
         if (meetingState.meetingId === this.id) {
             meetingState.shareScreenManager?.onUserLeft(userId)
+            meetingState.userMediaManager?.onUserLeft(userId)
         }
     }
 

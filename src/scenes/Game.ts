@@ -291,7 +291,6 @@ export default class Game extends Phaser.Scene {
   {
     if (itemType === ItemType.CHAIR) {
       const chair = this.chairMap.get(itemId)
-      console.log(chair == null)
       chair?.setConnectedUser(playerId)
     }
   }
