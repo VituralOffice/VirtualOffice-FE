@@ -13,7 +13,7 @@ export interface IPlayer extends IUser, Schema {
 export interface IMessage extends Schema {
   type: string
   text: string
-  filename: string
+  fileName: string
   fileType: string
   path: string
 }

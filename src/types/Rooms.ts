@@ -16,4 +16,5 @@ export interface IMessagePayload {
   type: string
   path: string
   chatId: string
+  filename?: string
 }

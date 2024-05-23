@@ -75,7 +75,7 @@ export default class Network {
 
   public disconnectMeeting() {
     console.log('Disconnecting meeting')
-    store.dispatch(disconnectMeeting);
+    store.dispatch(disconnectMeeting)
   }
 
   /**
@@ -352,8 +352,8 @@ export default class Network {
     this.room?.send(Message.STOP_SCREEN_SHARE, { meetingId: id })
   }
 
-  addChatMessage({ content, chatId, path, type }: IMessagePayload) {
-    this.room?.send(Message.ADD_CHAT_MESSAGE, { content, chatId, path, type })
+  addChatMessage(payload: IMessagePayload) {
+    this.room?.send(Message.ADD_CHAT_MESSAGE, payload)
   }
   loadChat() {
     this.room?.send(Message.LOAD_CHAT)
