@@ -1,8 +1,8 @@
 import Peer from 'peerjs'
-import store from '../stores'
-import Game from '../scenes/Game'
-import { addVideoStream, removeVideoStream, setMyStream } from '../stores/MeetingStore'
-import { PEER_CONNECT_OPTIONS } from '../constant'
+import store from '../../stores'
+import Game from '../../scenes/Game'
+import { addDisplayStream, removeDisplayStream, setMyDisplayStream } from '../../stores/MeetingStore'
+import { PEER_CONNECT_OPTIONS } from '../../constant'
 
 export default class ShareScreenManager {
   private myPeer: Peer
@@ -10,6 +10,7 @@ export default class ShareScreenManager {
 
   constructor(private userId: string) {
     const sanatizedId = this.makeId(userId)
+    console.log("ScreenSharingManager: sanatizedId: " + sanatizedId)
     this.myPeer = new Peer(sanatizedId, PEER_CONNECT_OPTIONS)
     this.myPeer.on('error', (err) => {
       console.log('ShareScreenWebRTC err.type', err.type)
@@ -19,7 +20,7 @@ export default class ShareScreenManager {
     this.myPeer.on('call', (call) => {
       call.answer()
       call.on('stream', (userVideoStream) => {
-        store.dispatch(addVideoStream({ id: call.peer, call, stream: userVideoStream }))
+        store.dispatch(addDisplayStream({ id: call.peer, call, stream: userVideoStream }))
       })
       // we handled on close on our own
     })
@@ -40,6 +41,7 @@ export default class ShareScreenManager {
   // https://peerjs.com/docs.html#peer-id
   // Also for screen sharing ID add a `-ss` at the end.
   private makeId(id: string) {
+    console.log(id)
     return `${id.replace(/[^0-9a-z]/gi, 'G')}-ss`
   }
 
@@ -61,7 +63,7 @@ export default class ShareScreenManager {
         }
 
         this.myStream = stream
-        store.dispatch(setMyStream(stream))
+        store.dispatch(setMyDisplayStream(stream))
 
         // Call all existing users.
         const meetingItem = Game.getInstance()?.meetingMap.get(store.getState().meeting.meetingId!)
@@ -80,7 +82,7 @@ export default class ShareScreenManager {
     this.myStream?.getTracks().forEach((track) => track.stop())
     this.myStream = undefined
     if (shouldDispatch) {
-      store.dispatch(setMyStream(null))
+      store.dispatch(setMyDisplayStream(null))
       // Manually let all other existing users know screen sharing is stopped
       Game.getInstance()?.network.onStopScreenShare(store.getState().meeting.meetingId!)
     }
@@ -97,6 +99,6 @@ export default class ShareScreenManager {
     if (userId === this.userId) return
 
     const sanatizedId = this.makeId(userId)
-    store.dispatch(removeVideoStream(sanatizedId))
+    store.dispatch(removeDisplayStream(sanatizedId))
   }
 }

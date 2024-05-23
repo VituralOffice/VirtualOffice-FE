@@ -20,6 +20,7 @@ const OptionButton = styled.div<ButtonProps>`
     transition: background-color 200ms ease 0s;
     cursor: pointer;
     position: relative;
+    outline: none;
     &:hover {
       background-color: ${(props) =>
         props.isEnabled ? 'rgba(6, 214, 160, 0.4)' : 'rgba(255, 48, 73, 0.4)'};

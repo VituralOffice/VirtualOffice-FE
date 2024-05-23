@@ -8,7 +8,7 @@ import {
   addAvailableRooms,
   removeAvailableRooms,
 } from '../stores/RoomStore'
-import { IMeeting, IOfficeState, IPlayer } from '../types/ISpaceState'
+import { IChair, IMeeting, IOfficeState, IPlayer } from '../types/ISpaceState'
 import WebRTC from '../web/WebRTC'
 import { GameEvent, phaserEvents } from '../events/EventCenter'
 import { IRoomData, RoomType, IMessagePayload } from '../types/Rooms'
@@ -23,6 +23,8 @@ import { Message } from '../types/Messages'
 import { ACCESS_TOKEN_KEY } from '../utils/util'
 import { API_URL } from '../constant'
 import Cookies from 'js-cookie'
+import { closeMeetingDialog, disconnectMeeting } from '../stores/MeetingStore'
+import Game from '../scenes/Game'
 
 export default class Network {
   private static instance: Network | null = null // Biến static instance
@@ -37,8 +39,8 @@ export default class Network {
   constructor() {
     Network.instance = this
     console.log('Construct Network')
-    const endpoint = API_URL.replace('https', `wss`)
-    // const endpoint = API_URL.replace(`http`, `ws`)
+    // const endpoint = API_URL.replace('https', `wss`)
+    const endpoint = API_URL.replace(`http`, `ws`)
     this.client = new Client(endpoint)
     this.client.auth.token = Cookies.get(ACCESS_TOKEN_KEY) as string
     this.joinLobbyRoom().then(() => {
@@ -47,6 +49,7 @@ export default class Network {
     })
 
     phaserEvents.on(GameEvent.MY_PLAYER_NAME_CHANGE, this.updatePlayerName, this)
+    phaserEvents.on(GameEvent.MY_PLAYER_MEETING_STATUS_CHANGE, this.updatePlayerMeetingStatus, this)
     phaserEvents.on(GameEvent.MY_PLAYER_TEXTURE_CHANGE, this.updatePlayer, this)
     phaserEvents.on(GameEvent.PLAYER_DISCONNECTED, this.playerStreamDisconnect, this)
   }
@@ -54,6 +57,11 @@ export default class Network {
   static getInstance(): Network | null {
     return Network.instance
   }
+
+  // public disconnectPlayer() {
+  //   console.log('Disconnecting my player')
+  //   Game.getInstance()?.myPlayer.disconnectPlayer(this)
+  // }
 
   public disconnectClient() {
     console.log('Disconnecting client')
@@ -63,6 +71,11 @@ export default class Network {
   public disconnectWebRTC() {
     console.log('Disconnecting webRTC')
     this.webRTC?.disconnect()
+  }
+
+  public disconnectMeeting() {
+    console.log('Disconnecting meeting')
+    store.dispatch(disconnectMeeting);
   }
 
   /**
@@ -152,7 +165,18 @@ export default class Network {
       store.dispatch(removePlayerNameMap(key))
     }
 
-    // new instance added to the computers MapSchema
+    this.room.state.chairs.onAdd = (chair: IChair, key: string) => {
+      chair.onChange = (changes) => {
+        changes.forEach((change) => {
+          const { field, value } = change
+          if (field === 'connectedUser') {
+            phaserEvents.emit(GameEvent.CHAIR_CONNECT_USER_CHANGE, value, key, ItemType.CHAIR)
+          }
+        })
+      }
+    }
+
+    // new instance added to the meetings MapSchema
     this.room.state.meetings.onAdd = (meeting: IMeeting, key: string) => {
       // track changes on every child object's connectedUser
       meeting.connectedUser.onAdd = (item, index) => {
@@ -215,6 +239,13 @@ export default class Network {
     phaserEvents.on(GameEvent.UPDATE_DIALOG_BUBBLE, callback, context)
   }
 
+  onChairConnectedUserChange(
+    callback: (playerId: string, key: string, itemType: ItemType) => void,
+    context?: any
+  ) {
+    phaserEvents.on(GameEvent.CHAIR_CONNECT_USER_CHANGE, callback, context)
+  }
+
   // method to register event listener and call back function when a item user added
   onItemUserAdded(
     callback: (playerId: string, key: string, itemType: ItemType) => void,
@@ -269,6 +300,11 @@ export default class Network {
     this.room?.send(Message.UPDATE_PLAYER_NAME, { name: currentName })
   }
 
+  // method to send player name to Colyseus server
+  updatePlayerMeetingStatus(isInMeeting: boolean) {
+    this.room?.send(Message.UPDATE_PLAYER_MEETING_STATUS, { isInMeeting: isInMeeting })
+  }
+
   // method to send ready-to-connect signal to Colyseus server
   readyToConnect() {
     this.room?.send(Message.READY_TO_CONNECT)
@@ -287,8 +323,17 @@ export default class Network {
     this.webRTC?.deleteVideoStream(id)
   }
 
+  connectToChair(id: string) {
+    this.room?.send(Message.CONNECT_TO_CHAIR, { chairId: id })
+  }
+
+  disconnectFromChair(id: string) {
+    this.room?.send(Message.DISCONNECT_FROM_CHAIR, { chairId: id })
+  }
+
   connectToMeeting(id: string) {
     this.room?.send(Message.CONNECT_TO_MEETING, { meetingId: id })
+    this.webRTC?.disconnect()
   }
 
   disconnectFromMeeting(id: string) {

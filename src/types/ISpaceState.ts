@@ -8,6 +8,7 @@ export interface IPlayer extends IUser, Schema {
   anim: string
   readyToConnect: boolean
   mediaConnected: boolean
+  isInMeeting: boolean
 }
 export interface IMessage extends Schema {
   type: string
@@ -31,8 +32,13 @@ export interface IMeeting extends Schema {
   connectedUser: SetSchema<string>
 }
 
+export interface IChair extends Schema {
+  connectedUser: string
+}
+
 export interface IOfficeState extends Schema {
   players: MapSchema<IPlayer>
+  chairs: MapSchema<IChair>
   meetings: MapSchema<IMeeting>
   mapMessages: MapSchema<IChatMessage>
 }
