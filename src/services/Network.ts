@@ -11,7 +11,7 @@ import {
 import { IChair, IMeeting, IOfficeState, IPlayer } from '../types/ISpaceState'
 import WebRTC from '../web/WebRTC'
 import { GameEvent, phaserEvents } from '../events/EventCenter'
-import { IRoomData, RoomType } from '../types/Rooms'
+import { IRoomData, RoomType, IMessagePayload } from '../types/Rooms'
 import {
   loadMapChatMessage,
   pushChatMessage,
@@ -75,7 +75,7 @@ export default class Network {
 
   public disconnectMeeting() {
     console.log('Disconnecting meeting')
-    store.dispatch(disconnectMeeting);
+    store.dispatch(disconnectMeeting)
   }
 
   /**
@@ -352,9 +352,8 @@ export default class Network {
     this.room?.send(Message.STOP_SCREEN_SHARE, { meetingId: id })
   }
 
-  addChatMessage({ content, chatId }: { content: string; chatId: string }) {
-    console.log({ content, chatId })
-    this.room?.send(Message.ADD_CHAT_MESSAGE, { content, chatId })
+  addChatMessage(payload: IMessagePayload) {
+    this.room?.send(Message.ADD_CHAT_MESSAGE, payload)
   }
   loadChat() {
     this.room?.send(Message.LOAD_CHAT)

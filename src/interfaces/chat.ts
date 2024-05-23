@@ -10,3 +10,8 @@ export interface IChatMember {
   role: string
   user: IUser
 }
+export interface IMessage {
+  content: string
+  type: string
+  path: string
+}

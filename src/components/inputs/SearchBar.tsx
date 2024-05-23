@@ -1,7 +1,7 @@
-import styled from "styled-components"
+import styled from 'styled-components'
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
-import { SetStateAction } from "react"
-import CancelIcon from '@mui/icons-material/Cancel';
+import { SetStateAction } from 'react'
+import CancelIcon from '@mui/icons-material/Cancel'
 
 const SearchBarContainer = styled.div`
   display: flex;
@@ -66,45 +66,44 @@ const SearchIcon = styled.span`
 `
 
 const ClearSearchButton = styled.div`
+  display: flex;
+  cursor: pointer;
+  & > span {
     display: flex;
-    cursor: pointer;
-    &>span{
-        display: flex;
-        width: 20px;
-        color: rgb(255, 255, 255);
-        flex-shrink: 0;
-        &>svg{
-            width: 100%;
-            height: auto;
-        }
+    width: 20px;
+    color: rgb(255, 255, 255);
+    flex-shrink: 0;
+    & > svg {
+      width: 100%;
+      height: auto;
     }
+  }
 `
 
 interface SearchBarProps {
-    search: string,
-    setSearch: React.Dispatch<SetStateAction<string>>
+  search: string
+  setSearch: React.Dispatch<SetStateAction<string>>
 }
 
 export const SearchBar = ({ search, setSearch }: SearchBarProps) => {
+  const handleChange = (e: any) => setSearch(e.target.value)
+  const handleClear = () => setSearch('')
 
-    const handleChange = (e: any) => setSearch(e.target.value);
-    const handleClear = () => setSearch('');
-
-    return (
-        <SearchBarContainer>
-            <SearchBarInner>
-                <SearchIcon>
-                    <SearchRoundedIcon />
-                </SearchIcon>
-                <SearchInput value={search} onChange={handleChange} />
-                {
-                    search && (
-                        <ClearSearchButton onClick={handleClear}>
-                            <span><CancelIcon /></span>
-                        </ClearSearchButton>
-                    )
-                }
-            </SearchBarInner>
-        </SearchBarContainer>
-    )
+  return (
+    <SearchBarContainer>
+      <SearchBarInner>
+        <SearchIcon>
+          <SearchRoundedIcon />
+        </SearchIcon>
+        <SearchInput value={search} onChange={handleChange} />
+        {search && (
+          <ClearSearchButton onClick={handleClear}>
+            <span>
+              <CancelIcon />
+            </span>
+          </ClearSearchButton>
+        )}
+      </SearchBarInner>
+    </SearchBarContainer>
+  )
 }
