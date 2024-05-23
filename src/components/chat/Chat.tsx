@@ -20,6 +20,12 @@ import { useParams } from 'react-router-dom'
 import ApiService from '../../apis/ApiService'
 import { IChat } from '../../interfaces/chat'
 import { IChatMessage } from '../../types/ISpaceState'
+import { AddPeopleToGroupChatPopup } from '../popups/AddPeopleToGroupChatPopup'
+import { SearchBar } from '../inputs/SearchBar'
+import { Input } from '@mui/material'
+import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
+import AddIcon from '@mui/icons-material/Add'
+import { IMessagePayload } from '../../types/Rooms'
 
 const Backdrop = styled.div`
   position: fixed;
@@ -181,6 +187,52 @@ export default function Chat() {
   const [inputType, setInputType] = useState<'text' | 'image'>('text')
   const [images, setImages] = useState<PasteItem[]>([])
   const [error, setError] = useState<string | null>(null)
+  // Draggable functionality state
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+  const draggableRef = useRef<HTMLDivElement>(null)
+  const handleUploadImage = async (files: File[]) => {
+    const filePaths = await Promise.all(
+      files.map(async (file) => {
+        try {
+          const form = new FormData()
+          form.append('file', file)
+          const { path } = await ApiService.getInstance().post(`/v1/upload/rooms/${roomId}`, form)
+          return path as string
+        } catch (error) {
+          return ``
+        }
+      })
+    )
+    return filePaths
+  }
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    setIsDragging(true)
+    const rect = draggableRef.current?.getBoundingClientRect()
+    if (rect) {
+      setDragOffset({ x: e.clientX - rect.left, y: e.clientY - rect.top })
+    }
+  }
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (isDragging && draggableRef.current) {
+      draggableRef.current.style.left = `${e.clientX - dragOffset.x}px`
+      draggableRef.current.style.top = `${e.clientY - dragOffset.y}px`
+    }
+  }
+
+  const handleMouseUp = () => {
+    setIsDragging(false)
+  }
+
+  useEffect(() => {
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [isDragging])
   const dispatch = useAppDispatch()
   let game: Game
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -267,10 +319,29 @@ export default function Chat() {
 
     const val = inputValue.trim()
     setInputValue('')
-    if (val) {
+    let messages: IMessagePayload[] = []
+    // handle send images
+    if (images.length > 0) {
+      const paths = await handleUploadImage(images.map((i) => i.file))
+      messages.push(
+        ...paths.map((p) => ({
+          content: ``,
+          type: 'image',
+          path: p,
+          chatId: currentChat?._id || '',
+        }))
+      )
+    }
+    // handle send text
+    if (val) messages.push({ content: val, chatId: currentChat?._id || '', type: 'text', path: '' })
+    //
+    console.log({ messages })
+    if (messages.length > 0) {
       if (!game) await loadPhaserGame()
-      game.network?.addChatMessage({ content: val, chatId: currentChat?._id || '' })
-      game.myPlayer?.updateDialogBubble(val)
+      messages.map((m) => {
+        game.network?.addChatMessage(m)
+        if (m.content) game.myPlayer?.updateDialogBubble(m.content)
+      })
     }
   }
   const getListChats = async () => {
@@ -298,7 +369,7 @@ export default function Chat() {
     scrollToBottom()
   }, [mapMessages.get(currentChat?._id || '')?.messages, showChat])
   return (
-    <Backdrop>
+    <Backdrop ref={draggableRef} onMouseDown={handleMouseDown}>
       <Wrapper>
         {showChat ? (
           <div style={{ height: '100%', display: 'flex' }}>
@@ -316,6 +387,24 @@ export default function Chat() {
                   <h3>Chats</h3>
                 </ChatHeader>
                 <ListChat style={{ borderRadius: '0 0 0 10px' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      border: '1px solid black',
+                      borderRadius: 4,
+                      padding: 5,
+                    }}
+                  >
+                    <span style={{ display: 'flex', alignItems: 'center' }}>
+                      <SearchRoundedIcon></SearchRoundedIcon>
+                    </span>
+                    <input style={{ flex: 1, background: 'transparent', width: '80%' }} />
+                    <span style={{ display: 'flex', alignItems: 'center' }}>
+                      <AddIcon></AddIcon>
+                    </span>
+                  </div>
+
                   {listChats.map((chat) => (
                     <ChatContainer key={chat._id}>
                       <p

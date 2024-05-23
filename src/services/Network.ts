@@ -11,7 +11,7 @@ import {
 import { IMeeting, IOfficeState, IPlayer } from '../types/ISpaceState'
 import WebRTC from '../web/WebRTC'
 import { GameEvent, phaserEvents } from '../events/EventCenter'
-import { IRoomData, RoomType } from '../types/Rooms'
+import { IRoomData, RoomType, IMessagePayload } from '../types/Rooms'
 import {
   loadMapChatMessage,
   pushChatMessage,
@@ -25,7 +25,7 @@ import { API_URL } from '../constant'
 import Cookies from 'js-cookie'
 
 export default class Network {
-  private static instance: Network | null = null; // Biến static instance
+  private static instance: Network | null = null // Biến static instance
 
   private client: Client
   private room?: Room<IOfficeState>
@@ -35,7 +35,7 @@ export default class Network {
   mySessionId!: string
 
   constructor() {
-    Network.instance = this;
+    Network.instance = this
     console.log('Construct Network')
     const endpoint = API_URL.replace('https', `wss`)
     // const endpoint = API_URL.replace(`http`, `ws`)
@@ -52,7 +52,7 @@ export default class Network {
   }
 
   static getInstance(): Network | null {
-    return Network.instance;
+    return Network.instance
   }
 
   public disconnectClient() {
@@ -162,7 +162,7 @@ export default class Network {
         phaserEvents.emit(GameEvent.ITEM_USER_REMOVED, item, key, ItemType.MEETING)
       }
     }
-    
+
     this.room.state.mapMessages.onChange = (item, key: string) => {
       console.log(`mapMessages change`, item, key)
     }
@@ -307,9 +307,8 @@ export default class Network {
     this.room?.send(Message.STOP_SCREEN_SHARE, { meetingId: id })
   }
 
-  addChatMessage({ content, chatId }: { content: string; chatId: string }) {
-    console.log({ content, chatId })
-    this.room?.send(Message.ADD_CHAT_MESSAGE, { content, chatId })
+  addChatMessage({ content, chatId, path, type }: IMessagePayload) {
+    this.room?.send(Message.ADD_CHAT_MESSAGE, { content, chatId, path, type })
   }
   loadChat() {
     this.room?.send(Message.LOAD_CHAT)

@@ -11,3 +11,9 @@ export interface IRoomData {
   autoDispose: boolean
   map: string
 }
+export interface IMessagePayload {
+  content: string
+  type: string
+  path: string
+  chatId: string
+}
