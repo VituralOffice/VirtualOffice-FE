@@ -21,6 +21,7 @@ export type JoinRoomParams = {
 }
 
 export type CreateGroupChatParams = {
+    roomId: string,
     name?:string,
     type: CHAT_TYPE,
     member: string[]

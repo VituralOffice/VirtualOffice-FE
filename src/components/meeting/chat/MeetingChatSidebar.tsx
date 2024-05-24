@@ -214,7 +214,7 @@ export default function MeetingChatSidebar() {
         <h3>Chat</h3>
       </ChatHeader>
       <ChatBox>
-        {mapMessages.map(({ messageType, chatMessage }, index) => (
+        {mapMessages.get(currentChat?._id || '')?.messages?.map(({ messageType, chatMessage }, index) => (
           <Message chatMessage={chatMessage} messageType={messageType} key={index} />
         ))}
         <div ref={messagesEndRef} />

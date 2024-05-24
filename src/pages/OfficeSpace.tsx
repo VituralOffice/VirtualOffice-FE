@@ -9,15 +9,20 @@ import { IRoomData } from '../types/Rooms'
 import { isApiSuccess } from '../apis/util'
 import OfficeToolbar from '../components/toolbar/OfficeToolbar'
 import MeetingDialog from '../components/meeting/MeetingDialog'
+import { CreateMeetingPopup } from '../components/popups/CreateMeetingPopup'
+import { useDispatch } from 'react-redux'
+import { setShowCreateMeeting } from '../stores/UIStore'
 
 export const OfficeSpace = () => {
   let { roomId } = useParams()
   const lobbyJoined = useAppSelector((state) => state.room.lobbyJoined)
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const [joinPageShow, setJoinPageShow] = useState(true)
   const [room, setRoom] = useState<IRoomData | null>()
-  const store = useAppSelector((state) => state)
+  const meeting = useAppSelector((state) => state.meeting)
+  const ui = useAppSelector((state) => state.ui)
 
   const handleJoinRoom = async () => {
     try {
@@ -74,11 +79,18 @@ export const OfficeSpace = () => {
     }
   }, [])
 
+  const CreateMeetingCallback = () => {
+
+  }
+
   return (
     <>
       {joinPageShow && <JoinOfficePage handleJoinRoom={handleJoinRoom} />}
       {!joinPageShow && <OfficeToolbar></OfficeToolbar>}
-      {store.meeting.meetingDialogOpen && <MeetingDialog />}
+      {meeting.meetingDialogOpen && <MeetingDialog />}
+      {ui.showCreateMeeting && (
+        <CreateMeetingPopup onClosePopup={() => dispatch(setShowCreateMeeting(false))} callback={CreateMeetingCallback} />
+      )}
       {/* <MeetingDialog /> */}
     </>
   )

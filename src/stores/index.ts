@@ -4,6 +4,7 @@ import userReducer from './UserStore'
 import meetingReducer from './MeetingStore'
 import chatReducer from './ChatStore'
 import roomReducer from './RoomStore'
+import uiReducer from './UIStore'
 
 enableMapSet()
 
@@ -13,6 +14,7 @@ const store = configureStore({
     meeting: meetingReducer,
     chat: chatReducer,
     room: roomReducer,
+    ui: uiReducer
   },
   // Temporary disable serialize check for redux as we store MediaStream in MeetingStore.
   // https://stackoverflow.com/a/63244831

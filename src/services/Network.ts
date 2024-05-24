@@ -154,7 +154,7 @@ export default class Network {
             store.dispatch(pushPlayerJoinedMessage(value))
           }
 
-          if (field === 'characterId' && value) {
+          if (field === 'characterId') {
             store.dispatch(setPlayerAvatarMap({ id: key, characterId: value }))
           }
         })

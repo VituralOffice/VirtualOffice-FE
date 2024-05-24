@@ -199,8 +199,6 @@ export default class MyPlayer extends Player {
         }
 
         if (Phaser.Input.Keyboard.JustDown(keyR) && this.chairOnSit) {
-          console.log(this.chairOnSit.groupId!)
-          console.log(Game.getInstance()?.meetingMap.get(this.chairOnSit.groupId!))
           const meeting = Game.getInstance()?.meetingMap.get(this.chairOnSit.groupId!) as Meeting
           meeting.openDialog(this.getPlayerId()!, network)
           break
