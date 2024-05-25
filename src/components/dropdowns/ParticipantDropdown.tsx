@@ -2,6 +2,7 @@ import styled from 'styled-components'
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded'
 import { useState } from 'react'
 import { ParticipantItem } from '../items/ParticipantItem'
+import { IRoomMember } from '../../types/Rooms'
 
 const ParticipantsBox = styled.div`
   display: flex;
@@ -61,11 +62,11 @@ const ParticipantsBox = styled.div`
 `
 
 interface DropdownProps {
-  items: any,
-  title: string,
+  members: IRoomMember[]
+  title: string
 }
 
-export const ParticipantDropdown = ({ items, title }: DropdownProps) => {
+export const ParticipantDropdown = ({ members, title }: DropdownProps) => {
   const [enabled, setEnabled] = useState<boolean>(false)
 
   return (
@@ -74,22 +75,27 @@ export const ParticipantDropdown = ({ items, title }: DropdownProps) => {
         <div>
           <div className="icon-dropdown" onClick={() => setEnabled(!enabled)}>
             <span>
-              <KeyboardArrowDownRoundedIcon style={{transform: enabled ? 'rotate(0deg)' : 'rotate(-90deg)'}} />
+              <KeyboardArrowDownRoundedIcon
+                style={{ transform: enabled ? 'rotate(0deg)' : 'rotate(-90deg)' }}
+              />
             </span>
           </div>
           <span className="title">{title}</span>
           <div className="online-numbers">
-            <span>1</span>
+            <span>{members.length}</span>
           </div>
         </div>
       </div>
       {enabled && (
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <ParticipantItem isOnline={true} isKing={true} />
-          <ParticipantItem isOnline={true} isKing={false} />
-          <ParticipantItem isOnline={true} isKing={false} />
-          <ParticipantItem isOnline={true} isKing={false} />
-          <ParticipantItem isOnline={true} isKing={false} />
+          {members.map((m, i) => (
+            <ParticipantItem
+              key={i}
+              isOnline={m.online}
+              isKing={m.role === 'admin'}
+              user={m.user}
+            />
+          ))}
         </div>
       )}
     </ParticipantsBox>

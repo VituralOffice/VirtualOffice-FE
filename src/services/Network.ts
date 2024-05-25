@@ -7,6 +7,7 @@ import {
   setAvailableRooms,
   addAvailableRooms,
   removeAvailableRooms,
+  updateMember,
 } from '../stores/RoomStore'
 import { IChair, IMeeting, IOfficeState, IPlayer } from '../types/ISpaceState'
 import WebRTC from '../web/WebRTC'
@@ -139,7 +140,7 @@ export default class Network {
     // new instance added to the players MapSchema
     this.room.state.players.onAdd = (player: IPlayer, key: string) => {
       if (key === this.mySessionId) return
-
+      store.dispatch(updateMember({ online: true, role: 'user', user: player }))
       // track changes on every child object inside the players MapSchema
       player.onChange = (changes) => {
         changes.forEach((change) => {
@@ -163,6 +164,7 @@ export default class Network {
       this.webRTC?.deleteOnCalledVideoStream(key)
       store.dispatch(pushPlayerLeftMessage(player.playerName))
       store.dispatch(removePlayerNameMap(key))
+      store.dispatch(updateMember({ online: false, role: 'user', user: player }))
     }
 
     this.room.state.chairs.onAdd = (chair: IChair, key: string) => {
