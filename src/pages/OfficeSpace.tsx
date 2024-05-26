@@ -58,7 +58,6 @@ export const OfficeSpace = () => {
           navigate('/app')
           return
         }
-
         setRoom(response.result)
       } catch (error) {
         console.error(error)

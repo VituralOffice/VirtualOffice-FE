@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RoomAvailable } from 'colyseus.js'
-import { RoomType } from '../types/Rooms'
+import { IRoomMember, RoomType } from '../types/Rooms'
 
 interface RoomInterface extends RoomAvailable {
   name?: string
@@ -22,6 +22,7 @@ export const roomSlice = createSlice({
     roomName: '',
     roomDescription: '',
     availableRooms: new Array<RoomAvailable>(),
+    members: new Array<IRoomMember>(),
   },
   reducers: {
     setLobbyJoined: (state, action: PayloadAction<boolean>) => {
@@ -32,11 +33,17 @@ export const roomSlice = createSlice({
     },
     setJoinedRoomData: (
       state,
-      action: PayloadAction<{ id: string; name: string; description: string }>
+      action: PayloadAction<{
+        id: string
+        name: string
+        description: string
+        members: IRoomMember[]
+      }>
     ) => {
       state.roomId = action.payload.id
       state.roomName = action.payload.name
       state.roomDescription = action.payload.description
+      state.members = action.payload.members
     },
     setAvailableRooms: (state, action: PayloadAction<RoomAvailable[]>) => {
       state.availableRooms = action.payload.filter((room) => isCustomRoom(room))
@@ -55,6 +62,21 @@ export const roomSlice = createSlice({
     removeAvailableRooms: (state, action: PayloadAction<string>) => {
       state.availableRooms = state.availableRooms.filter((room) => room.roomId !== action.payload)
     },
+    setMembers: (state, action: PayloadAction<IRoomMember[]>) => {
+      state.members = action.payload
+    },
+    addMember: (state, action: PayloadAction<IRoomMember>) => {
+      state.members = [...state.members, action.payload]
+    },
+    removeMember: (state, action: PayloadAction<IRoomMember>) => {
+      state.members = state.members.filter((m) => m.user.id !== action.payload.user.id)
+    },
+    updateMember: (state, action: PayloadAction<IRoomMember>) => {
+      state.members = [
+        ...state.members.filter((m) => m.user._id !== action.payload.user?.id),
+        action.payload,
+      ]
+    },
   },
 })
 
@@ -65,6 +87,10 @@ export const {
   setAvailableRooms,
   addAvailableRooms,
   removeAvailableRooms,
+  setMembers,
+  addMember,
+  removeMember,
+  updateMember,
 } = roomSlice.actions
 
 export default roomSlice.reducer
