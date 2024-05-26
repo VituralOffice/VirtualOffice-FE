@@ -20,7 +20,15 @@ import { useParams } from 'react-router-dom'
 import ApiService from '../../apis/ApiService'
 import { IChat } from '../../interfaces/chat'
 import { IChatMessage } from '../../types/ISpaceState'
-
+import { AddPeopleToGroupChatPopup } from '../popups/AddPeopleToGroupChatPopup'
+import { SearchBar } from '../inputs/SearchBar'
+import { Input } from '@mui/material'
+import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
+import AddIcon from '@mui/icons-material/Add'
+import { IMessagePayload } from '../../types/Rooms'
+import Zoom from 'react-medium-image-zoom'
+import 'react-medium-image-zoom/dist/styles.css'
+import AttachFileIcon from '@mui/icons-material/AttachFile'
 const Backdrop = styled.div`
   position: fixed;
   bottom: 150px;
@@ -160,7 +168,41 @@ const Message = ({ chatMessage }: MessageProps) => {
             color: getColorByString(chatMessage.user?.fullname || ''),
           }}
         >
-          {chatMessage.user?.fullname}: <span>{chatMessage.message?.text}</span>
+          {chatMessage.user?.fullname}:{' '}
+          {chatMessage.message?.type === 'text' ? (
+            <span>{chatMessage.message?.text}</span>
+          ) : chatMessage.message?.type === 'image' ? (
+            <div
+              style={{
+                width: '100px',
+                height: '60px',
+                margin: '10px',
+                position: 'relative',
+              }}
+            >
+              <Zoom>
+                <img
+                  src={chatMessage.message.path}
+                  alt="Preview"
+                  style={{ maxWidth: '100%', maxHeight: '100%' }}
+                />
+              </Zoom>
+            </div>
+          ) : chatMessage.message?.type === 'file' ? (
+            <div
+              style={{
+                height: '30px',
+                margin: '10px',
+                position: 'relative',
+              }}
+            >
+              <a href={chatMessage.message.path} style={{ color: 'white' }}>
+                {chatMessage.message?.fileName}
+              </a>
+            </div>
+          ) : (
+            <></>
+          )}
         </p>
       </Tooltip>
     </MessageWrapper>
@@ -180,7 +222,75 @@ export default function Chat() {
   const [currentChat, setCurrentChat] = useState<IChat | null>(null)
   const [inputType, setInputType] = useState<'text' | 'image'>('text')
   const [images, setImages] = useState<PasteItem[]>([])
+  const [files, setFiles] = useState<File[]>([])
+
   const [error, setError] = useState<string | null>(null)
+  // Draggable functionality state
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+  const draggableRef = useRef<HTMLDivElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleFileClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click()
+    }
+  }
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      const file = event.target.files[0]
+      if (file && file.type.includes(`image`)) {
+        setImages([...images, { preview: URL.createObjectURL(file), file }])
+      } else {
+        setFiles([...files, file])
+      }
+    }
+  }
+  const handleUploadImage = async (files: File[]) => {
+    const filePaths = await Promise.all(
+      files.map(async (file) => {
+        try {
+          const form = new FormData()
+          form.append('file', file)
+          const {
+            result: { path },
+          } = await ApiService.getInstance().post(`/upload/rooms/${roomId}`, form)
+          return path as string
+        } catch (error) {
+          return ``
+        }
+      })
+    )
+    return filePaths
+  }
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    setIsDragging(true)
+    const rect = draggableRef.current?.getBoundingClientRect()
+    if (rect) {
+      setDragOffset({ x: e.clientX - rect.left, y: e.clientY - rect.top })
+    }
+  }
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (isDragging && draggableRef.current) {
+      draggableRef.current.style.left = `${e.clientX - dragOffset.x}px`
+      draggableRef.current.style.top = `${e.clientY - dragOffset.y}px`
+    }
+  }
+
+  const handleMouseUp = () => {
+    setIsDragging(false)
+  }
+
+  useEffect(() => {
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [isDragging])
   const dispatch = useAppDispatch()
   let game: Game
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -263,14 +373,47 @@ export default function Chat() {
       return
     }
     // move focus back to the game
-    inputRef.current?.blur()
+    //inputRef.current?.blur()
 
     const val = inputValue.trim()
     setInputValue('')
-    if (val) {
+    let messages: IMessagePayload[] = []
+    // handle send images
+    if (images.length > 0) {
+      const paths = await handleUploadImage(images.map((i) => i.file))
+      messages.push(
+        ...paths.map((p) => ({
+          content: ``,
+          type: 'image',
+          path: p,
+          chatId: currentChat?._id || '',
+        }))
+      )
+    }
+    if (files.length > 0) {
+      const paths = await handleUploadImage(files)
+      const fileObjs = files.map((f, i) => ({ file: f, path: paths[i] }))
+      messages.push(
+        ...fileObjs.map((p) => ({
+          content: ``,
+          type: 'file',
+          path: p.path,
+          filename: p.file.name,
+          chatId: currentChat?._id || '',
+        }))
+      )
+    }
+    // handle send text
+    if (val) messages.push({ content: val, chatId: currentChat?._id || '', type: 'text', path: '' })
+    //
+    if (messages.length > 0) {
       if (!game) await loadPhaserGame()
-      game.network?.addChatMessage({ content: val, chatId: currentChat?._id || '' })
-      game.myPlayer?.updateDialogBubble(val)
+      messages.map((m) => {
+        game.network?.addChatMessage(m)
+        if (m.content) game.myPlayer?.updateDialogBubble(m.content)
+      })
+      setImages([])
+      setFiles([])
     }
   }
   const getListChats = async () => {
@@ -298,7 +441,7 @@ export default function Chat() {
     scrollToBottom()
   }, [mapMessages.get(currentChat?._id || '')?.messages, showChat])
   return (
-    <Backdrop>
+    <Backdrop ref={draggableRef} onMouseDown={handleMouseDown}>
       <Wrapper>
         {showChat ? (
           <div style={{ height: '100%', display: 'flex' }}>
@@ -316,6 +459,24 @@ export default function Chat() {
                   <h3>Chats</h3>
                 </ChatHeader>
                 <ListChat style={{ borderRadius: '0 0 0 10px' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      border: '1px solid black',
+                      borderRadius: 4,
+                      padding: 5,
+                    }}
+                  >
+                    <span style={{ display: 'flex', alignItems: 'center' }}>
+                      <SearchRoundedIcon></SearchRoundedIcon>
+                    </span>
+                    <input style={{ flex: 1, background: 'transparent', width: '80%' }} />
+                    <span style={{ display: 'flex', alignItems: 'center' }}>
+                      <AddIcon></AddIcon>
+                    </span>
+                  </div>
+
                   {listChats.map((chat) => (
                     <ChatContainer key={chat._id}>
                       <p
@@ -367,7 +528,7 @@ export default function Chat() {
                 )}
               </ChatBox>
               <InputWrapper onSubmit={handleSubmit}>
-                {inputType === 'image' && images.length > 0 && (
+                {images.length > 0 && (
                   <div style={{ width: '100%', display: 'flex' }}>
                     {images.map((image, idx) => (
                       <div
@@ -378,7 +539,11 @@ export default function Chat() {
                           position: 'relative',
                         }}
                       >
-                        <img src={image.preview} alt="Preview" style={{ width: '100%' }} />
+                        <img
+                          src={image.preview}
+                          alt="Preview"
+                          style={{ maxHeight: '100%', maxWidth: '100%' }}
+                        />
                         <IconButton
                           aria-label="close dialog"
                           className="close"
@@ -392,7 +557,52 @@ export default function Chat() {
                     ))}
                   </div>
                 )}
+                {files.length > 0 && (
+                  <div style={{ width: '100%', display: 'flex' }}>
+                    {files.map((file, idx) => (
+                      <div
+                        style={{
+                          margin: '10px',
+                          position: 'relative',
+                          display: 'flex',
+                          flexDirection: 'column',
+                        }}
+                      >
+                        <p key={idx} style={{ color: 'white' }}>
+                          {file.name}
+                        </p>
+                        <IconButton
+                          aria-label="close dialog"
+                          className="close"
+                          onClick={() => setFiles([...files.filter((_, i) => i !== idx)])}
+                          size="small"
+                          style={{ position: 'absolute', right: '0' }}
+                        >
+                          <CloseIcon />
+                        </IconButton>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 <div style={{ display: 'flex' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      cursor: 'pointer',
+                    }}
+                    onClick={handleFileClick}
+                  >
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      style={{ display: 'none' }}
+                      onChange={handleFileChange}
+                    />
+                    <AttachFileIcon style={{ color: 'white' }}> </AttachFileIcon>
+                  </div>
                   <InputTextField
                     inputRef={inputRef}
                     autoFocus={focused}

@@ -1,8 +1,8 @@
 import styled from 'styled-components'
 import FiberManualRecordRoundedIcon from '@mui/icons-material/FiberManualRecordRounded'
 import { getAvatarById } from '../../utils/util'
-import { User } from '../../types'
 import { ButtonProps } from '../../interfaces/Interfaces'
+import { IUser } from '../../interfaces/user'
 
 const LayoutContainer = styled.div<ButtonProps>`
   height: 56px;
@@ -20,7 +20,7 @@ const LayoutContainer = styled.div<ButtonProps>`
   opacity: ${(props) => (props.isActive ? '1' : '0.5')};
 `
 
-const Avatar = styled.div`
+const Avatar = styled.div<{ isOnline: boolean }>`
   flex-shrink: 0;
   width: 40px;
   height: 40px;
@@ -59,6 +59,7 @@ const Avatar = styled.div`
         height: 15px;
         margin-bottom: -1px;
         flex-shrink: 0;
+        color: ${(props) => (props.isOnline ? 'green' : 'none')};
       }
     }
   }
@@ -91,7 +92,7 @@ const Username = styled.div`
 `
 
 interface Props {
-  user?: User
+  user: IUser
   isOnline: boolean
   isKing: boolean
 }
@@ -99,7 +100,7 @@ interface Props {
 export const ParticipantItem = ({ user, isOnline, isKing }: Props) => {
   return (
     <LayoutContainer isActive={isOnline}>
-      <Avatar>
+      <Avatar isOnline={isOnline}>
         <div>
           <div className="background">
             {/* <img src={'/' + getAvatarById(user.character_id).img} /> */}
@@ -112,7 +113,7 @@ export const ParticipantItem = ({ user, isOnline, isKing }: Props) => {
       </Avatar>
       <Username>
         <div>
-          <span>hehe</span>
+          <span>{user.fullname}</span>
           {isKing && <img src="/icons/crown.png" />}
         </div>
       </Username>

@@ -7,11 +7,12 @@ import {
   setAvailableRooms,
   addAvailableRooms,
   removeAvailableRooms,
+  updateMember,
 } from '../stores/RoomStore'
 import { IChair, IMeeting, IOfficeState, IPlayer } from '../types/ISpaceState'
 import WebRTC from '../web/WebRTC'
 import { GameEvent, phaserEvents } from '../events/EventCenter'
-import { IRoomData, RoomType } from '../types/Rooms'
+import { IRoomData, RoomType, IMessagePayload } from '../types/Rooms'
 import {
   loadMapChatMessage,
   pushChatMessage,
@@ -75,7 +76,7 @@ export default class Network {
 
   public disconnectMeeting() {
     console.log('Disconnecting meeting')
-    store.dispatch(disconnectMeeting);
+    store.dispatch(disconnectMeeting)
   }
 
   /**
@@ -139,7 +140,7 @@ export default class Network {
     // new instance added to the players MapSchema
     this.room.state.players.onAdd = (player: IPlayer, key: string) => {
       if (key === this.mySessionId) return
-
+      store.dispatch(updateMember({ online: true, role: 'user', user: player }))
       // track changes on every child object inside the players MapSchema
       player.onChange = (changes) => {
         changes.forEach((change) => {
@@ -167,6 +168,7 @@ export default class Network {
       this.webRTC?.deleteOnCalledVideoStream(key)
       store.dispatch(pushPlayerLeftMessage(player.playerName))
       store.dispatch(removePlayerNameMap(key))
+      store.dispatch(updateMember({ online: false, role: 'user', user: player }))
       store.dispatch(removePlayerAvatarMap(key))
     }
 

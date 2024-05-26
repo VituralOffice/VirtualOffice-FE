@@ -1,3 +1,5 @@
+import { IUser } from '../interfaces/user'
+
 export enum RoomType {
   LOBBY = 'lobby',
   PUBLIC = 'skyoffice',
@@ -10,4 +12,17 @@ export interface IRoomData {
   private: boolean
   autoDispose: boolean
   map: string
+  members: IRoomMember[]
+}
+export interface IRoomMember {
+  online: boolean
+  user: IUser
+  role: string
+}
+export interface IMessagePayload {
+  content: string
+  type: string
+  path: string
+  chatId: string
+  filename?: string
 }
