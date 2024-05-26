@@ -22,12 +22,15 @@ export default class UserMediaManager {
         })
 
         this.myPeer.on('call', (call) => {
+            console.log("receive call")
             call.answer()
             call.on('stream', (userVideoStream) => {
                 store.dispatch(addCameraStream({ id: call.peer, call, stream: userVideoStream }))
             })
             // we handled on close on our own
         })
+
+        
     }
 
     onOpen() {
@@ -49,12 +52,13 @@ export default class UserMediaManager {
         return `${id.replace(/[^0-9a-z]/gi, 'G')}-um`
     }
 
-    startCameraShare() {
+    startCameraShare(video: boolean, microphone: boolean) {
+        if (!video && !microphone) return;
         // @ts-ignore
         navigator.mediaDevices
             ?.getUserMedia({
-                video: true,
-                audio: true,
+                video: video,
+                audio: microphone,
             })
             .then((stream) => {
                 this.myStream = stream
@@ -64,6 +68,7 @@ export default class UserMediaManager {
                 const meetingItem = Game.getInstance()?.meetingMap.get(store.getState().meeting.meetingId!)
                 if (meetingItem) {
                     for (const userId of meetingItem.currentUsers) {
+                        console.log("connected users: " + userId)
                         this.onUserJoined(userId)
                     }
                 }
@@ -79,12 +84,13 @@ export default class UserMediaManager {
         if (shouldDispatch) {
             store.dispatch(setMyCameraStream(null))
             // Manually let all other existing users know screen sharing is stopped
-            Game.getInstance()?.network.onStopScreenShare(store.getState().meeting.meetingId!)
+            Game.getInstance()?.network.onStopCameraShare(store.getState().meeting.meetingId!)
         }
     }
 
     onUserJoined(userId: string) {
         if (!this.myStream || userId === this.userId) return
+        console.log("meeting camera call " + userId);
 
         const sanatizedId = this.makeId(userId)
         this.myPeer.call(sanatizedId, this.myStream)

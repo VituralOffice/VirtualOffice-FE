@@ -11,7 +11,7 @@ const VideoGrid = styled.div`
   min-height: 0;
   display: grid;
   grid-gap: 10px;
-  grid-template-columns: repeat(auto-fit, minmax(40%, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(30%, 1fr));
 `
 
 const VideoContainerComponent = styled.div<ButtonProps>`

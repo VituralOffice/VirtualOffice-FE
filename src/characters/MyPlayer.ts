@@ -18,6 +18,7 @@ import { Meeting } from '../web/meeting/Meeting'
 export default class MyPlayer extends Player {
   private playContainerBody: Phaser.Physics.Arcade.Body
   private chairOnSit?: Chair
+  private forceLeaveCurrentChair?: boolean
   constructor(
     scene: Phaser.Scene,
     x: number,
@@ -52,6 +53,14 @@ export default class MyPlayer extends Player {
     )
   }
 
+  setCharacterId(id: number) {
+    this.characterId = id
+    phaserEvents.emit(
+      GameEvent.MY_PLAYER_CHARACTER_ID_CHANGE,
+      id
+    )
+  }
+
   setPlayerIsInMeeting(isInMeeting: boolean) {
     phaserEvents.emit(
       GameEvent.MY_PLAYER_MEETING_STATUS_CHANGE,
@@ -71,6 +80,12 @@ export default class MyPlayer extends Player {
     network: Network
   ) {
     if (!cursors) return
+
+    //force leave chair
+    if (this.forceLeaveCurrentChair) {
+      this.leaveCurrentChair(playerSelector, cursors, network);
+      return;
+    }
 
     const item = playerSelector.selectedItem
 
@@ -191,10 +206,13 @@ export default class MyPlayer extends Player {
         }
 
         if (Phaser.Input.Keyboard.JustDown(keyR) && this.chairOnSit) {
-          console.log(this.chairOnSit.groupId!)
-          console.log(Game.getInstance()?.meetingMap.get(this.chairOnSit.groupId!))
           const meeting = Game.getInstance()?.meetingMap.get(this.chairOnSit.groupId!) as Meeting
-          meeting.openDialog(this.getPlayerId()!, network)
+          if (meeting.isOpen) {
+            meeting.openDialog(this.getPlayerId()!, network)
+          }
+          else {
+            meeting.createMeeting(this.getPlayerId()!, network)
+          }
           break
         }
 
@@ -211,6 +229,27 @@ export default class MyPlayer extends Player {
       // }
       // break
     }
+  }
+
+  setLeaveCurrentChair(leave: boolean) {
+    this.forceLeaveCurrentChair = leave;
+  }
+
+  leaveCurrentChair(playerSelector: PlayerSelector, cursors: NavKeys, network: Network) {
+    if (!this.chairOnSit) return;
+    if (this.playerBehavior === PlayerBehavior.SITTING) {
+      // back to idle if player press E while sitting
+      const parts = this.anims.currentAnim!.key.split('_')
+      parts[1] = 'idle'
+      this.play(parts.join('_'), true)
+      this.playerBehavior = PlayerBehavior.IDLE
+      this.chairOnSit?.leave(Network.getInstance()!)
+      this.chairOnSit = undefined
+      playerSelector.setPosition(this.x, this.y)
+      playerSelector.update(this, cursors)
+      network.updatePlayer(this.x, this.y, this.anims.currentAnim!.key)
+    }
+    this.forceLeaveCurrentChair = false;
   }
 
   // disconnectPlayer(network: Network) {

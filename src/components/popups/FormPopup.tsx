@@ -185,7 +185,7 @@ interface Props {
     forms: Array<ReactElement>;
     totalSteps: number;
     formCanBeSubmit: boolean;
-    onSubmit: () => void;
+    onSubmit: any;
     submitText?: string;
 }
 

@@ -14,6 +14,7 @@ export const sittingShiftData = {
 export default class Player extends Phaser.Physics.Arcade.Sprite {
   playerId: string
   playerTexture: string
+  characterId: number
   playerBehavior = PlayerBehavior.IDLE
   readyToConnect = false
   mediaConnected = false
@@ -35,6 +36,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     this.playerId = id
     this.playerTexture = texture
+    this.characterId = 0
     this.setDepth(this.y)
 
     this.anims.play(`${this.playerTexture}_idle_down`, true)

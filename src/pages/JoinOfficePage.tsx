@@ -331,6 +331,7 @@ export function JoinOfficePage({ handleJoinRoom }) {
       Game.getInstance()?.registerKeys()
       Game.getInstance()?.myPlayer.setPlayerName(playerName)
       Game.getInstance()?.myPlayer.setPlayerTexture(avatars[user.character_id].name)
+      Game.getInstance()?.myPlayer.setCharacterId(user.character_id)
       Game.getInstance()?.network.readyToConnect()
       setPlayerNameInRedux(playerName)
     }

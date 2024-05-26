@@ -3,7 +3,7 @@ import Cookies from 'js-cookie'
 export function sanitizeId(id: string) {
   let sanitized = id
 
-  if (sanitized.length > 9 && sanitized.endsWith('-ss')) {
+  if (sanitized.length > 9 && (sanitized.endsWith('-ss') || sanitized.endsWith('-um'))) {
     sanitized = sanitized.substring(0, sanitized.length - 3)
   }
 
@@ -19,6 +19,10 @@ export const avatars = [
 
 export function getAvatarById(id: number) {
   return avatars[Math.max(0, Math.min(id, avatars.length - 1))]
+}
+
+export function getAvatarByTexture(texture: string) {
+  return avatars.find((a) => a.name == texture.toLowerCase())
 }
 
 export function setTokenToCookie(tokenName: string, tokenValue: any) {

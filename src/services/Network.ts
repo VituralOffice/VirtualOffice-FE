@@ -1,6 +1,6 @@
 import { Client, Room } from 'colyseus.js'
 import store from '../stores'
-import { setSessionId, setPlayerNameMap, removePlayerNameMap } from '../stores/UserStore'
+import { setSessionId, setPlayerNameMap, removePlayerNameMap, setPlayerAvatarMap, removePlayerAvatarMap } from '../stores/UserStore'
 import {
   setLobbyJoined,
   setJoinedRoomData,
@@ -24,8 +24,7 @@ import { Message } from '../types/Messages'
 import { ACCESS_TOKEN_KEY } from '../utils/util'
 import { API_URL } from '../constant'
 import Cookies from 'js-cookie'
-import { closeMeetingDialog, disconnectMeeting } from '../stores/MeetingStore'
-import Game from '../scenes/Game'
+import { disconnectMeeting } from '../stores/MeetingStore'
 
 export default class Network {
   private static instance: Network | null = null // Biến static instance
@@ -52,6 +51,7 @@ export default class Network {
     phaserEvents.on(GameEvent.MY_PLAYER_NAME_CHANGE, this.updatePlayerName, this)
     phaserEvents.on(GameEvent.MY_PLAYER_MEETING_STATUS_CHANGE, this.updatePlayerMeetingStatus, this)
     phaserEvents.on(GameEvent.MY_PLAYER_TEXTURE_CHANGE, this.updatePlayer, this)
+    phaserEvents.on(GameEvent.MY_PLAYER_CHARACTER_ID_CHANGE, this.updatePlayerCharacterId, this)
     phaserEvents.on(GameEvent.PLAYER_DISCONNECTED, this.playerStreamDisconnect, this)
   }
 
@@ -64,8 +64,8 @@ export default class Network {
   //   Game.getInstance()?.myPlayer.disconnectPlayer(this)
   // }
 
-  public disconnectClient() {
-    console.log('Disconnecting client')
+  public disconnectNetwork() {
+    console.log('Disconnecting network')
     this.room?.leave()
   }
 
@@ -153,6 +153,10 @@ export default class Network {
             store.dispatch(setPlayerNameMap({ id: key, name: value }))
             store.dispatch(pushPlayerJoinedMessage(value))
           }
+
+          if (field === 'characterId') {
+            store.dispatch(setPlayerAvatarMap({ id: key, characterId: value }))
+          }
         })
       }
     }
@@ -165,6 +169,7 @@ export default class Network {
       store.dispatch(pushPlayerLeftMessage(player.playerName))
       store.dispatch(removePlayerNameMap(key))
       store.dispatch(updateMember({ online: false, role: 'user', user: player }))
+      store.dispatch(removePlayerAvatarMap(key))
     }
 
     this.room.state.chairs.onAdd = (chair: IChair, key: string) => {
@@ -186,6 +191,13 @@ export default class Network {
       }
       meeting.connectedUser.onRemove = (item, index) => {
         phaserEvents.emit(GameEvent.ITEM_USER_REMOVED, item, key, ItemType.MEETING)
+      }
+      meeting.onChange = (changes) => {
+        changes.forEach((c) => {
+          if (c.field === 'isOpen') {
+            phaserEvents.emit(GameEvent.MEETING_STATE_CHANGE, c.value, key, ItemType.MEETING)
+          }
+        })
       }
     }
 
@@ -230,6 +242,12 @@ export default class Network {
     })
 
     // when a meeting user stops sharing screen
+    this.room.onMessage(Message.MEETING_STOP_CAMERA_SHARE, (clientId: string) => {
+      const meetingState = store.getState().meeting
+      meetingState.userMediaManager?.onUserLeft(clientId)
+    })
+
+    // when a meeting user stops sharing screen
     this.room.onMessage(Message.STOP_SCREEN_SHARE, (clientId: string) => {
       const meetingState = store.getState().meeting
       meetingState.shareScreenManager?.onUserLeft(clientId)
@@ -254,6 +272,13 @@ export default class Network {
     context?: any
   ) {
     phaserEvents.on(GameEvent.ITEM_USER_ADDED, callback, context)
+  }
+
+  onSetMeetingState(
+    callback: (isOpen: boolean, itemId: string, itemType: ItemType) => void,
+    context?: any
+  ) {
+    phaserEvents.on(GameEvent.MEETING_STATE_CHANGE, callback, context)
   }
 
   // method to register event listener and call back function when a item user removed
@@ -302,6 +327,10 @@ export default class Network {
     this.room?.send(Message.UPDATE_PLAYER_NAME, { name: currentName })
   }
 
+  updatePlayerCharacterId(id: number) {
+    this.room?.send(Message.UPDATE_PLAYER_CHARACTER_ID, { id })
+  }
+
   // method to send player name to Colyseus server
   updatePlayerMeetingStatus(isInMeeting: boolean) {
     this.room?.send(Message.UPDATE_PLAYER_MEETING_STATUS, { isInMeeting: isInMeeting })
@@ -339,7 +368,9 @@ export default class Network {
   }
 
   disconnectFromMeeting(id: string) {
+    console.log("DISCONNECT_FROM_MEETING, id: " + id)
     this.room?.send(Message.DISCONNECT_FROM_MEETING, { meetingId: id })
+    this.webRTC?.checkPreviousPermission();
   }
 
   connectToWhiteboard(id: string) {
@@ -354,8 +385,13 @@ export default class Network {
     this.room?.send(Message.STOP_SCREEN_SHARE, { meetingId: id })
   }
 
-  addChatMessage(payload: IMessagePayload) {
-    this.room?.send(Message.ADD_CHAT_MESSAGE, payload)
+  onStopCameraShare(id: string) {
+    this.room?.send(Message.MEETING_STOP_CAMERA_SHARE, { meetingId: id })
+  }
+
+  addChatMessage({ content, chatId }: { content: string; chatId: string }) {
+    console.log({ content, chatId })
+    this.room?.send(Message.ADD_CHAT_MESSAGE, { content, chatId })
   }
   loadChat() {
     this.room?.send(Message.LOAD_CHAT)
