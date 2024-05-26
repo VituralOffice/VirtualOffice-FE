@@ -1,6 +1,7 @@
 import Network from '../../services/Network'
 import store from '../../stores'
-import { openMeetingDialog } from '../../stores/MeetingStore'
+import { openMeetingDialog, createMeeting } from '../../stores/MeetingStore'
+import { setShowCreateMeeting, setCreateMeetingCallback } from '../../stores/UIStore'
 
 export class Meeting {
   id?: string
@@ -30,13 +31,29 @@ export class Meeting {
       meetingState.shareScreenManager?.onUserLeft(userId)
       meetingState.userMediaManager?.onUserLeft(userId)
     }
-    if (this.currentUsers.size == 0) this.isOpen = false
+  }
+
+  setIsOpen(isOpen: boolean) {
+    console.log("meeting setOpen: " + isOpen)
+    this.isOpen = isOpen
   }
 
   openDialog(playerId: string, network: Network) {
     if (!this.id) return
+
     store.dispatch(openMeetingDialog({ meetingId: this.id, myUserId: playerId }))
     network.connectToMeeting(this.id)
-    this.isOpen = true
+  }
+
+  createMeeting(playerId: string, network: Network) {
+    if (!this.id) return
+
+    const createMeetingCallback = (title: string) => {
+      store.dispatch(createMeeting({ meetingId: this.id!, title: title, myUserId: playerId }))
+      network.connectToMeeting(this.id!)
+    }
+
+    store.dispatch(setCreateMeetingCallback(createMeetingCallback))
+    store.dispatch(setShowCreateMeeting(true));
   }
 }

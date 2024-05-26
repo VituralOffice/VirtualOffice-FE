@@ -23,8 +23,7 @@ import { Message } from '../types/Messages'
 import { ACCESS_TOKEN_KEY } from '../utils/util'
 import { API_URL } from '../constant'
 import Cookies from 'js-cookie'
-import { closeMeetingDialog, disconnectMeeting } from '../stores/MeetingStore'
-import Game from '../scenes/Game'
+import { disconnectMeeting } from '../stores/MeetingStore'
 
 export default class Network {
   private static instance: Network | null = null // Biến static instance
@@ -191,6 +190,13 @@ export default class Network {
       meeting.connectedUser.onRemove = (item, index) => {
         phaserEvents.emit(GameEvent.ITEM_USER_REMOVED, item, key, ItemType.MEETING)
       }
+      meeting.onChange = (changes) => {
+        changes.forEach((c) => {
+          if (c.field === 'isOpen') {
+            phaserEvents.emit(GameEvent.MEETING_STATE_CHANGE, c.value, key, ItemType.MEETING)
+          }
+        })
+      }
     }
 
     this.room.state.mapMessages.onChange = (item, key: string) => {
@@ -264,6 +270,13 @@ export default class Network {
     context?: any
   ) {
     phaserEvents.on(GameEvent.ITEM_USER_ADDED, callback, context)
+  }
+
+  onSetMeetingState(
+    callback: (isOpen: boolean, itemId: string, itemType: ItemType) => void,
+    context?: any
+  ) {
+    phaserEvents.on(GameEvent.MEETING_STATE_CHANGE, callback, context)
   }
 
   // method to register event listener and call back function when a item user removed
@@ -353,7 +366,9 @@ export default class Network {
   }
 
   disconnectFromMeeting(id: string) {
+    console.log("DISCONNECT_FROM_MEETING, id: " + id)
     this.room?.send(Message.DISCONNECT_FROM_MEETING, { meetingId: id })
+    this.webRTC?.checkPreviousPermission();
   }
 
   connectToWhiteboard(id: string) {

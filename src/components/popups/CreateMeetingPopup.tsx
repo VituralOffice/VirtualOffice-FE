@@ -7,13 +7,23 @@ import { CreateGroupChat } from '../../apis/ChatApis'
 import { CHAT_TYPE } from '../../constants/constant'
 import { useAppSelector } from '../../hook'
 import { isApiSuccess } from '../../apis/util'
+import { useDispatch } from 'react-redux'
+import { setCreateMeetingCallback } from '../../stores/UIStore'
 
-export const CreateMeetingPopup = ({ onClosePopup, callback }) => {
+export const CreateMeetingPopup = ({ onClosePopup }) => {
   let { roomId } = useParams()
   const [title, setTitle] = useState('')
   const [canSubmit, setCanSubmit] = useState(false)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const user = useAppSelector((state) => state.user)
+  const ui = useAppSelector((state) => state.ui)
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (ui.showCreateMeeting) {
+      setTitle('')
+    }
+  }, [ui.showCreateMeeting])
 
   const checkCanSubmit = () => {
     setCanSubmit(title != '')
@@ -29,7 +39,8 @@ export const CreateMeetingPopup = ({ onClosePopup, callback }) => {
       })
 
       if (isApiSuccess(response)) {
-        callback(response)
+        ui.createMeetingCallback!(response.title)
+        dispatch(setCreateMeetingCallback(null))
       }
     }
     onClosePopup()
@@ -55,14 +66,16 @@ export const CreateMeetingPopup = ({ onClosePopup, callback }) => {
   }, [title])
 
   return (
-    <FormPopup
-      onClose={onClosePopup}
-      titles={titles}
-      forms={forms}
-      totalSteps={1}
-      formCanBeSubmit={canSubmit}
-      onSubmit={onSubmit}
-      submitText="Create"
-    />
+    ui.showCreateMeeting && (
+      <FormPopup
+        onClose={onClosePopup}
+        titles={titles}
+        forms={forms}
+        totalSteps={1}
+        formCanBeSubmit={canSubmit}
+        onSubmit={onSubmit}
+        submitText="Create"
+      />
+    )
   )
 }

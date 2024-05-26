@@ -12,6 +12,7 @@ import MeetingDialog from '../components/meeting/MeetingDialog'
 import { CreateMeetingPopup } from '../components/popups/CreateMeetingPopup'
 import { useDispatch } from 'react-redux'
 import { setShowCreateMeeting } from '../stores/UIStore'
+import Game from '../scenes/Game'
 
 export const OfficeSpace = () => {
   let { roomId } = useParams()
@@ -79,19 +80,15 @@ export const OfficeSpace = () => {
     }
   }, [])
 
-  const CreateMeetingCallback = () => {
-
-  }
-
   return (
     <>
       {joinPageShow && <JoinOfficePage handleJoinRoom={handleJoinRoom} />}
       {!joinPageShow && <OfficeToolbar></OfficeToolbar>}
       {meeting.meetingDialogOpen && <MeetingDialog />}
-      {ui.showCreateMeeting && (
-        <CreateMeetingPopup onClosePopup={() => dispatch(setShowCreateMeeting(false))} callback={CreateMeetingCallback} />
-      )}
-      {/* <MeetingDialog /> */}
+      <CreateMeetingPopup onClosePopup={() => {
+        dispatch(setShowCreateMeeting(false));
+        Game.getInstance()?.myPlayer.setLeaveCurrentChair(true);
+      }} />
     </>
   )
 }
