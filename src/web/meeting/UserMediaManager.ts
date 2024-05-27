@@ -65,7 +65,7 @@ export default class UserMediaManager {
                 store.dispatch(setMyCameraStream(stream))
 
                 // Call all existing users.
-                const meetingItem = Game.getInstance()?.meetingMap.get(store.getState().meeting.meetingId!)
+                const meetingItem = Game.getInstance()?.meetingMap.get(store.getState().meeting.activeMeetingId!)
                 if (meetingItem) {
                     for (const userId of meetingItem.currentUsers) {
                         console.log("connected users: " + userId)
@@ -84,7 +84,7 @@ export default class UserMediaManager {
         if (shouldDispatch) {
             store.dispatch(setMyCameraStream(null))
             // Manually let all other existing users know screen sharing is stopped
-            Game.getInstance()?.network.onStopCameraShare(store.getState().meeting.meetingId!)
+            Game.getInstance()?.network.onStopCameraShare(store.getState().meeting.activeMeetingId!)
         }
     }
 

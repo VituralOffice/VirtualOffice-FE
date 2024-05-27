@@ -26,3 +26,8 @@ export type CreateGroupChatParams = {
     type: CHAT_TYPE,
     member: string[]
 }
+
+export type GetChatParams = {
+    roomId: string,
+    id: string
+}

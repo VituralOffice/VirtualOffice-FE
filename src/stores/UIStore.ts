@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-type CreateMeetingCallback = ((title: string) => void) | null
+type CreateMeetingCallback = ((title: string, chatId: string) => void) | null
 
 export const uiSlice = createSlice({
   name: 'ui',

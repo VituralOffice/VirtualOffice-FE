@@ -9,6 +9,7 @@ import { useAppSelector } from '../../hook'
 import { isApiSuccess } from '../../apis/util'
 import { useDispatch } from 'react-redux'
 import { setCreateMeetingCallback } from '../../stores/UIStore'
+import { setActiveChat } from '../../stores/ChatStore'
 
 export const CreateMeetingPopup = ({ onClosePopup }) => {
   let { roomId } = useParams()
@@ -17,7 +18,7 @@ export const CreateMeetingPopup = ({ onClosePopup }) => {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const user = useAppSelector((state) => state.user)
   const ui = useAppSelector((state) => state.ui)
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
 
   useEffect(() => {
     if (ui.showCreateMeeting) {
@@ -39,8 +40,10 @@ export const CreateMeetingPopup = ({ onClosePopup }) => {
       })
 
       if (isApiSuccess(response)) {
-        ui.createMeetingCallback!(response.title)
+        console.log("New group chat: " + response.result)
+        ui.createMeetingCallback!(response.result.name, response.result._id)
         dispatch(setCreateMeetingCallback(null))
+        dispatch(setActiveChat(response.result))
       }
     }
     onClosePopup()

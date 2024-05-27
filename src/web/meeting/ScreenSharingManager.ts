@@ -66,7 +66,7 @@ export default class ShareScreenManager {
         store.dispatch(setMyDisplayStream(stream))
 
         // Call all existing users.
-        const meetingItem = Game.getInstance()?.meetingMap.get(store.getState().meeting.meetingId!)
+        const meetingItem = Game.getInstance()?.meetingMap.get(store.getState().meeting.activeMeetingId!)
         if (meetingItem) {
           for (const userId of meetingItem.currentUsers) {
             this.onUserJoined(userId)
@@ -84,7 +84,7 @@ export default class ShareScreenManager {
     if (shouldDispatch) {
       store.dispatch(setMyDisplayStream(null))
       // Manually let all other existing users know screen sharing is stopped
-      Game.getInstance()?.network.onStopScreenShare(store.getState().meeting.meetingId!)
+      Game.getInstance()?.network.onStopScreenShare(store.getState().meeting.activeMeetingId!)
     }
   }
 

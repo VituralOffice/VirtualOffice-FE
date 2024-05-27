@@ -18,4 +18,6 @@ export enum GameEvent {
   CHAIR_CONNECT_USER_CHANGE = 'chair-connected-user-change',
   MY_PLAYER_CHARACTER_ID_CHANGE = 'my-player-character-id-change',
   MEETING_STATE_CHANGE = 'meeting-state-change',
+  MEETING_TITLE_CHANGE = 'meeting-title-change',
+  MEETING_CHATID_CHANGE = 'meeting-chatid-change',
 }

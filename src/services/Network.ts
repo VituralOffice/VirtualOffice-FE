@@ -1,6 +1,12 @@
 import { Client, Room } from 'colyseus.js'
 import store from '../stores'
-import { setSessionId, setPlayerNameMap, removePlayerNameMap, setPlayerAvatarMap, removePlayerAvatarMap } from '../stores/UserStore'
+import {
+  setSessionId,
+  setPlayerNameMap,
+  removePlayerNameMap,
+  setPlayerAvatarMap,
+  removePlayerAvatarMap,
+} from '../stores/UserStore'
 import {
   setLobbyJoined,
   setJoinedRoomData,
@@ -197,6 +203,12 @@ export default class Network {
           if (c.field === 'isOpen') {
             phaserEvents.emit(GameEvent.MEETING_STATE_CHANGE, c.value, key, ItemType.MEETING)
           }
+          if (c.field === 'title') {
+            phaserEvents.emit(GameEvent.MEETING_TITLE_CHANGE, c.value, key, ItemType.MEETING)
+          }
+          if (c.field === 'chatId') {
+            phaserEvents.emit(GameEvent.MEETING_CHATID_CHANGE, c.value, key, ItemType.MEETING)
+          }
         })
       }
     }
@@ -279,6 +291,20 @@ export default class Network {
     context?: any
   ) {
     phaserEvents.on(GameEvent.MEETING_STATE_CHANGE, callback, context)
+  }
+
+  onSetMeetingTitle(
+    callback: (title: string, itemId: string, itemType: ItemType) => void,
+    context?: any
+  ) {
+    phaserEvents.on(GameEvent.MEETING_TITLE_CHANGE, callback, context)
+  }
+
+  onSetMeetingChatId(
+    callback: (chatId: string, itemId: string, itemType: ItemType) => void,
+    context?: any
+  ) {
+    phaserEvents.on(GameEvent.MEETING_CHATID_CHANGE, callback, context)
   }
 
   // method to register event listener and call back function when a item user removed
@@ -368,9 +394,13 @@ export default class Network {
   }
 
   disconnectFromMeeting(id: string) {
-    console.log("DISCONNECT_FROM_MEETING, id: " + id)
+    console.log('DISCONNECT_FROM_MEETING, id: ' + id)
     this.room?.send(Message.DISCONNECT_FROM_MEETING, { meetingId: id })
-    this.webRTC?.checkPreviousPermission();
+    this.webRTC?.checkPreviousPermission()
+  }
+
+  changeMeetingInfo(meetingId: string, title: string, chatId: string) {
+    this.room?.send(Message.MEETING_CHANGE_INFO, { meetingId, title, chatId })
   }
 
   connectToWhiteboard(id: string) {

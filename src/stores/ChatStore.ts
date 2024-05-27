@@ -9,14 +9,25 @@ export enum MessageType {
   REGULAR_MESSAGE,
 }
 
+interface ChatState {
+  focused: boolean
+  showChat: boolean
+  listChats: IChat[]
+  activeChat: null | IChat
+  mapMessages: Map<string, IMapMessage>
+}
+
+const initialState: ChatState = {
+  focused: false,
+  showChat: false,
+  listChats: [] as IChat[],
+  activeChat: null,
+  mapMessages: new Map<string, IMapMessage>(),
+}
+
 export const chatSlice = createSlice({
   name: 'chat',
-  initialState: {
-    focused: false,
-    showChat: false,
-    listChats: [] as IChat[],
-    mapMessages: new Map<string, IMapMessage>(),
-  },
+  initialState,
   reducers: {
     pushChatMessage: (state, action: PayloadAction<{ chatId: string; message: IChatMessage }>) => {
       console.log(`new message coming`)
@@ -61,6 +72,23 @@ export const chatSlice = createSlice({
     setListChat: (state, action: PayloadAction<IChat[]>) => {
       state.listChats = action.payload
     },
+    addChat: (state, action: PayloadAction<IChat>) => {
+      const { _id } = action.payload
+      const exists = state.listChats.find((c) => c._id === _id)
+      if (exists) {
+        const index = state.listChats.findIndex((c) => c._id === _id)
+        state.listChats[index] = action.payload
+      } else state.listChats.unshift(action.payload)
+    },
+    updateChat: (state, action: PayloadAction<IChat>) => {
+      const chat = action.payload
+      const index = state.listChats.findIndex((c) => c._id === chat._id)
+      state.listChats.splice(index, 1)
+      state.listChats.unshift(chat)
+    },
+    setActiveChat: (state, action: PayloadAction<IChat>) => {
+      state.activeChat = action.payload
+    },
   },
   extraReducers: {},
 })
@@ -76,6 +104,7 @@ export const {
   setShowChat,
   setListChat,
   loadMapChatMessage,
+  setActiveChat,
 } = chatSlice.actions
 
 export default chatSlice.reducer
