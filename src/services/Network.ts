@@ -1,6 +1,12 @@
 import { Client, Room } from 'colyseus.js'
 import store from '../stores'
-import { setSessionId, setPlayerNameMap, removePlayerNameMap, setPlayerAvatarMap, removePlayerAvatarMap } from '../stores/UserStore'
+import {
+  setSessionId,
+  setPlayerNameMap,
+  removePlayerNameMap,
+  setPlayerAvatarMap,
+  removePlayerAvatarMap,
+} from '../stores/UserStore'
 import {
   setLobbyJoined,
   setJoinedRoomData,
@@ -368,9 +374,9 @@ export default class Network {
   }
 
   disconnectFromMeeting(id: string) {
-    console.log("DISCONNECT_FROM_MEETING, id: " + id)
+    console.log('DISCONNECT_FROM_MEETING, id: ' + id)
     this.room?.send(Message.DISCONNECT_FROM_MEETING, { meetingId: id })
-    this.webRTC?.checkPreviousPermission();
+    this.webRTC?.checkPreviousPermission()
   }
 
   connectToWhiteboard(id: string) {
@@ -389,9 +395,9 @@ export default class Network {
     this.room?.send(Message.MEETING_STOP_CAMERA_SHARE, { meetingId: id })
   }
 
-  addChatMessage({ content, chatId }: { content: string; chatId: string }) {
-    console.log({ content, chatId })
-    this.room?.send(Message.ADD_CHAT_MESSAGE, { content, chatId })
+  addChatMessage(payload: IMessagePayload) {
+    console.log({ payload })
+    this.room?.send(Message.ADD_CHAT_MESSAGE, payload)
   }
   loadChat() {
     this.room?.send(Message.LOAD_CHAT)

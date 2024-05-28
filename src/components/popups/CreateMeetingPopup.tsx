@@ -17,7 +17,7 @@ export const CreateMeetingPopup = ({ onClosePopup }) => {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const user = useAppSelector((state) => state.user)
   const ui = useAppSelector((state) => state.ui)
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
 
   useEffect(() => {
     if (ui.showCreateMeeting) {
@@ -65,17 +65,17 @@ export const CreateMeetingPopup = ({ onClosePopup }) => {
     }
   }, [title])
 
-  return (
-    ui.showCreateMeeting && (
-      <FormPopup
-        onClose={onClosePopup}
-        titles={titles}
-        forms={forms}
-        totalSteps={1}
-        formCanBeSubmit={canSubmit}
-        onSubmit={onSubmit}
-        submitText="Create"
-      />
-    )
+  return ui.showCreateMeeting ? (
+    <FormPopup
+      onClose={onClosePopup}
+      titles={titles}
+      forms={forms}
+      totalSteps={1}
+      formCanBeSubmit={canSubmit}
+      onSubmit={onSubmit}
+      submitText="Create"
+    />
+  ) : (
+    <></>
   )
 }
