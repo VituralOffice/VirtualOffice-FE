@@ -1,5 +1,5 @@
 import ApiService from './ApiService'
-import { CreateGroupChatParams, GetChatParams } from './types'
+import { CreateGroupChatParams, GetOneChatParams, UploadChatImagesParams } from './types'
 export const CreateGroupChat = async (data: CreateGroupChatParams) => {
   // Gọi API đăng nhập
   const response = await ApiService.getInstance().post(`/rooms/${data.roomId}/chats`, {
@@ -10,12 +10,13 @@ export const CreateGroupChat = async (data: CreateGroupChatParams) => {
   return response
 }
 
-export const GetChat = async (data: GetChatParams) => {
+export const GetOneChat = async (data: GetOneChatParams) => {
   // Gọi API đăng nhập
-  const response = await ApiService.getInstance().get(`/rooms/${data.roomId}/chats/${}`, {
-    name: data.name,
-    type: data.type,
-    member: data.member,
-  })
+  const response = await ApiService.getInstance().get(`/rooms/${data.roomId}/chats/${data.chatId}`)
+  return response
+}
+
+export const UploadChatImage = async (data: UploadChatImagesParams) => {
+  const response = await ApiService.getInstance().post(`/upload/rooms/${data.roomId}`, data.form)
   return response
 }

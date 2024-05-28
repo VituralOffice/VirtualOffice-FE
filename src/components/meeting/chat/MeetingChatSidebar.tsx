@@ -11,6 +11,12 @@ import Game from '../../../scenes/Game'
 import InputBase from '@mui/material/InputBase'
 import { useDispatch } from 'react-redux'
 import { Message } from './Message'
+import Network from '../../../services/Network'
+import { IMessagePayload } from '../../../types/Rooms'
+import { UploadChatImage } from '../../../apis/ChatApis'
+import { isApiSuccess } from '../../../apis/util'
+import { useParams } from 'react-router-dom'
+import AttachFileIcon from '@mui/icons-material/AttachFile'
 
 const Backdrop = styled.div`
   position: fixed;
@@ -91,6 +97,7 @@ interface PasteItem {
 }
 
 export default function MeetingChatSidebar() {
+  let { roomId } = useParams()
   const [inputValue, setInputValue] = useState('')
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const [readyToSubmit, setReadyToSubmit] = useState(false)
@@ -102,6 +109,7 @@ export default function MeetingChatSidebar() {
   const activeChat = useAppSelector((state) => state.chat.activeChat)
   const [images, setImages] = useState<PasteItem[]>([])
   const [files, setFiles] = useState<File[]>([])
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const dispatch = useDispatch()
 
@@ -109,7 +117,41 @@ export default function MeetingChatSidebar() {
     setInputValue(event.target.value)
   }
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleFileClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click()
+    }
+  }
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      const file = event.target.files[0]
+      if (file && file.type.includes(`image`)) {
+        setImages([...images, { preview: URL.createObjectURL(file), file }])
+      } else {
+        setFiles([...files, file])
+      }
+    }
+  }
+  const handleUploadImage = async (files: File[]) => {
+    const filePaths = await Promise.all(
+      files.map(async (file) => {
+        try {
+          const form = new FormData()
+          form.append('file', file)
+          const response = await UploadChatImage({ roomId: roomId!, form })
+          if (isApiSuccess(response)) {
+            return response.result.path as string
+          }
+        } catch (error) {
+          return ``
+        }
+      })
+    )
+    return filePaths
+  }
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     // this is added because without this, 2 things happen at the same
@@ -125,9 +167,42 @@ export default function MeetingChatSidebar() {
 
     const val = inputValue.trim()
     setInputValue('')
-    if (val) {
-      Game.getInstance()?.network.addChatMessage({ content: val, chatId: activeChat?._id! })
-      Game.getInstance()?.myPlayer.updateDialogBubble(val)
+    let messages: IMessagePayload[] = []
+    // handle send images
+    if (images.length > 0) {
+      const paths = await handleUploadImage(images.map((i) => i.file))
+      messages.push(
+        ...paths.map((p) => ({
+          content: ``,
+          type: 'image',
+          path: p!,
+          chatId: activeChat?._id || '',
+        }))
+      )
+    }
+    if (files.length > 0) {
+      const paths = await handleUploadImage(files)
+      const fileObjs = files.map((f, i) => ({ file: f, path: paths[i] }))
+      messages.push(
+        ...fileObjs.map((p) => ({
+          content: ``,
+          type: 'file',
+          path: p.path!,
+          filename: p.file.name,
+          chatId: activeChat?._id || '',
+        }))
+      )
+    }
+    // handle send text
+    if (val) messages.push({ content: val, chatId: activeChat?._id || '', type: 'text', path: '' })
+    //
+    if (messages.length > 0) {
+      messages.map((m) => {
+        Network.getInstance()?.addChatMessage(m)
+        // if (m.content) Game.getInstance()?.myPlayer.updateDialogBubble(m.content)
+      })
+      setImages([])
+      setFiles([])
     }
   }
 
@@ -172,6 +247,23 @@ export default function MeetingChatSidebar() {
         )}
       </ChatBox>
       <InputWrapper onSubmit={handleSubmit}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            cursor: 'pointer',
+          }}
+          onClick={handleFileClick}
+        >
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            onChange={handleFileChange}
+          />
+          <AttachFileIcon style={{ color: 'white' }}> </AttachFileIcon>
+        </div>
         <InputTextField
           inputRef={inputRef}
           autoFocus={focused}

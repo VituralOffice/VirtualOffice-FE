@@ -71,7 +71,6 @@ export const meetingSlice = createSlice({
         state.userMediaManager = new UserMediaManager(action.payload.myUserId)
       }
       Game.getInstance()?.myPlayer.setPlayerIsInMeeting(true);
-      Game.getInstance()?.myPlayer.setLeaveCurrentChair(true);
       Game.getInstance()?.disableKeys()
       state.shareScreenManager.onOpen()
       state.userMediaManager.onOpen()
@@ -83,6 +82,7 @@ export const meetingSlice = createSlice({
       Game.getInstance()?.enableKeys()
       Network.getInstance()?.disconnectFromMeeting(state.activeMeetingId!)
       Game.getInstance()?.myPlayer.setPlayerIsInMeeting(false);
+      Game.getInstance()?.myPlayer.setLeaveCurrentChair(true);
       for (const { call } of state.peerDisplayStreams.values()) {
         call.close()
       }

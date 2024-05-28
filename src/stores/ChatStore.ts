@@ -30,7 +30,6 @@ export const chatSlice = createSlice({
   initialState,
   reducers: {
     pushChatMessage: (state, action: PayloadAction<{ chatId: string; message: IChatMessage }>) => {
-      console.log(`new message coming`)
       if (state.mapMessages.get(action.payload.chatId)) {
         const mapMessage = {
           id: action.payload.chatId,
@@ -105,6 +104,8 @@ export const {
   setListChat,
   loadMapChatMessage,
   setActiveChat,
+  addChat,
+  updateChat,
 } = chatSlice.actions
 
 export default chatSlice.reducer

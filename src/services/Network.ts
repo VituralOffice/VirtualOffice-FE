@@ -82,7 +82,7 @@ export default class Network {
 
   public disconnectMeeting() {
     console.log('Disconnecting meeting')
-    store.dispatch(disconnectMeeting)
+    store.dispatch(disconnectMeeting())
   }
 
   /**
@@ -207,6 +207,7 @@ export default class Network {
             phaserEvents.emit(GameEvent.MEETING_TITLE_CHANGE, c.value, key, ItemType.MEETING)
           }
           if (c.field === 'chatId') {
+            console.log("GameEvent.MEETING_CHATID_CHANGE", c.value)
             phaserEvents.emit(GameEvent.MEETING_CHATID_CHANGE, c.value, key, ItemType.MEETING)
           }
         })
@@ -214,21 +215,20 @@ export default class Network {
     }
 
     this.room.state.mapMessages.onChange = (item, key: string) => {
-      console.log(`mapMessages change`, item, key)
+      // console.log(`mapMessages change`, item, key)
     }
     // new instance added to the chatMessages ArraySchema
     this.room.state.mapMessages.onAdd = (item, key: string) => {
-      console.log(`mapMessages onAdd`, item, key)
-      item.onChange = (changes) => {
-        changes.forEach((change) => console.log({ change }))
-      }
+      // console.log(`mapMessages onAdd`, item, key)
+      // item.onChange = (changes) => {
+      //   changes.forEach((change) => console.log({ change }))
+      // }
       store.dispatch(pushChatMessage({ chatId: key, message: item }))
     }
 
     // when the server sends room data
     this.room.onMessage(Message.SEND_ROOM_DATA, (content) => {
-      console.log(`// when the server sends room data`)
-      console.log({ content })
+      console.log(`server sends room data`, {content})
       store.dispatch(setJoinedRoomData(content))
     })
     // when the server sends room data
@@ -399,7 +399,7 @@ export default class Network {
     this.webRTC?.checkPreviousPermission()
   }
 
-  changeMeetingInfo(meetingId: string, title: string, chatId: string) {
+  changeMeetingInfo(meetingId: string, title?: string, chatId?: string) {
     this.room?.send(Message.MEETING_CHANGE_INFO, { meetingId, title, chatId })
   }
 
@@ -419,9 +419,9 @@ export default class Network {
     this.room?.send(Message.MEETING_STOP_CAMERA_SHARE, { meetingId: id })
   }
 
-  addChatMessage({ content, chatId }: { content: string; chatId: string }) {
-    console.log({ content, chatId })
-    this.room?.send(Message.ADD_CHAT_MESSAGE, { content, chatId })
+  addChatMessage(payload: IMessagePayload) {
+    console.log("send messgae", payload)
+    this.room?.send(Message.ADD_CHAT_MESSAGE, payload)
   }
   loadChat() {
     this.room?.send(Message.LOAD_CHAT)

@@ -40,7 +40,7 @@ export const CreateMeetingPopup = ({ onClosePopup }) => {
       })
 
       if (isApiSuccess(response)) {
-        console.log("New group chat: " + response.result)
+        console.log("New group chat: ", response.result)
         ui.createMeetingCallback!(response.result.name, response.result._id)
         dispatch(setCreateMeetingCallback(null))
         dispatch(setActiveChat(response.result))

@@ -86,7 +86,6 @@ export const OfficeSpace = () => {
       {meeting.meetingDialogOpen && <MeetingDialog />}
       <CreateMeetingPopup onClosePopup={() => {
         dispatch(setShowCreateMeeting(false));
-        Game.getInstance()?.myPlayer.setLeaveCurrentChair(true);
       }} />
     </>
   )

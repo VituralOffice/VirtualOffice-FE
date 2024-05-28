@@ -1,6 +1,7 @@
+import { GetOneChat } from '../../apis/ChatApis'
 import Network from '../../services/Network'
 import store from '../../stores'
-import { setActiveChat } from '../../stores/ChatStore'
+import { addChat, setActiveChat } from '../../stores/ChatStore'
 import { openMeetingDialog, createMeeting } from '../../stores/MeetingStore'
 import { setShowCreateMeeting, setCreateMeetingCallback } from '../../stores/UIStore'
 
@@ -39,7 +40,6 @@ export class Meeting {
   }
 
   setIsOpen(isOpen: boolean) {
-    console.log('meeting setOpen: ' + isOpen)
     this.isOpen = isOpen
   }
 
@@ -48,10 +48,15 @@ export class Meeting {
   }
 
   setChatId(chatId: string) {
+    console.log(`meeting ${this.id} has pre chatId: ${this.chatId}, new chatId: ${chatId}`)
+    if (this.chatId === chatId) return
     this.chatId = chatId
     const getChatContent = async () => {
-        const chat = await 
+      const chat = await GetOneChat({ roomId: store.getState().room.roomId, chatId })
+      store.dispatch(addChat(chat))
+      console.log('Sync chat from meeting ', chat)
     }
+    getChatContent()
   }
 
   openDialog(playerId: string, network: Network) {
@@ -68,6 +73,8 @@ export class Meeting {
       store.dispatch(createMeeting({ meetingId: this.id!, myUserId: playerId }))
       network.connectToMeeting(this.id!)
       network.changeMeetingInfo(this.id!, title, chatId)
+      this.title = title
+      this.chatId = chatId
     }
 
     store.dispatch(setCreateMeetingCallback(createMeetingCallback))

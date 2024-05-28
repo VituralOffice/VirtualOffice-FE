@@ -27,7 +27,17 @@ export type CreateGroupChatParams = {
     member: string[]
 }
 
-export type GetChatParams = {
+export type GetAllChatParams = {
     roomId: string,
     id: string
+}
+
+export type GetOneChatParams = {
+    roomId: string,
+    chatId: string,
+}
+
+export type UploadChatImagesParams = {
+    roomId: string,
+    form: FormData,
 }
