@@ -7,6 +7,9 @@ import { CreateRoomPanel } from '../forms/CreateRoom'
 import Bootstrap from '../../scenes/Bootstrap'
 import { useNavigate } from 'react-router-dom'
 import { FormPopup } from './FormPopup'
+import { toast } from 'react-toastify'
+import { AxiosError } from 'axios'
+import { UNKNOWN_ERROR } from '../../constant'
 
 export const CreateSpacePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
   const navigate = useNavigate()
@@ -44,22 +47,27 @@ export const CreateSpacePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
   const checkMapSize = () => mapSize > 0
 
   const submitForm = async () => {
-    if (!checkSpaceName() || !checkSecurityOption() || !checkMapId() || !checkMapSize()) return
+    try {
+      if (!checkSpaceName() || !checkSecurityOption() || !checkMapId() || !checkMapSize()) return
 
-    const response = await CreateRoom({
-      map: '6623f6a93981dda1700fc844',
-      name: spaceName,
-      private: securitySelectedOption == 1,
-    })
+      const response = await CreateRoom({
+        map: '6623f6a93981dda1700fc844',
+        name: spaceName,
+        private: securitySelectedOption == 1,
+      })
 
-    console.log('Room created: ', response)
-    await Bootstrap.getInstance()?.network.createCustom({
-      name: response.result.name,
-      id: response.result._id,
-      map: response.result.map,
-      autoDispose: false,
-    } as any)
-    navigate(`/room/${response.result._id}`)
+      console.log('Room created: ', response)
+      await Bootstrap.getInstance()?.network.createCustom({
+        name: response.result.name,
+        id: response.result._id,
+        map: response.result.map,
+        autoDispose: false,
+      } as any)
+      navigate(`/room/${response.result._id}`)
+    } catch (error) {
+      if (error instanceof AxiosError) toast(error.response?.data?.message)
+      else toast(UNKNOWN_ERROR)
+    }
   }
 
   const PopupContents = [

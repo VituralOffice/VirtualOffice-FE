@@ -4,3 +4,4 @@ export const PEER_CONNECT_OPTIONS = {
   host: PEER_HOST,
   secure: true,
 }
+export const UNKNOWN_ERROR = `An error ocurred`

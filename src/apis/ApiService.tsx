@@ -12,18 +12,21 @@ class ApiService {
       baseURL: baseUrl,
       withCredentials: true,
     })
-    this.axiosInstance.interceptors.request.use((config) => {
-      const accessToken = Cookies.get(ACCESS_TOKEN_KEY); // Implement getAccessToken() to retrieve token
-    
-      if (accessToken) {
-        config.headers.Authorization = `Bearer ${accessToken}`;
+    this.axiosInstance.interceptors.request.use(
+      (config) => {
+        const accessToken = Cookies.get(ACCESS_TOKEN_KEY) // Implement getAccessToken() to retrieve token
+
+        if (accessToken) {
+          config.headers.Authorization = `Bearer ${accessToken}`
+        }
+
+        return config
+      },
+      (error) => {
+        // Handle request errors (optional)
+        return Promise.reject(error)
       }
-    
-      return config;
-    }, (error) => {
-      // Handle request errors (optional)
-      return Promise.reject(error);
-    });
+    )
     this.axiosInstance.interceptors.response.use(
       (response) => response,
       async (error) => {
@@ -41,7 +44,7 @@ class ApiService {
           // retry pre failed request
           return this.axiosInstance.request(originalRequest)
         }
-        return error
+        return Promise.reject(error)
       }
     )
   }
