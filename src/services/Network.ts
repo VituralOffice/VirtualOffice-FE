@@ -24,6 +24,7 @@ import {
   pushChatMessage,
   pushPlayerJoinedMessage,
   pushPlayerLeftMessage,
+  setActiveChat,
 } from '../stores/ChatStore'
 import { ItemType } from '../types/Items'
 import { Message } from '../types/Messages'
@@ -31,6 +32,9 @@ import { ACCESS_TOKEN_KEY } from '../utils/util'
 import { API_URL } from '../constant'
 import Cookies from 'js-cookie'
 import { disconnectMeeting } from '../stores/MeetingStore'
+import { GetOneChat } from '../apis/ChatApis'
+import { isApiSuccess } from '../apis/util'
+import Game from '../scenes/Game'
 
 export default class Network {
   private static instance: Network | null = null // Biến static instance
@@ -207,7 +211,7 @@ export default class Network {
             phaserEvents.emit(GameEvent.MEETING_TITLE_CHANGE, c.value, key, ItemType.MEETING)
           }
           if (c.field === 'chatId') {
-            console.log("GameEvent.MEETING_CHATID_CHANGE", c.value)
+            console.log('GameEvent.MEETING_CHATID_CHANGE', c.value)
             phaserEvents.emit(GameEvent.MEETING_CHATID_CHANGE, c.value, key, ItemType.MEETING)
           }
         })
@@ -228,7 +232,7 @@ export default class Network {
 
     // when the server sends room data
     this.room.onMessage(Message.SEND_ROOM_DATA, (content) => {
-      console.log(`server sends room data`, {content})
+      console.log(`server sends room data`, { content })
       store.dispatch(setJoinedRoomData(content))
     })
     // when the server sends room data
@@ -264,6 +268,25 @@ export default class Network {
       const meetingState = store.getState().meeting
       meetingState.shareScreenManager?.onUserLeft(clientId)
     })
+
+    // when receive info from server when join a new meeting
+    this.room.onMessage(
+      Message.CONNECT_TO_MEETING,
+      async (message: { meetingId: string; chatId: string; title: string }) => {
+        console.log(`on event Message.CONNECT_TO_MEETING: meetingId: ${message.meetingId}, chatId: ${message.chatId}, title: ${message.title}`)
+        const response = await GetOneChat({
+          roomId: store.getState().room.roomId,
+          chatId: message.chatId,
+        })
+        if (isApiSuccess(response)) {
+          console.log(`on event Message.CONNECT_TO_MEETING success`, response.result)
+          store.dispatch(setActiveChat(response.result))
+          // const meeting = Game.getInstance()?.meetingMap.get(message.meetingId)!
+          // meeting.setTitle(message.title)
+          // meeting.setChatId(message.chatId)
+        }
+      }
+    )
   }
 
   // method to register event listener and call back function when a item user added
@@ -388,8 +411,13 @@ export default class Network {
     this.room?.send(Message.DISCONNECT_FROM_CHAIR, { chairId: id })
   }
 
-  connectToMeeting(id: string) {
-    this.room?.send(Message.CONNECT_TO_MEETING, { meetingId: id })
+  connectToMeeting(meetingId: string, title?: string) {
+    this.room?.send(Message.CONNECT_TO_MEETING, {
+      roomId: store.getState().room.roomId,
+      userId: store.getState().user.userId,
+      meetingId,
+      title,
+    })
     this.webRTC?.disconnect()
   }
 
@@ -399,9 +427,9 @@ export default class Network {
     this.webRTC?.checkPreviousPermission()
   }
 
-  changeMeetingInfo(meetingId: string, title?: string, chatId?: string) {
-    this.room?.send(Message.MEETING_CHANGE_INFO, { meetingId, title, chatId })
-  }
+  // changeMeetingInfo(meetingId: string, title?: string, chatId?: string) {
+  //   this.room?.send(Message.MEETING_CHANGE_INFO, { meetingId, title, chatId })
+  // }
 
   connectToWhiteboard(id: string) {
     this.room?.send(Message.CONNECT_TO_WHITEBOARD, { whiteboardId: id })
@@ -420,7 +448,7 @@ export default class Network {
   }
 
   addChatMessage(payload: IMessagePayload) {
-    console.log("send messgae", payload)
+    console.log('send messgae', payload)
     this.room?.send(Message.ADD_CHAT_MESSAGE, payload)
   }
   loadChat() {

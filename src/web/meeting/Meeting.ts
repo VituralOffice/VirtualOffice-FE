@@ -48,15 +48,7 @@ export class Meeting {
   }
 
   setChatId(chatId: string) {
-    console.log(`meeting ${this.id} has pre chatId: ${this.chatId}, new chatId: ${chatId}`)
-    if (this.chatId === chatId) return
     this.chatId = chatId
-    const getChatContent = async () => {
-      const chat = await GetOneChat({ roomId: store.getState().room.roomId, chatId })
-      store.dispatch(addChat(chat))
-      console.log('Sync chat from meeting ', chat)
-    }
-    getChatContent()
   }
 
   openDialog(playerId: string, network: Network) {
@@ -69,12 +61,11 @@ export class Meeting {
   createMeeting(playerId: string, network: Network) {
     if (!this.id) return
 
-    const createMeetingCallback = (title: string, chatId: string) => {
+    const createMeetingCallback = (title: string) => {
       store.dispatch(createMeeting({ meetingId: this.id!, myUserId: playerId }))
-      network.connectToMeeting(this.id!)
-      network.changeMeetingInfo(this.id!, title, chatId)
-      this.title = title
-      this.chatId = chatId
+      network.connectToMeeting(this.id!, title)
+      // network.changeMeetingInfo(this.id!, title, chatId)
+      // this.title = title
     }
 
     store.dispatch(setCreateMeetingCallback(createMeetingCallback))

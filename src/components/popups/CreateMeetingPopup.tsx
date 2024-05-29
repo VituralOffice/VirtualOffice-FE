@@ -32,19 +32,22 @@ export const CreateMeetingPopup = ({ onClosePopup }) => {
 
   const onSubmit = async () => {
     if (roomId) {
-      const response = await CreateGroupChat({
-        roomId,
-        name: title,
-        type: CHAT_TYPE.GROUP,
-        member: [user.userId],
-      })
+      // const response = await CreateGroupChat({
+      //   roomId,
+      //   name: title,
+      //   type: CHAT_TYPE.GROUP,
+      //   member: [user.userId],
+      // })
 
-      if (isApiSuccess(response)) {
-        console.log("New group chat: ", response.result)
-        ui.createMeetingCallback!(response.result.name, response.result._id)
-        dispatch(setCreateMeetingCallback(null))
-        dispatch(setActiveChat(response.result))
-      }
+      // if (isApiSuccess(response)) {
+      //   console.log("New group chat: ", response.result)
+      //   ui.createMeetingCallback!(response.result.name, response.result._id)
+      //   dispatch(setCreateMeetingCallback(null))
+      //   dispatch(setActiveChat(response.result))
+      // }
+
+      ui.createMeetingCallback!(title)
+      dispatch(setCreateMeetingCallback(null))
     }
     onClosePopup()
   }

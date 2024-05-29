@@ -152,6 +152,7 @@ export default function MeetingChatSidebar() {
   }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    console.log(activeChat)
     event.preventDefault()
 
     // this is added because without this, 2 things happen at the same
