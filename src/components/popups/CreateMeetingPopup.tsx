@@ -68,17 +68,17 @@ export const CreateMeetingPopup = ({ onClosePopup }) => {
     }
   }, [title])
 
-  return (
-    ui.showCreateMeeting && (
-      <FormPopup
-        onClose={onClosePopup}
-        titles={titles}
-        forms={forms}
-        totalSteps={1}
-        formCanBeSubmit={canSubmit}
-        onSubmit={onSubmit}
-        submitText="Create"
-      />
-    )
+  return ui.showCreateMeeting ? (
+    <FormPopup
+      onClose={onClosePopup}
+      titles={titles}
+      forms={forms}
+      totalSteps={1}
+      formCanBeSubmit={canSubmit}
+      onSubmit={onSubmit}
+      submitText="Create"
+    />
+  ) : (
+    <></>
   )
 }
