@@ -106,7 +106,7 @@ export default function MeetingChatSidebar() {
   const mapMessages = useAppSelector((state) => state.chat.mapMessages)
   const focused = useAppSelector((state) => state.chat.focused)
   const showChat = useAppSelector((state) => state.chat.showChat)
-  const activeChat = useAppSelector((state) => state.chat.activeChat)
+  const chat = useAppSelector((state) => state.chat)
   const [images, setImages] = useState<PasteItem[]>([])
   const [files, setFiles] = useState<File[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -152,7 +152,7 @@ export default function MeetingChatSidebar() {
   }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    console.log(activeChat)
+    console.log(chat.activeChatId)
     event.preventDefault()
 
     // this is added because without this, 2 things happen at the same
@@ -177,7 +177,7 @@ export default function MeetingChatSidebar() {
           content: ``,
           type: 'image',
           path: p!,
-          chatId: activeChat?._id || '',
+          chatId: chat.activeChatId || '',
         }))
       )
     }
@@ -190,12 +190,12 @@ export default function MeetingChatSidebar() {
           type: 'file',
           path: p.path!,
           filename: p.file.name,
-          chatId: activeChat?._id || '',
+          chatId: chat.activeChatId || '',
         }))
       )
     }
     // handle send text
-    if (val) messages.push({ content: val, chatId: activeChat?._id || '', type: 'text', path: '' })
+    if (val) messages.push({ content: val, chatId: chat.activeChatId || '', type: 'text', path: '' })
     //
     if (messages.length > 0) {
       messages.map((m) => {
@@ -227,7 +227,7 @@ export default function MeetingChatSidebar() {
         <h3>Chat</h3>
       </ChatHeader>
       <ChatBox>
-        {mapMessages.get(activeChat?._id || '')?.messages?.map((chatMessage, index) => (
+        {mapMessages.get(chat.activeChatId || '')?.messages?.map((chatMessage, index) => (
           <Message chatMessage={chatMessage} key={index} />
         ))}
         <div ref={messagesEndRef} />

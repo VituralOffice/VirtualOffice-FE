@@ -24,7 +24,7 @@ export interface IChatMessage extends Schema {
   message: IMessage
 }
 export interface IMapMessage extends Schema {
-  id: string
+  _id: string
   messages: IChatMessage[]
 }
 

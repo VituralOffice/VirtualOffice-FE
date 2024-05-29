@@ -20,11 +20,11 @@ import WebRTC from '../web/WebRTC'
 import { GameEvent, phaserEvents } from '../events/EventCenter'
 import { IRoomData, RoomType, IMessagePayload } from '../types/Rooms'
 import {
+  addChatAndSetActive,
   loadMapChatMessage,
   pushChatMessage,
-  pushPlayerJoinedMessage,
   pushPlayerLeftMessage,
-  setActiveChat,
+  updateMapMessage,
 } from '../stores/ChatStore'
 import { ItemType } from '../types/Items'
 import { Message } from '../types/Messages'
@@ -34,7 +34,6 @@ import Cookies from 'js-cookie'
 import { disconnectMeeting } from '../stores/MeetingStore'
 import { GetOneChat } from '../apis/ChatApis'
 import { isApiSuccess } from '../apis/util'
-import Game from '../scenes/Game'
 
 export default class Network {
   private static instance: Network | null = null // Biến static instance
@@ -161,7 +160,7 @@ export default class Network {
           if (field === 'playerName' && value !== '') {
             phaserEvents.emit(GameEvent.PLAYER_JOINED, player, key)
             store.dispatch(setPlayerNameMap({ id: key, name: value }))
-            store.dispatch(pushPlayerJoinedMessage(value))
+            // store.dispatch(pushPlayerJoinedMessage(value))
           }
 
           if (field === 'characterId') {
@@ -227,7 +226,7 @@ export default class Network {
       // item.onChange = (changes) => {
       //   changes.forEach((change) => console.log({ change }))
       // }
-      store.dispatch(pushChatMessage({ chatId: key, message: item }))
+      // store.dispatch(pushChatMessage({ chatId: key, message: item }))
     }
 
     // when the server sends room data
@@ -280,7 +279,8 @@ export default class Network {
         })
         if (isApiSuccess(response)) {
           console.log(`on event Message.CONNECT_TO_MEETING success`, response.result)
-          store.dispatch(setActiveChat(response.result))
+          store.dispatch(addChatAndSetActive(response.result))
+          store.dispatch(updateMapMessage(response.result))
           // const meeting = Game.getInstance()?.meetingMap.get(message.meetingId)!
           // meeting.setTitle(message.title)
           // meeting.setChatId(message.chatId)

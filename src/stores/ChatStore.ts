@@ -13,7 +13,7 @@ interface ChatState {
   focused: boolean
   showChat: boolean
   listChats: IChat[]
-  activeChat: null | IChat
+  activeChatId: string
   mapMessages: Map<string, IMapMessage>
 }
 
@@ -21,7 +21,7 @@ const initialState: ChatState = {
   focused: false,
   showChat: false,
   listChats: [] as IChat[],
-  activeChat: null,
+  activeChatId: '',
   mapMessages: new Map<string, IMapMessage>(),
 }
 
@@ -30,33 +30,42 @@ export const chatSlice = createSlice({
   initialState,
   reducers: {
     pushChatMessage: (state, action: PayloadAction<{ chatId: string; message: IChatMessage }>) => {
+      console.log("push new message", action.payload.message)
       if (state.mapMessages.get(action.payload.chatId)) {
-        const mapMessage = {
-          id: action.payload.chatId,
-          messages: [
-            ...(state.mapMessages.get(action.payload.chatId)?.messages || []),
-            action.payload.message,
-          ],
-        } as IMapMessage
-        state.mapMessages.set(action.payload.chatId, mapMessage)
-        //state.mapMessages[action.payload.chatId].messages.push({
-        //  messageType: MessageType.REGULAR_MESSAGE,
-        //  chatMessage: action.payload.message,
-        //})
+        // const mapMessage = {
+        //   id: action.payload.chatId,
+        //   messages: [
+        //     ...(state.mapMessages.get(action.payload.chatId)?.messages || []),
+        //     action.payload.message,
+        //   ],
+        // } as IMapMessage
+        // state.mapMessages.set(action.payload.chatId, mapMessage)
+        const mapMessage = state.mapMessages.get(action.payload.chatId);
+        if (mapMessage && mapMessage.messages) {
+          mapMessage.messages.push(action.payload.message)
+        } else {
+          const newMapMessage = {
+            _id: action.payload.chatId,
+            messages: [
+              action.payload.message,
+            ],
+          }
+          state.mapMessages.set(action.payload.chatId, newMapMessage as IMapMessage)
+        }
       } else {
         const newMapMessage = {
-          id: action.payload.chatId,
+          _id: action.payload.chatId,
           messages: [action.payload.message],
         } as IMapMessage
         state.mapMessages.set(action.payload.chatId, newMapMessage)
       }
     },
-    pushPlayerJoinedMessage: (state, action: PayloadAction<string>) => {},
-    pushPlayerLeftMessage: (state, action: PayloadAction<string>) => {},
+    pushPlayerJoinedMessage: (state, action: PayloadAction<string>) => { },
+    pushPlayerLeftMessage: (state, action: PayloadAction<string>) => { },
     loadMapChatMessage: (state, action: PayloadAction<IMapMessage[]>) => {
       action.payload.forEach((mc) =>
-        state.mapMessages.set(mc.id, {
-          id: mc.id,
+        state.mapMessages.set(mc._id, {
+          _id: mc._id,
           messages: mc.messages,
         } as IMapMessage)
       )
@@ -71,6 +80,9 @@ export const chatSlice = createSlice({
     setListChat: (state, action: PayloadAction<IChat[]>) => {
       state.listChats = action.payload
     },
+    updateMapMessage: (state, action: PayloadAction<IMapMessage>) => {
+      state.mapMessages.set(action.payload._id, action.payload)
+    },
     addChat: (state, action: PayloadAction<IChat>) => {
       const { _id } = action.payload
       const exists = state.listChats.find((c) => c._id === _id)
@@ -79,21 +91,33 @@ export const chatSlice = createSlice({
         state.listChats[index] = action.payload
       } else state.listChats.unshift(action.payload)
     },
+    addChatAndSetActive: (state, action: PayloadAction<IChat>) => {
+      const { _id } = action.payload
+      const exists = state.listChats.find((c) => c._id === _id)
+      if (exists) {
+        const index = state.listChats.findIndex((c) => c._id === _id)
+        state.listChats[index] = action.payload
+      } else state.listChats.unshift(action.payload)
+
+      //set active chatId
+      state.activeChatId = _id
+    },
     updateChat: (state, action: PayloadAction<IChat>) => {
       const chat = action.payload
       const index = state.listChats.findIndex((c) => c._id === chat._id)
+      if (index === -1) return;
       state.listChats.splice(index, 1)
       state.listChats.unshift(chat)
     },
-    setActiveChat: (state, action: PayloadAction<IChat>) => {
-      state.activeChat = action.payload
+    setActiveChat: (state, action: PayloadAction<string>) => {
+      state.activeChatId = action.payload
     },
   },
   extraReducers: {},
 })
 const fetchMessagesByChatId = createAsyncThunk(
   'users/fetchByIdStatus',
-  async (userId: number, thunkAPI) => {}
+  async (userId: number, thunkAPI) => { }
 )
 export const {
   pushChatMessage,
@@ -106,6 +130,8 @@ export const {
   setActiveChat,
   addChat,
   updateChat,
+  updateMapMessage,
+  addChatAndSetActive,
 } = chatSlice.actions
 
 export default chatSlice.reducer

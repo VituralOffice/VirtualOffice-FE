@@ -9,7 +9,6 @@ import { useAppSelector } from '../../hook'
 import { isApiSuccess } from '../../apis/util'
 import { useDispatch } from 'react-redux'
 import { setCreateMeetingCallback } from '../../stores/UIStore'
-import { setActiveChat } from '../../stores/ChatStore'
 
 export const CreateMeetingPopup = ({ onClosePopup }) => {
   let { roomId } = useParams()
@@ -32,20 +31,6 @@ export const CreateMeetingPopup = ({ onClosePopup }) => {
 
   const onSubmit = async () => {
     if (roomId) {
-      // const response = await CreateGroupChat({
-      //   roomId,
-      //   name: title,
-      //   type: CHAT_TYPE.GROUP,
-      //   member: [user.userId],
-      // })
-
-      // if (isApiSuccess(response)) {
-      //   console.log("New group chat: ", response.result)
-      //   ui.createMeetingCallback!(response.result.name, response.result._id)
-      //   dispatch(setCreateMeetingCallback(null))
-      //   dispatch(setActiveChat(response.result))
-      // }
-
       ui.createMeetingCallback!(title)
       dispatch(setCreateMeetingCallback(null))
     }

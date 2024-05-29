@@ -1,7 +1,5 @@
-import { GetOneChat } from '../../apis/ChatApis'
 import Network from '../../services/Network'
 import store from '../../stores'
-import { addChat, setActiveChat } from '../../stores/ChatStore'
 import { openMeetingDialog, createMeeting } from '../../stores/MeetingStore'
 import { setShowCreateMeeting, setCreateMeetingCallback } from '../../stores/UIStore'
 
