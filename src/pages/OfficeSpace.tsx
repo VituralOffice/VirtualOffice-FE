@@ -13,6 +13,8 @@ import { CreateMeetingPopup } from '../components/popups/CreateMeetingPopup'
 import { useDispatch } from 'react-redux'
 import { setShowCreateMeeting } from '../stores/UIStore'
 import { setRoomId } from '../stores/RoomStore'
+import { GetAllChat, GetAllMsg } from '../apis/ChatApis'
+import { setListChat, setMessageMaps } from '../stores/ChatStore'
 
 export const OfficeSpace = () => {
   let { roomId } = useParams()
@@ -56,9 +58,12 @@ export const OfficeSpace = () => {
   }
 
   useEffect(() => {
+    if (!roomId) return
+    //set roomId if it is not set
     if (roomStore.roomId === '') {
       dispatch(setRoomId(roomId!))
     }
+
     const fetchData = async () => {
       try {
         const response = await GetRoomById({ _id: roomId! })
@@ -73,6 +78,13 @@ export const OfficeSpace = () => {
       }
 
       await InitGame()
+
+      //load user's chat
+      const chatResponse = await GetAllChat({ roomId })
+      const msgResponse = await GetAllMsg({ roomId })
+
+      dispatch(setListChat(chatResponse.result))
+      dispatch(setMessageMaps(msgResponse.result))
     }
 
     fetchData()

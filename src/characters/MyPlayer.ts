@@ -7,7 +7,6 @@ import Chair from '../items/Chair'
 
 import { phaserEvents, GameEvent } from '../events/EventCenter'
 import store from '../stores'
-import { pushPlayerJoinedMessage } from '../stores/ChatStore'
 import { NavKeys } from '../types/KeyboardState'
 import { ItemType } from '../types/Items'
 // import Meeting from '../items/Meeting'

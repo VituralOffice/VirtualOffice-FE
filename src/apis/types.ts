@@ -29,12 +29,20 @@ export type CreateGroupChatParams = {
 
 export type GetAllChatParams = {
     roomId: string,
-    id: string
 }
 
 export type GetOneChatParams = {
     roomId: string,
     chatId: string,
+}
+
+export type GetMsgByChatIdParams = {
+    roomId: string,
+    chatId: string,
+}
+
+export type GetAllMsgParams = {
+    roomId: string;
 }
 
 export type UploadChatImagesParams = {

@@ -298,7 +298,7 @@ export default function Chat() {
   }
   const loadPhaserGame = async () => {
     game = (await PhaserGameInstance())?.scene.keys.game as Game
-    game.network?.loadChat()
+    // game.network?.loadChat()
   }
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Escape') {

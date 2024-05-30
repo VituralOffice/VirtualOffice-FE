@@ -23,8 +23,6 @@ import {
   addChatAndSetActive,
   loadMapChatMessage,
   pushChatMessage,
-  pushPlayerLeftMessage,
-  updateMapMessage,
 } from '../stores/ChatStore'
 import { ItemType } from '../types/Items'
 import { Message } from '../types/Messages'
@@ -32,7 +30,7 @@ import { ACCESS_TOKEN_KEY } from '../utils/util'
 import { API_URL } from '../constant'
 import Cookies from 'js-cookie'
 import { disconnectMeeting } from '../stores/MeetingStore'
-import { GetOneChat } from '../apis/ChatApis'
+import { GetMsgByChatId, GetOneChat } from '../apis/ChatApis'
 import { isApiSuccess } from '../apis/util'
 
 export default class Network {
@@ -175,7 +173,7 @@ export default class Network {
       phaserEvents.emit(GameEvent.PLAYER_LEFT, key)
       this.webRTC?.deleteVideoStream(key)
       this.webRTC?.deleteOnCalledVideoStream(key)
-      store.dispatch(pushPlayerLeftMessage(player.playerName))
+      // store.dispatch(pushPlayerLeftMessage(player.playerName))
       store.dispatch(removePlayerNameMap(key))
       store.dispatch(updateMember({ online: false, role: 'user', user: player }))
       store.dispatch(removePlayerAvatarMap(key))
@@ -235,10 +233,10 @@ export default class Network {
       store.dispatch(setJoinedRoomData(content))
     })
     // when the server sends room data
-    this.room.onMessage(Message.LOAD_CHAT, ({ mapChatMessages }) => {
-      ///store.dispatch(setJoinedRoomData(content))
-      store.dispatch(loadMapChatMessage(mapChatMessages))
-    })
+    // this.room.onMessage(Message.LOAD_CHAT, ({ mapChatMessages }) => {
+    //   ///store.dispatch(setJoinedRoomData(content))
+    //   store.dispatch(loadMapChatMessage(mapChatMessages))
+    // })
     // when a user sends a message
     this.room.onMessage(Message.ADD_CHAT_MESSAGE, ({ clientId, chatId, message }) => {
       //
@@ -268,25 +266,27 @@ export default class Network {
       meetingState.shareScreenManager?.onUserLeft(clientId)
     })
 
-    // when a meeting user stops sharing screen
-    this.room.onMessage(Message.UPDATE_ONE_CHAT, (clientId: string) => {
-      const meetingState = store.getState().meeting
-      meetingState.shareScreenManager?.onUserLeft(clientId)
-    })
-
     // when receive info from server when join a new meeting
     this.room.onMessage(
       Message.CONNECT_TO_MEETING,
       async (message: { meetingId: string; chatId: string; title: string }) => {
-        console.log(`on event Message.CONNECT_TO_MEETING: meetingId: ${message.meetingId}, chatId: ${message.chatId}, title: ${message.title}`)
-        const response = await GetOneChat({
+        console.log(
+          `on event Message.CONNECT_TO_MEETING: meetingId: ${message.meetingId}, chatId: ${message.chatId}, title: ${message.title}`
+        )
+        const chatResponse = await GetOneChat({
           roomId: store.getState().room.roomId,
           chatId: message.chatId,
         })
-        if (isApiSuccess(response)) {
-          console.log(`on event Message.CONNECT_TO_MEETING success`, response.result)
-          store.dispatch(addChatAndSetActive(response.result))
-          store.dispatch(updateMapMessage(response.result))
+        const msgResponse = await GetMsgByChatId({
+          roomId: store.getState().room.roomId,
+          chatId: message.chatId,
+        })
+        if (isApiSuccess(chatResponse) && isApiSuccess(msgResponse)) {
+          console.log(`on event Message.CONNECT_TO_MEETING success`, chatResponse.result)
+          console.log('mapMessages of chat: ', msgResponse.result)
+          store.dispatch(
+            addChatAndSetActive({ chat: chatResponse.result, mapMessage: msgResponse.result })
+          )
           // const meeting = Game.getInstance()?.meetingMap.get(message.meetingId)!
           // meeting.setTitle(message.title)
           // meeting.setChatId(message.chatId)
@@ -457,7 +457,7 @@ export default class Network {
     console.log('send messgae', payload)
     this.room?.send(Message.ADD_CHAT_MESSAGE, payload)
   }
-  loadChat() {
-    this.room?.send(Message.LOAD_CHAT)
-  }
+  // loadChat() {
+  //   this.room?.send(Message.LOAD_CHAT)
+  // }
 }
