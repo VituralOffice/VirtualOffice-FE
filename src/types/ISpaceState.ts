@@ -41,5 +41,5 @@ export interface IOfficeState extends Schema {
   players: MapSchema<IPlayer>
   chairs: MapSchema<IChair>
   meetings: MapSchema<IMeeting>
-  mapMessages: MapSchema<IChatMessage>
+  // mapMessages: MapSchema<IChatMessage>
 }

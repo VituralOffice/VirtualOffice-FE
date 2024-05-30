@@ -217,17 +217,17 @@ export default class Network {
       }
     }
 
-    this.room.state.mapMessages.onChange = (item, key: string) => {
-      // console.log(`mapMessages change`, item, key)
-    }
-    // new instance added to the chatMessages ArraySchema
-    this.room.state.mapMessages.onAdd = (item, key: string) => {
-      // console.log(`mapMessages onAdd`, item, key)
-      // item.onChange = (changes) => {
-      //   changes.forEach((change) => console.log({ change }))
-      // }
-      // store.dispatch(pushChatMessage({ chatId: key, message: item }))
-    }
+    // this.room.state.mapMessages.onChange = (item, key: string) => {
+    //   // console.log(`mapMessages change`, item, key)
+    // }
+    // // new instance added to the chatMessages ArraySchema
+    // this.room.state.mapMessages.onAdd = (item, key: string) => {
+    //   // console.log(`mapMessages onAdd`, item, key)
+    //   // item.onChange = (changes) => {
+    //   //   changes.forEach((change) => console.log({ change }))
+    //   // }
+    //   // store.dispatch(pushChatMessage({ chatId: key, message: item }))
+    // }
 
     // when the server sends room data
     this.room.onMessage(Message.SEND_ROOM_DATA, (content) => {
@@ -264,6 +264,12 @@ export default class Network {
 
     // when a meeting user stops sharing screen
     this.room.onMessage(Message.STOP_SCREEN_SHARE, (clientId: string) => {
+      const meetingState = store.getState().meeting
+      meetingState.shareScreenManager?.onUserLeft(clientId)
+    })
+
+    // when a meeting user stops sharing screen
+    this.room.onMessage(Message.UPDATE_ONE_CHAT, (clientId: string) => {
       const meetingState = store.getState().meeting
       meetingState.shareScreenManager?.onUserLeft(clientId)
     })
