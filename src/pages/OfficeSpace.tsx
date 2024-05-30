@@ -13,7 +13,7 @@ import { CreateMeetingPopup } from '../components/popups/CreateMeetingPopup'
 import { useDispatch } from 'react-redux'
 import { setShowCreateMeeting } from '../stores/UIStore'
 import { setRoomId } from '../stores/RoomStore'
-import { GetAllChat, GetAllMsg } from '../apis/ChatApis'
+import { GetAllChats, GetAllChatsWithMessage } from '../apis/ChatApis'
 import { setListChat, setMessageMaps } from '../stores/ChatStore'
 
 export const OfficeSpace = () => {
@@ -78,13 +78,6 @@ export const OfficeSpace = () => {
       }
 
       await InitGame()
-
-      //load user's chat
-      const chatResponse = await GetAllChat({ roomId })
-      const msgResponse = await GetAllMsg({ roomId })
-
-      dispatch(setListChat(chatResponse.result))
-      dispatch(setMessageMaps(msgResponse.result))
     }
 
     fetchData()
@@ -92,6 +85,22 @@ export const OfficeSpace = () => {
     return () => {
       DestroyGame()
     }
+  }, [])
+
+  useEffect(() => {
+    const loadUserChat = async () => {
+      if (!roomId) return
+      //load user's chat
+      // const chatResponse = await GetAllChats({ roomId })
+      const response = await GetAllChatsWithMessage({ roomId })
+
+      console.log("load all chats:", response.result)
+
+      dispatch(setListChat(response.result.chats))
+      dispatch(setMessageMaps(response.result.mapMessages))
+    }
+
+    loadUserChat();
   }, [])
 
   return (

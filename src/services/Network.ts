@@ -208,7 +208,7 @@ export default class Network {
             phaserEvents.emit(GameEvent.MEETING_TITLE_CHANGE, c.value, key, ItemType.MEETING)
           }
           if (c.field === 'chatId') {
-            console.log('GameEvent.MEETING_CHATID_CHANGE', c.value)
+            // console.log('GameEvent.MEETING_CHATID_CHANGE', c.value)
             phaserEvents.emit(GameEvent.MEETING_CHATID_CHANGE, c.value, key, ItemType.MEETING)
           }
         })

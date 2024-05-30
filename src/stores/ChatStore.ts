@@ -111,6 +111,8 @@ export const chatSlice = createSlice({
 
       //set active chatId
       state.activeChatId = _id
+
+      console.log(state.mapMessages.get(action.payload.mapMessage._id))
     },
     updateChat: (state, action: PayloadAction<IChat>) => {
       const chat = action.payload

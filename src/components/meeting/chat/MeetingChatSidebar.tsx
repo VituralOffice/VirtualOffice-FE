@@ -221,6 +221,12 @@ export default function MeetingChatSidebar() {
     scrollToBottom()
   }, [mapMessages, showChat])
 
+  useEffect(() => {
+console.log(`active chat id: ${chat.activeChatId}`);
+console.log(`active chat has ${mapMessages.get(chat.activeChatId)?.messages.length} messages`);
+console.log(`active chat has messages`, mapMessages.get(chat.activeChatId));
+  }, [chat.activeChatId])
+
   return (
     <Wrapper>
       <ChatHeader>
