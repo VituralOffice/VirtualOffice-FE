@@ -80,7 +80,7 @@ export default class Game extends Phaser.Scene {
     }
 
     createCharacterAnims(this.anims)
-    console.log('create character anims')
+    // console.log('create character anims')
 
     this.map = this.make.tilemap({ key: 'tilemap' })
     const FloorAndGround = this.map.addTilesetImage('FloorAndGround', 'tiles_wall')
@@ -180,6 +180,8 @@ export default class Game extends Phaser.Scene {
     this.network.onPlayerUpdated(this.handlePlayerUpdated, this)
     this.network.onItemUserAdded(this.handleItemUserAdded, this)
     this.network.onSetMeetingState(this.handleSetMeetingState, this)
+    this.network.onSetMeetingTitle(this.handleMeetingTitleChange, this)
+    this.network.onSetMeetingChatId(this.handleMeetingChatIdChange, this)
     this.network.onItemUserRemoved(this.handleItemUserRemoved, this)
     this.network.onChatMessageAdded(this.handleChatMessageAdded, this)
     this.network.onChairConnectedUserChange(this.handleChairUserConnectedChange, this)
@@ -299,6 +301,20 @@ export default class Game extends Phaser.Scene {
     if (itemType === ItemType.CHAIR) {
       const chair = this.chairMap.get(itemId)
       chair?.setConnectedUser(playerId)
+    }
+  }
+
+  private handleMeetingTitleChange(title: string, itemId: string, itemType: ItemType) {
+    if (itemType === ItemType.MEETING) {
+      const meeting = this.meetingMap.get(itemId)
+      meeting?.setTitle(title)
+    }
+  }
+
+  private handleMeetingChatIdChange(chatId: string, itemId: string, itemType: ItemType) {
+    if (itemType === ItemType.MEETING) {
+      const meeting = this.meetingMap.get(itemId)
+      meeting?.setChatId(chatId)
     }
   }
 

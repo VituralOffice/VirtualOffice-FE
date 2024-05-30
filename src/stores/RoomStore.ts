@@ -31,6 +31,9 @@ export const roomSlice = createSlice({
     setRoomJoined: (state, action: PayloadAction<boolean>) => {
       state.roomJoined = action.payload
     },
+    setRoomId: (state, action: PayloadAction<string>) => {
+      state.roomId = action.payload
+    },
     setJoinedRoomData: (
       state,
       action: PayloadAction<{
@@ -91,6 +94,7 @@ export const {
   addMember,
   removeMember,
   updateMember,
+  setRoomId,
 } = roomSlice.actions
 
 export default roomSlice.reducer

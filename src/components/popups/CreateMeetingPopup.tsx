@@ -31,17 +31,8 @@ export const CreateMeetingPopup = ({ onClosePopup }) => {
 
   const onSubmit = async () => {
     if (roomId) {
-      const response = await CreateGroupChat({
-        roomId,
-        name: title,
-        type: CHAT_TYPE.GROUP,
-        member: [user.userId],
-      })
-
-      if (isApiSuccess(response)) {
-        ui.createMeetingCallback!(response.title)
-        dispatch(setCreateMeetingCallback(null))
-      }
+      ui.createMeetingCallback!(title)
+      dispatch(setCreateMeetingCallback(null))
     }
     onClosePopup()
   }

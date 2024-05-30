@@ -26,3 +26,26 @@ export type CreateGroupChatParams = {
     type: CHAT_TYPE,
     member: string[]
 }
+
+export type GetAllChatParams = {
+    roomId: string,
+}
+
+export type GetOneChatParams = {
+    roomId: string,
+    chatId: string,
+}
+
+export type GetMsgByChatIdParams = {
+    roomId: string,
+    chatId: string,
+}
+
+export type GetAllMsgParams = {
+    roomId: string;
+}
+
+export type UploadChatImagesParams = {
+    roomId: string,
+    form: FormData,
+}

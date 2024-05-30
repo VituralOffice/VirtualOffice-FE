@@ -48,7 +48,6 @@ export default class UserMediaManager {
     // https://peerjs.com/docs.html#peer-id
     // Also for screen sharing ID add a `-ss` at the end.
     private makeId(id: string) {
-        console.log(id)
         return `${id.replace(/[^0-9a-z]/gi, 'G')}-um`
     }
 
@@ -65,7 +64,7 @@ export default class UserMediaManager {
                 store.dispatch(setMyCameraStream(stream))
 
                 // Call all existing users.
-                const meetingItem = Game.getInstance()?.meetingMap.get(store.getState().meeting.meetingId!)
+                const meetingItem = Game.getInstance()?.meetingMap.get(store.getState().meeting.activeMeetingId!)
                 if (meetingItem) {
                     for (const userId of meetingItem.currentUsers) {
                         console.log("connected users: " + userId)
@@ -84,7 +83,7 @@ export default class UserMediaManager {
         if (shouldDispatch) {
             store.dispatch(setMyCameraStream(null))
             // Manually let all other existing users know screen sharing is stopped
-            Game.getInstance()?.network.onStopCameraShare(store.getState().meeting.meetingId!)
+            Game.getInstance()?.network.onStopCameraShare(store.getState().meeting.activeMeetingId!)
         }
     }
 

@@ -7,7 +7,6 @@ import Chair from '../items/Chair'
 
 import { phaserEvents, GameEvent } from '../events/EventCenter'
 import store from '../stores'
-import { pushPlayerJoinedMessage } from '../stores/ChatStore'
 import { NavKeys } from '../types/KeyboardState'
 import { ItemType } from '../types/Items'
 // import Meeting from '../items/Meeting'
@@ -39,7 +38,7 @@ export default class MyPlayer extends Player {
   setPlayerName(name: string) {
     this.playerNameText.setText(name)
     phaserEvents.emit(GameEvent.MY_PLAYER_NAME_CHANGE, name)
-    store.dispatch(pushPlayerJoinedMessage(name))
+    // store.dispatch(pushPlayerJoinedMessage(name))
   }
 
   setPlayerTexture(texture: string) {

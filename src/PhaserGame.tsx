@@ -49,7 +49,7 @@ export const InitGame = async () => {
     autoFocus: true,
     scene: [Bootstrap, Background, Game],
     fps: {
-      target: 45,
+      target: 15,
       forceSetTimeOut: true,
     },
   }

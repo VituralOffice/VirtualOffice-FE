@@ -103,7 +103,6 @@ const MeetingBody = styled.div`
 
 const MeetingSidebarContainer = styled.div`
   background-color: rgb(26 29 45);
-  padding: 8px;
   border-radius: 8px;
   display: flex;
   width: 30%;
@@ -231,7 +230,7 @@ export default function MeetingDialog() {
             />
             <SeparateLine />
             <ToolbarButton isEnabled={showChat} onClick={() => {
-              if (!showChat) setShowMeetingInfo(false)
+              setShowMeetingInfo(false)
               setShowChat(!showChat)
             }}>
               <div>
@@ -243,7 +242,7 @@ export default function MeetingDialog() {
             <ToolbarButton
               isEnabled={showMeetingInfo}
               onClick={() => {
-                if (!showMeetingInfo) setShowChat(false)
+                setShowChat(false)
                 setShowMeetingInfo(!showMeetingInfo)
               }}
             >
@@ -274,12 +273,12 @@ export default function MeetingDialog() {
           </MeetingView>
           {showChat ? (
             <MeetingSidebarContainer>
-              {/* <MeetingChatSidebar /> */}
+              <MeetingChatSidebar />
             </MeetingSidebarContainer>
           ) : (
             showMeetingInfo && (
               <MeetingSidebarContainer>
-                <MeetingChatSidebar />
+                {/* <MeetingChatSidebar /> */}
               </MeetingSidebarContainer>
             )
           )}

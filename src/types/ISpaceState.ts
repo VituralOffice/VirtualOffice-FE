@@ -24,7 +24,7 @@ export interface IChatMessage extends Schema {
   message: IMessage
 }
 export interface IMapMessage extends Schema {
-  id: string
+  _id: string
   messages: IChatMessage[]
 }
 
@@ -41,5 +41,5 @@ export interface IOfficeState extends Schema {
   players: MapSchema<IPlayer>
   chairs: MapSchema<IChair>
   meetings: MapSchema<IMeeting>
-  mapMessages: MapSchema<IChatMessage>
+  // mapMessages: MapSchema<IChatMessage>
 }

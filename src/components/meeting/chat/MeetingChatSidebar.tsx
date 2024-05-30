@@ -1,19 +1,22 @@
 import React, { useRef, useState, useEffect } from 'react'
 import styled from 'styled-components'
 import Box from '@mui/material/Box'
-import Fab from '@mui/material/Fab'
-import Tooltip from '@mui/material/Tooltip'
 import IconButton from '@mui/material/IconButton'
-import InputBase from '@mui/material/InputBase'
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon'
-import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline'
-import CloseIcon from '@mui/icons-material/Close'
 import 'emoji-mart/css/emoji-mart.css'
 import { Picker } from 'emoji-mart'
-import { MessageType } from '../../../stores/ChatStore'
-import { getColorByString } from '../../../utils/util'
+import { MessageType, setFocused } from '../../../stores/ChatStore'
 import { useAppDispatch, useAppSelector } from '../../../hook'
 import Game from '../../../scenes/Game'
+import InputBase from '@mui/material/InputBase'
+import { useDispatch } from 'react-redux'
+import { Message } from './Message'
+import Network from '../../../services/Network'
+import { IMessagePayload } from '../../../types/Rooms'
+import { UploadChatImage } from '../../../apis/ChatApis'
+import { isApiSuccess } from '../../../apis/util'
+import { useParams } from 'react-router-dom'
+import AttachFileIcon from '@mui/icons-material/AttachFile'
 
 const Backdrop = styled.div`
   position: fixed;
@@ -27,8 +30,8 @@ const Backdrop = styled.div`
 
 const Wrapper = styled.div`
   position: relative;
+  width: 100%;
   height: 100%;
-  padding: 16px;
   display: flex;
   flex-direction: column;
 `
@@ -40,7 +43,7 @@ const FabWrapper = styled.div`
 const ChatHeader = styled.div`
   position: relative;
   height: 35px;
-  background: #000000a7;
+  background: rgb(51 58 100);
   border-radius: 10px 10px 0px 0px;
 
   h3 {
@@ -61,53 +64,8 @@ const ChatBox = styled(Box)`
   height: 100%;
   width: 100%;
   overflow: auto;
-  background: #2c2c2c;
-  border: 1px solid #00000029;
-`
-
-const MessageWrapper = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  padding: 0px 2px;
-
-  p {
-    margin: 3px;
-    text-shadow: 0.3px 0.3px black;
-    font-size: 15px;
-    font-weight: bold;
-    line-height: 1.4;
-    overflow-wrap: anywhere;
-  }
-
-  span {
-    color: white;
-    font-weight: normal;
-  }
-
-  .notification {
-    color: grey;
-    font-weight: normal;
-  }
-
-  :hover {
-    background: #3a3a3a;
-  }
-`
-
-const InputWrapper = styled.form`
-  box-shadow: 10px 10px 10px #00000018;
-  border: 1px solid #42eacb;
-  border-radius: 0px 0px 10px 10px;
-  display: flex;
-  flex-direction: row;
-  background: linear-gradient(180deg, #000000c1, #242424c0);
-`
-
-const InputTextField = styled(InputBase)`
-  border-radius: 0px 0px 10px 10px;
-  input {
-    padding: 5px;
-  }
+  background-color: rgb(26 29 45);
+  padding: 8px;
 `
 
 const EmojiPickerWrapper = styled.div`
@@ -116,48 +74,30 @@ const EmojiPickerWrapper = styled.div`
   right: 16px;
 `
 
-const dateFormatter = new Intl.DateTimeFormat('en', {
-  timeStyle: 'short',
-  dateStyle: 'short',
-})
+const InputWrapper = styled.form`
+  box-shadow: 10px 10px 10px #00000018;
+  border: 1px solid rgb(88 97 159);
+  border-radius: 0px 0px 10px 10px;
+  display: flex;
+  flex-direction: row;
+  background: linear-gradient(rgb(26 29 45), rgb(34 38 57));
+`
 
-const Message = ({ chatMessage, messageType }) => {
-  const [tooltipOpen, setTooltipOpen] = useState(false)
+const InputTextField = styled(InputBase)`
+  border-radius: 0px 0px 10px 10px;
+  padding-left: 5px;
+  input {
+    padding: 5px;
+  }
+`
 
-  return (
-    <MessageWrapper
-      onMouseEnter={() => {
-        setTooltipOpen(true)
-      }}
-      onMouseLeave={() => {
-        setTooltipOpen(false)
-      }}
-    >
-      <Tooltip
-        open={tooltipOpen}
-        title={dateFormatter.format(chatMessage.createdAt)}
-        placement="right"
-        arrow
-      >
-        {messageType === MessageType.REGULAR_MESSAGE ? (
-          <p
-            style={{
-              color: getColorByString(chatMessage.author),
-            }}
-          >
-            {chatMessage.author}: <span>{chatMessage.content}</span>
-          </p>
-        ) : (
-          <p className="notification">
-            {chatMessage.author} {chatMessage.content}
-          </p>
-        )}
-      </Tooltip>
-    </MessageWrapper>
-  )
+interface PasteItem {
+  file: File
+  preview: string
 }
 
 export default function MeetingChatSidebar() {
+  let { roomId } = useParams()
   const [inputValue, setInputValue] = useState('')
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const [readyToSubmit, setReadyToSubmit] = useState(false)
@@ -166,13 +106,53 @@ export default function MeetingChatSidebar() {
   const mapMessages = useAppSelector((state) => state.chat.mapMessages)
   const focused = useAppSelector((state) => state.chat.focused)
   const showChat = useAppSelector((state) => state.chat.showChat)
-  const dispatch = useAppDispatch()
+  const chat = useAppSelector((state) => state.chat)
+  const [images, setImages] = useState<PasteItem[]>([])
+  const [files, setFiles] = useState<File[]>([])
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const dispatch = useDispatch()
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value)
   }
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleFileClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click()
+    }
+  }
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      const file = event.target.files[0]
+      if (file && file.type.includes(`image`)) {
+        setImages([...images, { preview: URL.createObjectURL(file), file }])
+      } else {
+        setFiles([...files, file])
+      }
+    }
+  }
+  const handleUploadImage = async (files: File[]) => {
+    const filePaths = await Promise.all(
+      files.map(async (file) => {
+        try {
+          const form = new FormData()
+          form.append('file', file)
+          const response = await UploadChatImage({ roomId: roomId!, form })
+          if (isApiSuccess(response)) {
+            return response.result.path as string
+          }
+        } catch (error) {
+          return ``
+        }
+      })
+    )
+    return filePaths
+  }
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    console.log(chat.activeChatId)
     event.preventDefault()
 
     // this is added because without this, 2 things happen at the same
@@ -184,13 +164,46 @@ export default function MeetingChatSidebar() {
       return
     }
     // move focus back to the game
-    inputRef.current?.blur()
+    // inputRef.current?.blur()
 
     const val = inputValue.trim()
     setInputValue('')
-    if (val) {
-      Game.getInstance()?.network.addChatMessage(val)
-      Game.getInstance()?.myPlayer.updateDialogBubble(val)
+    let messages: IMessagePayload[] = []
+    // handle send images
+    if (images.length > 0) {
+      const paths = await handleUploadImage(images.map((i) => i.file))
+      messages.push(
+        ...paths.map((p) => ({
+          content: ``,
+          type: 'image',
+          path: p!,
+          chatId: chat.activeChatId || '',
+        }))
+      )
+    }
+    if (files.length > 0) {
+      const paths = await handleUploadImage(files)
+      const fileObjs = files.map((f, i) => ({ file: f, path: paths[i] }))
+      messages.push(
+        ...fileObjs.map((p) => ({
+          content: ``,
+          type: 'file',
+          path: p.path!,
+          filename: p.file.name,
+          chatId: chat.activeChatId || '',
+        }))
+      )
+    }
+    // handle send text
+    if (val) messages.push({ content: val, chatId: chat.activeChatId || '', type: 'text', path: '' })
+    //
+    if (messages.length > 0) {
+      messages.map((m) => {
+        Network.getInstance()?.addChatMessage(m)
+        // if (m.content) Game.getInstance()?.myPlayer.updateDialogBubble(m.content)
+      })
+      setImages([])
+      setFiles([])
     }
   }
 
@@ -208,14 +221,20 @@ export default function MeetingChatSidebar() {
     scrollToBottom()
   }, [mapMessages, showChat])
 
+  useEffect(() => {
+console.log(`active chat id: ${chat.activeChatId}`);
+console.log(`active chat has ${mapMessages.get(chat.activeChatId)?.messages.length} messages`);
+console.log(`active chat has messages`, mapMessages.get(chat.activeChatId));
+  }, [chat.activeChatId])
+
   return (
-    <>
+    <Wrapper>
       <ChatHeader>
         <h3>Chat</h3>
       </ChatHeader>
       <ChatBox>
-        {mapMessages.get(currentChat?._id || '')?.messages?.map(({ messageType, chatMessage }, index) => (
-          <Message chatMessage={chatMessage} messageType={messageType} key={index} />
+        {mapMessages.get(chat.activeChatId || '')?.messages?.map((chatMessage, index) => (
+          <Message chatMessage={chatMessage} key={index} />
         ))}
         <div ref={messagesEndRef} />
         {showEmojiPicker && (
@@ -227,7 +246,7 @@ export default function MeetingChatSidebar() {
               onSelect={(emoji) => {
                 setInputValue(inputValue + emoji.native)
                 setShowEmojiPicker(!showEmojiPicker)
-                //   dispatch(setFocused(true))
+                dispatch(setFocused(true))
               }}
               exclude={['recent', 'flags']}
             />
@@ -235,6 +254,23 @@ export default function MeetingChatSidebar() {
         )}
       </ChatBox>
       <InputWrapper onSubmit={handleSubmit}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            cursor: 'pointer',
+          }}
+          onClick={handleFileClick}
+        >
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            onChange={handleFileChange}
+          />
+          <AttachFileIcon style={{ color: 'white' }}> </AttachFileIcon>
+        </div>
         <InputTextField
           inputRef={inputRef}
           autoFocus={focused}
@@ -245,12 +281,12 @@ export default function MeetingChatSidebar() {
           onChange={handleChange}
           onFocus={() => {
             if (!focused) {
-              // dispatch(setFocused(true))
+              dispatch(setFocused(true))
               setReadyToSubmit(true)
             }
           }}
           onBlur={() => {
-            //   dispatch(setFocused(false))
+            dispatch(setFocused(false))
             setReadyToSubmit(false)
           }}
         />
@@ -258,6 +294,6 @@ export default function MeetingChatSidebar() {
           <InsertEmoticonIcon />
         </IconButton>
       </InputWrapper>
-    </>
+    </Wrapper>
   )
 }

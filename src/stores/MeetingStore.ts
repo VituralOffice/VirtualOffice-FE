@@ -9,7 +9,7 @@ import Network from '../services/Network'
 
 interface MeetingState {
   meetingDialogOpen: boolean
-  meetingId: null | string
+  activeMeetingId: null | string
   myDisplayStream: null | MediaStream
   myCameraStream: null | MediaStream
   peerDisplayStreams: Map<
@@ -32,7 +32,7 @@ interface MeetingState {
 
 const initialState: MeetingState = {
   meetingDialogOpen: false,
-  meetingId: null,
+  activeMeetingId: null,
 
   myDisplayStream: null,
   myCameraStream: null,
@@ -61,9 +61,9 @@ export const meetingSlice = createSlice({
       state.shareScreenManager.onOpen()
       state.userMediaManager.onOpen()
       state.meetingDialogOpen = true
-      state.meetingId = action.payload.meetingId
+      state.activeMeetingId = action.payload.meetingId
     },
-    createMeeting: (state, action: PayloadAction<{ meetingId: string; title: string; myUserId: string }>) => {
+    createMeeting: (state, action: PayloadAction<{ meetingId: string; myUserId: string }>) => {
       if (!state.shareScreenManager) {
         state.shareScreenManager = new ShareScreenManager(action.payload.myUserId)
       }
@@ -71,18 +71,18 @@ export const meetingSlice = createSlice({
         state.userMediaManager = new UserMediaManager(action.payload.myUserId)
       }
       Game.getInstance()?.myPlayer.setPlayerIsInMeeting(true);
-      Game.getInstance()?.myPlayer.setLeaveCurrentChair(true);
       Game.getInstance()?.disableKeys()
       state.shareScreenManager.onOpen()
       state.userMediaManager.onOpen()
       state.meetingDialogOpen = true
-      state.meetingId = action.payload.meetingId
+      state.activeMeetingId = action.payload.meetingId
     },
     closeMeetingDialog: (state) => {
       // Tell server the meeting dialog is closed.
       Game.getInstance()?.enableKeys()
-      Network.getInstance()?.disconnectFromMeeting(state.meetingId!)
+      Network.getInstance()?.disconnectFromMeeting(state.activeMeetingId!)
       Game.getInstance()?.myPlayer.setPlayerIsInMeeting(false);
+      Game.getInstance()?.myPlayer.setLeaveCurrentChair(true);
       for (const { call } of state.peerDisplayStreams.values()) {
         call.close()
       }
@@ -94,7 +94,7 @@ export const meetingSlice = createSlice({
       state.meetingDialogOpen = false
       state.myDisplayStream = null
       state.myCameraStream = null
-      state.meetingId = null
+      state.activeMeetingId = null
       state.peerDisplayStreams.clear()
       state.peerCameraStreams.clear()
     },
@@ -129,7 +129,7 @@ export const meetingSlice = createSlice({
       state.peerCameraStreams.delete(sanitizeId(action.payload))
     },
     disconnectMeeting: (state) => {
-      Game.getInstance()?.network.disconnectFromMeeting(state.meetingId!)
+      Network.getInstance()?.disconnectFromMeeting(state.activeMeetingId!)
       for (const { call } of state.peerDisplayStreams.values()) {
         call.close()
       }
@@ -141,7 +141,7 @@ export const meetingSlice = createSlice({
       state.meetingDialogOpen = false
       state.myDisplayStream = null
       state.myCameraStream = null
-      state.meetingId = null
+      state.activeMeetingId = null
       state.peerDisplayStreams.clear()
       state.peerCameraStreams.clear()
     }

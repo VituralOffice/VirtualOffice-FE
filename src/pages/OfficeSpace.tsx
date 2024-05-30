@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAppSelector } from '../hook'
 import { useNavigate, useParams } from 'react-router-dom'
-import { InitGame, DestroyGame, PhaserGameInstance, loadGameScene } from '../PhaserGame'
+import { InitGame, DestroyGame } from '../PhaserGame'
 import { JoinOfficePage } from './JoinOfficePage'
 import Bootstrap from '../scenes/Bootstrap'
 import { GetRoomById } from '../apis/RoomApis'
@@ -12,7 +12,9 @@ import MeetingDialog from '../components/meeting/MeetingDialog'
 import { CreateMeetingPopup } from '../components/popups/CreateMeetingPopup'
 import { useDispatch } from 'react-redux'
 import { setShowCreateMeeting } from '../stores/UIStore'
-import Game from '../scenes/Game'
+import { setRoomId } from '../stores/RoomStore'
+import { GetAllChats, GetAllChatsWithMessage } from '../apis/ChatApis'
+import { setListChat, setMessageMaps } from '../stores/ChatStore'
 
 export const OfficeSpace = () => {
   let { roomId } = useParams()
@@ -22,8 +24,8 @@ export const OfficeSpace = () => {
 
   const [joinPageShow, setJoinPageShow] = useState(true)
   const [room, setRoom] = useState<IRoomData | null>()
+  const roomStore = useAppSelector((state) => state.room)
   const meeting = useAppSelector((state) => state.meeting)
-  const ui = useAppSelector((state) => state.ui)
 
   const handleJoinRoom = async () => {
     try {
@@ -56,6 +58,12 @@ export const OfficeSpace = () => {
   }
 
   useEffect(() => {
+    if (!roomId) return
+    //set roomId if it is not set
+    if (roomStore.roomId === '') {
+      dispatch(setRoomId(roomId!))
+    }
+
     const fetchData = async () => {
       try {
         const response = await GetRoomById({ _id: roomId! })
@@ -79,15 +87,32 @@ export const OfficeSpace = () => {
     }
   }, [])
 
+  useEffect(() => {
+    const loadUserChat = async () => {
+      if (!roomId) return
+      //load user's chat
+      // const chatResponse = await GetAllChats({ roomId })
+      const response = await GetAllChatsWithMessage({ roomId })
+
+      console.log("load all chats:", response.result)
+
+      dispatch(setListChat(response.result.chats))
+      dispatch(setMessageMaps(response.result.mapMessages))
+    }
+
+    loadUserChat();
+  }, [])
+
   return (
     <>
       {joinPageShow && <JoinOfficePage handleJoinRoom={handleJoinRoom} />}
       {!joinPageShow && <OfficeToolbar></OfficeToolbar>}
       {meeting.meetingDialogOpen && <MeetingDialog />}
-      <CreateMeetingPopup onClosePopup={() => {
-        dispatch(setShowCreateMeeting(false));
-        Game.getInstance()?.myPlayer.setLeaveCurrentChair(true);
-      }} />
+      <CreateMeetingPopup
+        onClosePopup={() => {
+          dispatch(setShowCreateMeeting(false))
+        }}
+      />
     </>
   )
 }

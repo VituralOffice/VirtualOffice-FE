@@ -20,10 +20,9 @@ import WebRTC from '../web/WebRTC'
 import { GameEvent, phaserEvents } from '../events/EventCenter'
 import { IRoomData, RoomType, IMessagePayload } from '../types/Rooms'
 import {
+  addChatAndSetActive,
   loadMapChatMessage,
   pushChatMessage,
-  pushPlayerJoinedMessage,
-  pushPlayerLeftMessage,
 } from '../stores/ChatStore'
 import { ItemType } from '../types/Items'
 import { Message } from '../types/Messages'
@@ -31,6 +30,8 @@ import { ACCESS_TOKEN_KEY } from '../utils/util'
 import { API_URL } from '../constant'
 import Cookies from 'js-cookie'
 import { disconnectMeeting } from '../stores/MeetingStore'
+import { GetMsgByChatId, GetOneChat } from '../apis/ChatApis'
+import { isApiSuccess } from '../apis/util'
 
 export default class Network {
   private static instance: Network | null = null // Biến static instance
@@ -82,7 +83,7 @@ export default class Network {
 
   public disconnectMeeting() {
     console.log('Disconnecting meeting')
-    store.dispatch(disconnectMeeting)
+    store.dispatch(disconnectMeeting())
   }
 
   /**
@@ -157,7 +158,7 @@ export default class Network {
           if (field === 'playerName' && value !== '') {
             phaserEvents.emit(GameEvent.PLAYER_JOINED, player, key)
             store.dispatch(setPlayerNameMap({ id: key, name: value }))
-            store.dispatch(pushPlayerJoinedMessage(value))
+            // store.dispatch(pushPlayerJoinedMessage(value))
           }
 
           if (field === 'characterId') {
@@ -172,7 +173,7 @@ export default class Network {
       phaserEvents.emit(GameEvent.PLAYER_LEFT, key)
       this.webRTC?.deleteVideoStream(key)
       this.webRTC?.deleteOnCalledVideoStream(key)
-      store.dispatch(pushPlayerLeftMessage(player.playerName))
+      // store.dispatch(pushPlayerLeftMessage(player.playerName))
       store.dispatch(removePlayerNameMap(key))
       store.dispatch(updateMember({ online: false, role: 'user', user: player }))
       store.dispatch(removePlayerAvatarMap(key))
@@ -203,33 +204,39 @@ export default class Network {
           if (c.field === 'isOpen') {
             phaserEvents.emit(GameEvent.MEETING_STATE_CHANGE, c.value, key, ItemType.MEETING)
           }
+          if (c.field === 'title') {
+            phaserEvents.emit(GameEvent.MEETING_TITLE_CHANGE, c.value, key, ItemType.MEETING)
+          }
+          if (c.field === 'chatId') {
+            // console.log('GameEvent.MEETING_CHATID_CHANGE', c.value)
+            phaserEvents.emit(GameEvent.MEETING_CHATID_CHANGE, c.value, key, ItemType.MEETING)
+          }
         })
       }
     }
 
-    this.room.state.mapMessages.onChange = (item, key: string) => {
-      console.log(`mapMessages change`, item, key)
-    }
-    // new instance added to the chatMessages ArraySchema
-    this.room.state.mapMessages.onAdd = (item, key: string) => {
-      console.log(`mapMessages onAdd`, item, key)
-      item.onChange = (changes) => {
-        changes.forEach((change) => console.log({ change }))
-      }
-      store.dispatch(pushChatMessage({ chatId: key, message: item }))
-    }
+    // this.room.state.mapMessages.onChange = (item, key: string) => {
+    //   // console.log(`mapMessages change`, item, key)
+    // }
+    // // new instance added to the chatMessages ArraySchema
+    // this.room.state.mapMessages.onAdd = (item, key: string) => {
+    //   // console.log(`mapMessages onAdd`, item, key)
+    //   // item.onChange = (changes) => {
+    //   //   changes.forEach((change) => console.log({ change }))
+    //   // }
+    //   // store.dispatch(pushChatMessage({ chatId: key, message: item }))
+    // }
 
     // when the server sends room data
     this.room.onMessage(Message.SEND_ROOM_DATA, (content) => {
-      console.log(`// when the server sends room data`)
-      console.log({ content })
+      console.log(`server sends room data`, { content })
       store.dispatch(setJoinedRoomData(content))
     })
     // when the server sends room data
-    this.room.onMessage(Message.LOAD_CHAT, ({ mapChatMessages }) => {
-      ///store.dispatch(setJoinedRoomData(content))
-      store.dispatch(loadMapChatMessage(mapChatMessages))
-    })
+    // this.room.onMessage(Message.LOAD_CHAT, ({ mapChatMessages }) => {
+    //   ///store.dispatch(setJoinedRoomData(content))
+    //   store.dispatch(loadMapChatMessage(mapChatMessages))
+    // })
     // when a user sends a message
     this.room.onMessage(Message.ADD_CHAT_MESSAGE, ({ clientId, chatId, message }) => {
       //
@@ -258,6 +265,34 @@ export default class Network {
       const meetingState = store.getState().meeting
       meetingState.shareScreenManager?.onUserLeft(clientId)
     })
+
+    // when receive info from server when join a new meeting
+    this.room.onMessage(
+      Message.CONNECT_TO_MEETING,
+      async (message: { meetingId: string; chatId: string; title: string }) => {
+        console.log(
+          `on event Message.CONNECT_TO_MEETING: meetingId: ${message.meetingId}, chatId: ${message.chatId}, title: ${message.title}`
+        )
+        const chatResponse = await GetOneChat({
+          roomId: store.getState().room.roomId,
+          chatId: message.chatId,
+        })
+        const msgResponse = await GetMsgByChatId({
+          roomId: store.getState().room.roomId,
+          chatId: message.chatId,
+        })
+        if (isApiSuccess(chatResponse) && isApiSuccess(msgResponse)) {
+          console.log(`on event Message.CONNECT_TO_MEETING success`, chatResponse.result)
+          console.log('mapMessages of chat: ', msgResponse.result)
+          store.dispatch(
+            addChatAndSetActive({ chat: chatResponse.result, mapMessage: msgResponse.result })
+          )
+          // const meeting = Game.getInstance()?.meetingMap.get(message.meetingId)!
+          // meeting.setTitle(message.title)
+          // meeting.setChatId(message.chatId)
+        }
+      }
+    )
   }
 
   // method to register event listener and call back function when a item user added
@@ -285,6 +320,20 @@ export default class Network {
     context?: any
   ) {
     phaserEvents.on(GameEvent.MEETING_STATE_CHANGE, callback, context)
+  }
+
+  onSetMeetingTitle(
+    callback: (title: string, itemId: string, itemType: ItemType) => void,
+    context?: any
+  ) {
+    phaserEvents.on(GameEvent.MEETING_TITLE_CHANGE, callback, context)
+  }
+
+  onSetMeetingChatId(
+    callback: (chatId: string, itemId: string, itemType: ItemType) => void,
+    context?: any
+  ) {
+    phaserEvents.on(GameEvent.MEETING_CHATID_CHANGE, callback, context)
   }
 
   // method to register event listener and call back function when a item user removed
@@ -368,8 +417,13 @@ export default class Network {
     this.room?.send(Message.DISCONNECT_FROM_CHAIR, { chairId: id })
   }
 
-  connectToMeeting(id: string) {
-    this.room?.send(Message.CONNECT_TO_MEETING, { meetingId: id })
+  connectToMeeting(meetingId: string, title?: string) {
+    this.room?.send(Message.CONNECT_TO_MEETING, {
+      roomId: store.getState().room.roomId,
+      userId: store.getState().user.userId,
+      meetingId,
+      title,
+    })
     this.webRTC?.disconnect()
   }
 
@@ -378,6 +432,10 @@ export default class Network {
     this.room?.send(Message.DISCONNECT_FROM_MEETING, { meetingId: id })
     this.webRTC?.checkPreviousPermission()
   }
+
+  // changeMeetingInfo(meetingId: string, title?: string, chatId?: string) {
+  //   this.room?.send(Message.MEETING_CHANGE_INFO, { meetingId, title, chatId })
+  // }
 
   connectToWhiteboard(id: string) {
     this.room?.send(Message.CONNECT_TO_WHITEBOARD, { whiteboardId: id })
@@ -396,10 +454,10 @@ export default class Network {
   }
 
   addChatMessage(payload: IMessagePayload) {
-    console.log({ payload })
+    console.log('send messgae', payload)
     this.room?.send(Message.ADD_CHAT_MESSAGE, payload)
   }
-  loadChat() {
-    this.room?.send(Message.LOAD_CHAT)
-  }
+  // loadChat() {
+  //   this.room?.send(Message.LOAD_CHAT)
+  // }
 }
