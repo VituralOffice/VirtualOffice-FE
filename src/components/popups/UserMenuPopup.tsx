@@ -10,6 +10,7 @@ import EditUserCharacterPopup from './EditUserCharacterPopup'
 import { useAppSelector } from '../../hook'
 import { useNavigate } from 'react-router-dom'
 import { useSignOut } from '../../apis/AuthApis'
+import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded'
 
 const Container = styled.div`
   display: flex;
@@ -166,6 +167,35 @@ export default function UserMenuPopup() {
             ></hr>
           </>
         )}
+
+        {user.loggedIn && (
+          <NavItem onClick={() => navigate('/user/settings')}>
+            <span
+              style={{
+                flex: '0 1 0%',
+                paddingRight: '8px',
+                textDecoration: 'none',
+              }}
+            >
+              <span
+                style={{
+                  display: 'flex',
+                  width: '20px',
+                  color: 'rgb(255, 255, 255)',
+                }}
+              >
+                <SettingsRoundedIcon
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                  }}
+                />
+              </span>
+            </span>
+            Settings
+          </NavItem>
+        )}
+
         <NavItem onClick={() => setEditUserCharacterPopupShow(!isEditUserCharacterPopupShow)}>
           <span
             style={{
