@@ -16,6 +16,7 @@ import { JoinOfficePage } from './pages/JoinOfficePage'
 import { GetUserProfile } from './apis/UserApis'
 import { JoinRoomByLink } from './pages/JoinRoomByLink'
 import MeetingDialog from './components/meeting/MeetingDialog'
+import UserSettingPage from './pages/UserSettingPage'
 
 const Backdrop = styled.div`
   position: absolute;
@@ -45,6 +46,7 @@ function App() {
           {/* private */}
           {user.loggedIn && (
             <>
+              <Route path="/user/settings" element={<UserSettingPage />} />
               <Route path="/dashboard" element={<SpaceDashboardPage />} />
               <Route path="/test-space" element={<TestSpace />} />
               <Route path="/room/:roomId" element={<OfficeSpace />} />

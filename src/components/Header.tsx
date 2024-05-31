@@ -6,9 +6,8 @@ import { useState } from 'react'
 import { ButtonProps } from '../interfaces/Interfaces'
 import { useNavigate } from 'react-router-dom'
 import { useAppSelector } from '../hook'
-import { ACCESS_TOKEN_KEY, getAvatarById } from '../utils/util'
+import { getAvatarById } from '../utils/util'
 import { CreateSpacePopup } from './popups/CreateSpacePopup'
-import Cookies from 'js-cookie'
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -236,7 +235,6 @@ export default function Header() {
   const user = useAppSelector((state) => state.user)
 
   const [activeTab, setActiveTab] = useState(0)
-  const tabs = [0]
 
   return (
     <>

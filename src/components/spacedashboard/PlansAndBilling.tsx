@@ -1,5 +1,7 @@
 import styled from 'styled-components'
-import { AntSwitch } from '../switches/CustomSwitches'
+import { AntSwitch, IOSSwitch } from '../switches/CustomSwitches'
+import { ButtonProps } from '../../interfaces/Interfaces'
+import { useState } from 'react'
 
 const ContentHeader = styled.div`
   padding-top: 56px;
@@ -93,127 +95,223 @@ const SubcriptionOrder = styled.div`
 `
 
 const AutoRenew = styled.div`
-border-radius: 8px;
-padding: 4px 8px;
-margin-left: 6px;
-text-align: center;
-text-transform: uppercase;
-font-weight: 700;
-font-size: 12px;
-line-height: 16px;
-letter-spacing: 0.03em;
-color: rgb(17, 17, 17);
-background-color: rgb(251, 193, 44);
+  border-radius: 8px;
+  padding: 4px 8px;
+  margin-left: 6px;
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.03em;
+  color: rgb(17, 17, 17);
+  background-color: rgb(251, 193, 44);
+`
+
+const DetailsBlock = styled.div`
+  & > p {
+    margin: 0;
+    padding: 3px 0px;
+  }
 `
 
 const PriceBlock = styled.div`
-    display: flex;
-    margin-bottom: 4px;
-    align-items: baseline;
-    flex-direction: column;
-    gap: 8px;
-    .price-text {
-        font-size: 34px;
-        line-height: 34px;
-        font-weight: 700;
-        color: rgb(32, 37, 64);
-    }
-    .desc {
-        color: rgb(51, 58, 100);
-        font-family: "DM Sans", sans-serif;
-        font-weight: 500;
-        font-size: 15px;
-        line-height: 20px;
-    }
+  display: flex;
+  margin-bottom: 4px;
+  align-items: baseline;
+  flex-direction: column;
+  gap: 8px;
+  .price-text {
+    font-size: 34px;
+    line-height: 34px;
+    font-weight: 700;
+    color: rgb(32, 37, 64);
+  }
+  .desc {
+    color: rgb(51, 58, 100);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 15px;
+    line-height: 20px;
+  }
 `
 
 const BillOptionsBlock = styled.div`
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  .title {
     display: flex;
-    gap: 6px;
-    align-items: center;
-    .title {
-        display: flex;
-        opacity: 1;
+    opacity: 1;
 
-        &>span {
-            color: rgb(51, 58, 100);
-            font-weight: 500;
-            font-size: 15px;
-            line-height: 20px;
-        }
+    & > span {
+      color: rgb(51, 58, 100);
+      font-weight: 500;
+      font-size: 15px;
+      line-height: 20px;
     }
-    .discount-text{
-        display: flex;
-        padding: 2px 4px;
-        align-items: flex-start;
-        gap: 8px;
-        border-radius: 8px;
-        background: rgba(144, 173, 255, 0.3);
-        &>span {
-            color: rgb(67, 88, 216);
-            font-weight: 500;
-            font-size: 15px;
-            line-height: 20px;
-        }
+  }
+  .discount-text {
+    display: flex;
+    padding: 2px 4px;
+    align-items: flex-start;
+    gap: 8px;
+    border-radius: 8px;
+    background: rgba(144, 173, 255, 0.3);
+    & > span {
+      color: rgb(67, 88, 216);
+      font-weight: 500;
+      font-size: 15px;
+      line-height: 20px;
     }
-    .desc {
-        display: flex;
-        opacity: 0.6;
-        &>span{
-            color: rgb(51, 58, 100);
-            font-weight: 500;
-            font-size: 15px;
-            line-height: 20px;
-        }
+  }
+  .desc {
+    display: flex;
+    opacity: 0.6;
+    & > span {
+      color: rgb(51, 58, 100);
+      font-weight: 500;
+      font-size: 15px;
+      line-height: 20px;
     }
+  }
+`
+
+const ButtonSelect = styled.button`
+  display: flex;
+  position: relative;
+  box-sizing: border-box;
+  outline: none;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  justify-content: center;
+  font-family: inherit;
+  font-weight: 700;
+  transition: background-color 200ms ease 0s, border-color 200ms ease 0s;
+  cursor: pointer;
+  opacity: 1;
+  overflow: hidden;
+  background-color: rgb(88, 130, 247);
+  border: 2px solid transparent;
+  padding: 0px 16px;
+  width: 100%;
+  min-width: min(104px, 100%);
+  max-width: 100%;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 15px;
+  color: rgb(255, 255, 255) !important;
+
+  &:hover {
+    background-color: rgb(121, 155, 249);
+  }
 `
 
 export default function PlansAndBilling() {
+  const [purchased, setPurchased] = useState(false)
+  const [isAnually, setIsAnually] = useState(true)
   return (
     <>
       <ContentHeader>
-        <div className="space-name">Space Name</div>
-        <div style={{ display: 'flex', marginBottom: '16px', gap: '8px' }}>
+        <div className="space-name">Plans & Billing</div>
+        {/* <div style={{ display: 'flex', marginBottom: '16px', gap: '8px' }}>
           <LinkButton>Enter Space</LinkButton>
-        </div>
+        </div> */}
       </ContentHeader>
 
       <ContentBody>
         <div>
-          <SubcriptionOrder>
-            <div className="subcription-header">
-              <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '8px' }}>
-                <div
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-                >
-                  <span
+          {purchased ? (
+            <SubcriptionOrder>
+              <div className="subcription-header">
+                <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '8px' }}>
+                  <div
                     style={{
-                      color: 'rgb(17, 17, 17)',
-                      fontWeight: '700',
-                      fontSize: '20px',
-                      lineHeight: '26px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
                     }}
                   >
-                    Premium
-                  </span>
-                  {/* <AutoRenew>AUTO RENEWS</AutoRenew> */}
+                    <span
+                      style={{
+                        color: 'rgb(17, 17, 17)',
+                        fontWeight: '700',
+                        fontSize: '20px',
+                        lineHeight: '26px',
+                      }}
+                    >
+                      Premium
+                    </span>
+                    {/* <AutoRenew>AUTO RENEWS</AutoRenew> */}
+                  </div>
                 </div>
+                <span className="description">Best for remote teams collaborating day-to-day</span>
               </div>
-              <span className="description">Best for remote teams collaborating day-to-day</span>
-            </div>
-            <div className="subcription-body">
+              <div className="subcription-body">
+                <DetailsBlock>
+                  <p>Your next bill is $99.99 due on June 3, 2024.</p>
+                </DetailsBlock>
+              </div>
+            </SubcriptionOrder>
+          ) : (
+            <SubcriptionOrder>
+              <div className="subcription-header">
+                <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '8px' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: 'rgb(17, 17, 17)',
+                        fontWeight: '700',
+                        fontSize: '20px',
+                        lineHeight: '26px',
+                      }}
+                    >
+                      Premium
+                    </span>
+                    {/* <AutoRenew>AUTO RENEWS</AutoRenew> */}
+                  </div>
+                </div>
+                <span className="description">Best for remote teams collaborating day-to-day</span>
+              </div>
+              <div className="subcription-body">
                 <PriceBlock>
-                    <div className='price-text'>$99.99 USD</div>
-                    <span className='desc'>/month /person</span>
+                  <div className="price-text">{isAnually ? '$102 USD' : '$10 USD'}</div>
+                  <span className="desc">{isAnually ? '/year' : '/month'}</span>
                 </PriceBlock>
                 <BillOptionsBlock>
-                    <div className='title'><span>Billed annually</span></div>
-                    <div className='discount-text'>-15%</div>
-                    {/* <AntSwitch /> */}
-                    <div className='desc'>Monthly</div>
+                  <div className="title" style={{ opacity: isAnually ? '1' : '0.6' }}>
+                    <span>Billed annually</span>
+                  </div>
+                  <div className="discount-text">-15%</div>
+                  {/* <AntSwitch defaultChecked inputProps={{ 'aria-label': 'ant design' }} /> */}
+                  <IOSSwitch
+                    checked={isAnually}
+                    onClick={() => setIsAnually(!isAnually)}
+                    sx={{ m: 1 }}
+                  />
+                  <div className="desc" style={{ opacity: !isAnually ? '1' : '0.6' }}>
+                    Monthly
+                  </div>
                 </BillOptionsBlock>
-            </div>
-          </SubcriptionOrder>
+                <DetailsBlock>
+                  <p>Details information ...</p>
+                  <p>Details information ...</p>
+                  <p>Details information ...</p>
+                  <p>Details information ...</p>
+                  <p>Details information ...</p>
+                  <p>Details information ...</p>
+                </DetailsBlock>
+                <ButtonSelect onClick={() => setPurchased(true)}>Purchase</ButtonSelect>
+              </div>
+            </SubcriptionOrder>
+          )}
         </div>
       </ContentBody>
     </>
