@@ -1,7 +1,11 @@
 import styled from 'styled-components'
 import { AntSwitch, IOSSwitch } from '../switches/CustomSwitches'
 import { ButtonProps } from '../../interfaces/Interfaces'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import ApiService from '../../apis/ApiService'
+import { BILLING_CYCLE, IPlan, ISubscription } from '../../interfaces/plan'
+import { AxiosError } from 'axios'
+import { toast } from 'react-toastify'
 
 const ContentHeader = styled.div`
   padding-top: 56px;
@@ -209,8 +213,72 @@ const ButtonSelect = styled.button`
 `
 
 export default function PlansAndBilling() {
-  const [purchased, setPurchased] = useState(false)
-  const [isAnually, setIsAnually] = useState(true)
+  const [plans, setPlans] = useState<IPlan[]>([])
+  const [subscriptions, setSubscriptions] = useState<ISubscription[]>([])
+  const fetchSubscription = async () => {
+    try {
+      const res = await ApiService.getInstance().get(`/subscriptions`)
+      setSubscriptions(res.result)
+    } catch (error) {}
+  }
+  const fetchListPlan = async () => {
+    try {
+      const res = await ApiService.getInstance().get(`/plans`)
+      setPlans(res.result)
+    } catch (error) {}
+  }
+  const fetchData = () => {
+    fetchSubscription().then(() => fetchListPlan())
+  }
+  const handleRetryCheckout = async (subscription: ISubscription) => {
+    try {
+      if (!subscription) return
+      const res = await ApiService.getInstance().post(`/payments/checkout_retry`, {
+        subscriptionId: subscription._id,
+      })
+      if (res.message === `Success`) {
+        const result = res.result
+        window.open(result.checkoutUrl)
+      }
+      fetchSubscription()
+    } catch (error) {
+      console.log(error)
+      if (error instanceof AxiosError) toast(error.response?.data.result.message)
+    }
+  }
+  const handleCancel = async (subscription: ISubscription) => {
+    try {
+      if (!subscription) return
+      await ApiService.getInstance().post(`/payments/cancel`, {
+        subscriptionId: subscription._id,
+      })
+      fetchSubscription()
+    } catch (error) {
+      console.log(error)
+      if (error instanceof AxiosError) toast(error.response?.data.result.message)
+    }
+  }
+  const handleCheckout = async (plan: IPlan) => {
+    try {
+      if (!plan) return
+      console.log({ plan })
+      const res = await ApiService.getInstance().post(`/payments/checkout`, {
+        planId: plan._id,
+        billingCycle: isAnnually ? BILLING_CYCLE.YEAR : BILLING_CYCLE.MONTH,
+      })
+      if (res.message === `Success`) {
+        const result = res.result
+        window.open(result.checkoutUrl)
+      }
+    } catch (error) {
+      console.log(error)
+      if (error instanceof AxiosError) toast(error.response?.data.result.message)
+    }
+  }
+  const [isAnnually, setIsAnnually] = useState(true)
+  useEffect(() => {
+    fetchData()
+  }, [])
   return (
     <>
       <ContentHeader>
@@ -221,8 +289,8 @@ export default function PlansAndBilling() {
       </ContentHeader>
 
       <ContentBody>
-        <div>
-          {purchased ? (
+        <div style={{ display: 'flex' }}>
+          {subscriptions.map((subscription) => (
             <SubcriptionOrder>
               <div className="subcription-header">
                 <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '8px' }}>
@@ -250,68 +318,105 @@ export default function PlansAndBilling() {
               </div>
               <div className="subcription-body">
                 <DetailsBlock>
-                  <p>Your next bill is $99.99 due on June 3, 2024.</p>
+                  <p>Status: {subscription.status}</p>
+                  <p>Payment status: {subscription.paymentStatus}</p>
+                  {subscription.status == 'active' ? (
+                    <p>
+                      Your next bill is ${subscription.total} due on{' '}
+                      {new Date(subscription.endDate).toDateString()}
+                    </p>
+                  ) : (
+                    <></>
+                  )}
                 </DetailsBlock>
-              </div>
-            </SubcriptionOrder>
-          ) : (
-            <SubcriptionOrder>
-              <div className="subcription-header">
-                <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '8px' }}>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                    }}
+                {subscription.status === `active` ? (
+                  <ButtonSelect
+                    style={{ color: 'yellow' }}
+                    onClick={() => handleCancel(subscription)}
                   >
-                    <span
-                      style={{
-                        color: 'rgb(17, 17, 17)',
-                        fontWeight: '700',
-                        fontSize: '20px',
-                        lineHeight: '26px',
-                      }}
-                    >
-                      Premium
-                    </span>
-                    {/* <AutoRenew>AUTO RENEWS</AutoRenew> */}
-                  </div>
-                </div>
-                <span className="description">Best for remote teams collaborating day-to-day</span>
-              </div>
-              <div className="subcription-body">
-                <PriceBlock>
-                  <div className="price-text">{isAnually ? '$102 USD' : '$10 USD'}</div>
-                  <span className="desc">{isAnually ? '/year' : '/month'}</span>
-                </PriceBlock>
-                <BillOptionsBlock>
-                  <div className="title" style={{ opacity: isAnually ? '1' : '0.6' }}>
-                    <span>Billed annually</span>
-                  </div>
-                  <div className="discount-text">-15%</div>
-                  {/* <AntSwitch defaultChecked inputProps={{ 'aria-label': 'ant design' }} /> */}
-                  <IOSSwitch
-                    checked={isAnually}
-                    onClick={() => setIsAnually(!isAnually)}
-                    sx={{ m: 1 }}
-                  />
-                  <div className="desc" style={{ opacity: !isAnually ? '1' : '0.6' }}>
-                    Monthly
-                  </div>
-                </BillOptionsBlock>
-                <DetailsBlock>
-                  <p>Details information ...</p>
-                  <p>Details information ...</p>
-                  <p>Details information ...</p>
-                  <p>Details information ...</p>
-                  <p>Details information ...</p>
-                  <p>Details information ...</p>
-                </DetailsBlock>
-                <ButtonSelect onClick={() => setPurchased(true)}>Purchase</ButtonSelect>
+                    Cancel
+                  </ButtonSelect>
+                ) : subscription.paymentStatus !== `paid` ? (
+                  <ButtonSelect
+                    style={{ color: 'yellow' }}
+                    onClick={() => handleRetryCheckout(subscription)}
+                  >
+                    Pay
+                  </ButtonSelect>
+                ) : (
+                  <></>
+                )}
               </div>
             </SubcriptionOrder>
-          )}
+          ))}
+          {subscriptions.length === 0 &&
+            plans
+              .filter((p) => !p.free)
+              .map((p, i) => (
+                <SubcriptionOrder key={i}>
+                  <div className="subcription-header">
+                    <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '8px' }}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                        }}
+                      >
+                        <span
+                          style={{
+                            color: 'rgb(17, 17, 17)',
+                            fontWeight: '700',
+                            fontSize: '20px',
+                            lineHeight: '26px',
+                          }}
+                        >
+                          {p.name}
+                        </span>
+                        {/* <AutoRenew>AUTO RENEWS</AutoRenew> */}
+                      </div>
+                    </div>
+                    <span className="description">
+                      Best for remote teams collaborating day-to-day
+                    </span>
+                  </div>
+                  <div className="subcription-body">
+                    <PriceBlock>
+                      <div className="price-text">
+                        {isAnnually ? `$${p.annuallyPrice} USD` : `$${p.monthlyPrice} USD`}
+                      </div>
+                      <span className="desc">{isAnnually ? '/year' : '/month'}</span>
+                    </PriceBlock>
+                    <BillOptionsBlock>
+                      <div className="title" style={{ opacity: isAnnually ? '1' : '0.6' }}>
+                        <span>Billed annually</span>
+                      </div>
+                      <div className="discount-text">
+                        {`-${(((p.monthlyPrice * 12) / p.annuallyPrice - 1) * 100).toFixed(0)}%`}
+                      </div>
+                      {/* <AntSwitch defaultChecked inputProps={{ 'aria-label': 'ant design' }} /> */}
+                      <IOSSwitch
+                        checked={isAnnually}
+                        onClick={() => setIsAnnually(!isAnnually)}
+                        sx={{ m: 1 }}
+                      />
+                      <div className="desc" style={{ opacity: !isAnnually ? '1' : '0.6' }}>
+                        Monthly
+                      </div>
+                    </BillOptionsBlock>
+                    <div>
+                      <p className="price-text">Max room: {p.maxRoom}</p>
+                      <p className="price-text">Max people in room: {p.maxRoomCapacity}</p>
+                    </div>
+                    <DetailsBlock>
+                      {p.features.map((f, i) => (
+                        <p key={i}>{f}</p>
+                      ))}
+                    </DetailsBlock>
+                    <ButtonSelect onClick={() => handleCheckout(p)}>Purchase</ButtonSelect>
+                  </div>
+                </SubcriptionOrder>
+              ))}
         </div>
       </ContentBody>
     </>
