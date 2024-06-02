@@ -213,11 +213,12 @@ const ButtonSelect = styled.button`
 `
 
 export default function PlansAndBilling() {
+  const [portalLink, setPortalLink] = useState('')
   const [plans, setPlans] = useState<IPlan[]>([])
   const [subscriptions, setSubscriptions] = useState<ISubscription[]>([])
   const fetchSubscription = async () => {
     try {
-      const res = await ApiService.getInstance().get(`/subscriptions`)
+      const res = await ApiService.getInstance().get(`/subscriptions?status=pending,active,expired`)
       setSubscriptions(res.result)
     } catch (error) {}
   }
@@ -228,7 +229,16 @@ export default function PlansAndBilling() {
     } catch (error) {}
   }
   const fetchData = () => {
-    fetchSubscription().then(() => fetchListPlan())
+    fetchSubscription().then(() => {
+      fetchListPlan()
+      fetchCustomerPortal()
+    })
+  }
+  const fetchCustomerPortal = async () => {
+    try {
+      const res = await ApiService.getInstance().get(`/payments/stripe_customer_portal`)
+      setPortalLink(res.result)
+    } catch (error) {}
   }
   const handleRetryCheckout = async (subscription: ISubscription) => {
     try {
@@ -321,10 +331,18 @@ export default function PlansAndBilling() {
                   <p>Status: {subscription.status}</p>
                   <p>Payment status: {subscription.paymentStatus}</p>
                   {subscription.status == 'active' ? (
-                    <p>
-                      Your next bill is ${subscription.total} due on{' '}
-                      {new Date(subscription.endDate).toDateString()}
-                    </p>
+                    <>
+                      <p>
+                        Your next bill is ${subscription.total} due on{' '}
+                        {new Date(subscription.endDate).toDateString()}
+                      </p>
+                      <p>
+                        Manage on{' '}
+                        <a href={portalLink} target="_blank">
+                          Stripe
+                        </a>
+                      </p>
+                    </>
                   ) : (
                     <></>
                   )}
