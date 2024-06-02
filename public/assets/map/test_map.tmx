@@ -13201,12 +13201,12 @@
   <object id="1263" gid="4687" x="512" y="544" width="64" height="64"/>
  </objectgroup>
  <objectgroup id="13" name="Basement">
-  <object id="1192" gid="5037" x="480" y="256" width="32" height="32"/>
-  <object id="1194" gid="5055" x="480" y="288" width="32" height="32"/>
-  <object id="1195" gid="5053" x="480" y="320" width="32" height="32"/>
-  <object id="1196" gid="5054" x="512" y="320" width="32" height="32"/>
-  <object id="1198" gid="5039" x="512" y="288" width="32" height="32"/>
-  <object id="1199" gid="5038" x="512" y="256" width="32" height="32"/>
+  <object id="1192" x="480" y="256" width="32" height="32"/>
+  <object id="1194" x="480" y="288" width="32" height="32"/>
+  <object id="1195" x="480" y="320" width="32" height="32"/>
+  <object id="1196" x="512" y="320" width="32" height="32"/>
+  <object id="1198" x="512" y="288" width="32" height="32"/>
+  <object id="1199" x="512" y="256" width="32" height="32"/>
   <object id="1214" gid="5061" x="480" y="256" width="32" height="32"/>
   <object id="1215" gid="5062" x="512" y="256" width="32" height="32"/>
   <object id="1216" gid="5077" x="480" y="288" width="32" height="32"/>
