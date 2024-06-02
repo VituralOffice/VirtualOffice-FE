@@ -10,12 +10,17 @@ import { FormPopup } from './FormPopup'
 import { toast } from 'react-toastify'
 import { AxiosError } from 'axios'
 import { UNKNOWN_ERROR } from '../../constant'
+import { IMap } from '../../interfaces/map'
+import ApiService from '../../apis/ApiService'
+import { ISubscription } from '../../interfaces/plan'
 
 export const CreateSpacePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
   const navigate = useNavigate()
   const totalSteps = 2
   const titles = ['Choose your office template', 'Create a new office space for your team']
-
+  const [maps, setMaps] = useState<IMap[]>([])
+  const [subscriptions, setSubscriptions] = useState<ISubscription[]>([])
+  console.log({ subscriptions })
   const [spaceName, setSpaceName] = useState('')
   const [securitySelectedOption, setSecuritySelectedOption] = useState(0)
   const spaceOptions = ['Anyone with the office URL can enter', 'Only invited members can enter']
@@ -29,11 +34,21 @@ export const CreateSpacePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
   const [mapId, setMapId] = useState(mapIds[0])
   const [mapSize, setMapSize] = useState(10)
 
-  // const [password, setPassword] = useState('');
-  // const [passwordShowing, setPasswordShowing] = useState(false);
-
   const [formComplete, setFormComplete] = useState(false)
-
+  const fetchSubscription = async () => {
+    try {
+      const res = await ApiService.getInstance().get(`/subscriptions?status=active`)
+      setSubscriptions(res.result)
+    } catch (error) {}
+  }
+  const fetchListMap = async () => {
+    try {
+      const res = await ApiService.getInstance().get(`/maps`)
+      if (res.message === `Success`) {
+        setMaps(res.result)
+      }
+    } catch (error) {}
+  }
   const checkSpaceName = () => {
     if (spaceName && spaceName.length > 0) return true
     return false
@@ -49,13 +64,12 @@ export const CreateSpacePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
   const submitForm = async () => {
     try {
       if (!checkSpaceName() || !checkSecurityOption() || !checkMapId() || !checkMapSize()) return
-
       const response = await CreateRoom({
         map: '6623f6a93981dda1700fc844',
         name: spaceName,
         private: securitySelectedOption == 1,
+        plan: '663277c9401c17854a17ec7a', //temp:
       })
-
       console.log('Room created: ', response)
       await Bootstrap.getInstance()?.network.createCustom({
         name: response.result.name,
@@ -85,7 +99,10 @@ export const CreateSpacePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
       spaceOptions={spaceOptions}
     />,
   ]
-
+  useEffect(() => {
+    fetchListMap()
+    fetchSubscription()
+  }, [])
   useEffect(() => {
     if (checkSpaceName() && checkSecurityOption()) setFormComplete(true)
     else setFormComplete(false)

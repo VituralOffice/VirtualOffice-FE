@@ -94,18 +94,18 @@ export const OfficeSpace = () => {
       // const chatResponse = await GetAllChats({ roomId })
       const response = await GetAllChatsWithMessage({ roomId })
 
-      console.log("load all chats:", response.result)
+      console.log('load all chats:', response.result)
 
       dispatch(setListChat(response.result.chats))
       dispatch(setMessageMaps(response.result.mapMessages))
     }
 
-    loadUserChat();
+    loadUserChat()
   }, [])
 
   return (
     <>
-      {joinPageShow && <JoinOfficePage handleJoinRoom={handleJoinRoom} />}
+      {joinPageShow && room && <JoinOfficePage handleJoinRoom={handleJoinRoom} room={room} />}
       {!joinPageShow && <OfficeToolbar></OfficeToolbar>}
       {meeting.meetingDialogOpen && <MeetingDialog />}
       <CreateMeetingPopup
