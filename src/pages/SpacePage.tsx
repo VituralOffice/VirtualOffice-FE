@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
-import { MutableRefObject, SetStateAction, useEffect, useRef, useState } from 'react'
+import { MutableRefObject, SetStateAction, useCallback, useEffect, useRef, useState } from 'react'
 import { ButtonProps } from '../interfaces/Interfaces'
 import Header from '../components/Header'
 import { useDispatch } from 'react-redux'
@@ -12,6 +12,8 @@ import { GetRoomsByUserId, InviteUserToRoom, JoinRoom } from '../apis/RoomApis'
 import { useAppSelector } from '../hook'
 import { isApiSuccess } from '../apis/util'
 import { SpaceItem } from '../components/SpaceItem'
+import { RoomQueryParam } from '../types/Rooms'
+import { debounce } from '../utils/helpers'
 
 const TopBar = styled.div`
   display: flex;
@@ -51,13 +53,24 @@ const CustomButton = styled.button<ButtonProps>`
   }
 `
 
-const GroupedButtons = () => {
+const GroupedButtons = ({ setParam }) => {
   const [activeButton, setActiveButton] = useState(1)
-
   const handleClick = (buttonNumber: number) => {
     setActiveButton(buttonNumber)
+    switch (buttonNumber) {
+      case 1:
+        setParam({ active: true })
+        break
+      case 2:
+        setParam({ owner: true, active: true })
+        break
+      case 3:
+        setParam({ active: false })
+        break
+      default:
+        break
+    }
   }
-
   return (
     <>
       <CustomButton isEnabled={activeButton === 1} onClick={() => handleClick(1)}>
@@ -65,6 +78,9 @@ const GroupedButtons = () => {
       </CustomButton>
       <CustomButton isEnabled={activeButton === 2} onClick={() => handleClick(2)}>
         <Text>Created Space</Text>
+      </CustomButton>
+      <CustomButton isEnabled={activeButton === 3} onClick={() => handleClick(3)}>
+        <Text>Inactive Space</Text>
       </CustomButton>
     </>
   )
@@ -160,7 +176,8 @@ const SpacesGrid = styled.div`
 export default function SpacePage() {
   const [activeSpaceItemId, setActiveSpaceItemId] = useState('')
   const [spaces, setSpaces] = useState<any[]>([])
-
+  const [param, setParam] = useState<RoomQueryParam>({})
+  const [keyword, setKeyword] = useState('')
   const handleOptionPopupShow = (itemId: SetStateAction<string>) => {
     if (activeSpaceItemId === itemId) {
       setActiveSpaceItemId('')
@@ -168,29 +185,46 @@ export default function SpacePage() {
     }
     setActiveSpaceItemId(itemId)
   }
-
-  useEffect(() => {
-    const GetRoomsData = async () => {
-      const response = await GetRoomsByUserId()
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target
+    if (keyword !== value) {
+      setKeyword(value)
+      handleSearch(value)
+    }
+  }
+  const handleSearch = useCallback(
+    debounce(async (searchQuery: string) => {
+      const response = await GetRoomsByUserId({ ...param, name: searchQuery })
       if (isApiSuccess(response)) {
         setSpaces([...response.result])
       }
+    }, 300),
+    []
+  )
+  const GetRoomsData = async () => {
+    const response = await GetRoomsByUserId(param)
+    if (isApiSuccess(response)) {
+      setSpaces([...response.result])
     }
+  }
+  useEffect(() => {
     GetRoomsData()
   }, [])
+  useEffect(() => {
+    GetRoomsData()
+  }, [param])
 
   return (
     <>
       <Header />
       <TopBar>
-        {/* <button onClick={() => JoinRoom({ roomId: joinRoomId, token: joinToken })}>join</button> */}
-        <GroupedButtons />
+        <GroupedButtons setParam={setParam} />
         <SearchBarContainer>
           <SearchBarInner>
             <SearchIcon>
               <SearchRoundedIcon />
             </SearchIcon>
-            <SearchInput />
+            <SearchInput onChange={handleChange} />
           </SearchBarInner>
         </SearchBarContainer>
       </TopBar>

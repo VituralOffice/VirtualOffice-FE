@@ -68,7 +68,7 @@ export const CreateSpacePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
         map: '6623f6a93981dda1700fc844',
         name: spaceName,
         private: securitySelectedOption == 1,
-        plan: '663277c9401c17854a17ec7a', //temp:
+        plan: '663277c9401c17854a17ec7a', //todo: 
       })
       console.log('Room created: ', response)
       await Bootstrap.getInstance()?.network.createCustom({

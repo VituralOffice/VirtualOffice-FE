@@ -61,9 +61,9 @@ class ApiService {
     return ApiService.instance
   }
 
-  async get(endpoint: string) {
+  async get(endpoint: string, params: any = {}) {
     try {
-      const response = await this.axiosInstance.get(endpoint)
+      const response = await this.axiosInstance.get(endpoint, { params })
       return response.data
     } catch (error) {
       throw error
