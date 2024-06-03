@@ -199,7 +199,7 @@ export default function SpacePage() {
         setSpaces([...response.result])
       }
     }, 300),
-    []
+    [param]
   )
   const GetRoomsData = async () => {
     const response = await GetRoomsByUserId(param)
