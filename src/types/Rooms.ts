@@ -14,6 +14,11 @@ export interface IRoomData {
   map: string
   members: IRoomMember[]
 }
+export interface RoomQueryParam {
+  active?: boolean
+  owner?: boolean
+  name?: string
+}
 export interface IRoomMember {
   online: boolean
   user: IUser

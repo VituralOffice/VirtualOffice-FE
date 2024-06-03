@@ -12,6 +12,7 @@ import EditUserCharacterPopup from '../components/popups/EditUserCharacterPopup'
 import UserDeviceSettings from '../components/officeJoin/UserDeviceSettings'
 import { setPlayerName as setPlayerNameInRedux } from '../stores/UserStore'
 import Game from '../scenes/Game'
+import { IRoomData } from '../types/Rooms'
 
 //#region
 const Background = styled.div`
@@ -67,7 +68,7 @@ const EmailButton = styled.div<ButtonProps>`
       transition: all 0.25s ease-in-out 0s;
       overflow: hidden;
       background-color: ${(props) =>
-    props.isEnabled ? 'rgba(255, 255, 255, 0.1)' : 'transparent'};
+        props.isEnabled ? 'rgba(255, 255, 255, 0.1)' : 'transparent'};
       &:hover {
         background-color: rgba(255, 255, 255, 0.1);
       }
@@ -305,7 +306,6 @@ function EmailMenu() {
 //     }
 // `
 
-
 // function PasswordRequirePanel() {
 
 //   return (
@@ -315,13 +315,19 @@ function EmailMenu() {
 //   )
 // }
 
-export function JoinOfficePage({ handleJoinRoom }) {
+export function JoinOfficePage({
+  handleJoinRoom,
+  room,
+}: {
+  room: IRoomData
+  handleJoinRoom: Function
+}) {
   const [isEditUserCharacterPopupShow, setEditUserCharacterPopupShow] = useState(false)
   const user = useAppSelector((state) => state.user)
   const [playerName, setPlayerName] = useState(user.username)
   // const [passwordRequired, setPasswordRequired] = useState(false);
   // const [password, setPassword] = useState('')
-  const [menuShow, setMenuShow] = useState(false);
+  const [menuShow, setMenuShow] = useState(false)
   const navigate = useNavigate()
 
   const handleJoin = async () => {
@@ -334,8 +340,7 @@ export function JoinOfficePage({ handleJoinRoom }) {
       Game.getInstance()?.myPlayer.setCharacterId(user.character_id)
       Game.getInstance()?.network.readyToConnect()
       setPlayerNameInRedux(playerName)
-    }
-    catch (e: any) {
+    } catch (e: any) {
       console.log(e)
       navigate('/')
     }
@@ -381,7 +386,7 @@ export function JoinOfficePage({ handleJoinRoom }) {
               </EmailButton>
             </TopContent>
             <WelcomeTitle>
-              Welcome to <span>test space</span>
+              Welcome to <span>{room.name}</span>
             </WelcomeTitle>
             <BodyContent>
               <div>
@@ -399,7 +404,7 @@ export function JoinOfficePage({ handleJoinRoom }) {
                         >
                           <div className="avatar-block">
                             <div className="shadow"></div>
-                            <img src={"/" + avatars[user.character_id].img} alt="" />
+                            <img src={'/' + avatars[user.character_id].img} alt="" />
                           </div>
                           <div className="edit-button">
                             <span>Edit</span>
@@ -429,11 +434,9 @@ export function JoinOfficePage({ handleJoinRoom }) {
         </Background>
       </div>
       {/* )} */}
-      {
-        isEditUserCharacterPopupShow && (
-          <EditUserCharacterPopup onClosePopup={() => setEditUserCharacterPopupShow(false)} />
-        )
-      }
+      {isEditUserCharacterPopupShow && (
+        <EditUserCharacterPopup onClosePopup={() => setEditUserCharacterPopupShow(false)} />
+      )}
     </>
   )
 }
