@@ -1,51 +1,52 @@
-import { CHAT_TYPE } from "../constants/constant"
+import { CHAT_TYPE } from '../constants/constant'
 
 export type CreateRoomParams = {
-    map: string,
-    name: string,
-    private: boolean
+  map: string
+  name: string
+  private: boolean
+  plan: string
 }
 
 export type GetRoomParams = {
-    _id: string,
+  _id: string
 }
 
 export type InviteUserParams = {
-    roomId: string,
-    email: string,
+  roomId: string
+  email: string
 }
 
 export type JoinRoomParams = {
-    roomId: string,
-    token: string,
+  roomId: string
+  token: string
 }
 
 export type CreateGroupChatParams = {
-    roomId: string,
-    name?:string,
-    type: CHAT_TYPE,
-    member: string[]
+  roomId: string
+  name?: string
+  type: CHAT_TYPE
+  member: string[]
 }
 
 export type GetAllChatParams = {
-    roomId: string,
+  roomId: string
 }
 
 export type GetOneChatParams = {
-    roomId: string,
-    chatId: string,
+  roomId: string
+  chatId: string
 }
 
 export type GetMsgByChatIdParams = {
-    roomId: string,
-    chatId: string,
+  roomId: string
+  chatId: string
 }
 
 export type GetAllMsgParams = {
-    roomId: string;
+  roomId: string
 }
 
 export type UploadChatImagesParams = {
-    roomId: string,
-    form: FormData,
+  roomId: string
+  form: FormData
 }
