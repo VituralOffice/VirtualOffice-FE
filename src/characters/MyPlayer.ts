@@ -13,6 +13,7 @@ import { ItemType } from '../types/Items'
 import { PlayerBehavior } from '../types/PlayerBehaviour'
 import Game from '../scenes/Game'
 import { Meeting } from '../web/meeting/Meeting'
+import Whiteboard from '../items/WhiteBoard'
 
 export default class MyPlayer extends Player {
   private playContainerBody: Phaser.Physics.Arcade.Body
@@ -130,6 +131,15 @@ export default class MyPlayer extends Player {
             this.chairOnSit = chairItem
             this.playerBehavior = PlayerBehavior.SITTING
             return
+          }
+        }
+
+        if (Phaser.Input.Keyboard.JustDown(keyR)) {
+          switch (item?.itemType) {
+            case ItemType.WHITEBOARD:
+              const whiteboard = item as Whiteboard
+              whiteboard.openDialog(network)
+              break
           }
         }
 

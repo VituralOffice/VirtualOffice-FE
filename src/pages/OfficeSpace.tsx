@@ -15,6 +15,7 @@ import { setShowCreateMeeting } from '../stores/UIStore'
 import { setRoomId } from '../stores/RoomStore'
 import { GetAllChats, GetAllChatsWithMessage } from '../apis/ChatApis'
 import { setListChat, setMessageMaps } from '../stores/ChatStore'
+import WhiteboardDialog from '../components/whiteboards/WhiteboardDialog'
 
 export const OfficeSpace = () => {
   let { roomId } = useParams()
@@ -25,6 +26,7 @@ export const OfficeSpace = () => {
   const [joinPageShow, setJoinPageShow] = useState(true)
   const [room, setRoom] = useState<IRoomData | null>()
   const roomStore = useAppSelector((state) => state.room)
+  const whiteboardDialogOpen = useAppSelector((state) => state.whiteboard.whiteboardDialogOpen)
   const meeting = useAppSelector((state) => state.meeting)
 
   const handleJoinRoom = async () => {
@@ -107,6 +109,7 @@ export const OfficeSpace = () => {
     <>
       {joinPageShow && <JoinOfficePage handleJoinRoom={handleJoinRoom} />}
       {!joinPageShow && <OfficeToolbar></OfficeToolbar>}
+      {whiteboardDialogOpen && <WhiteboardDialog />}
       {meeting.meetingDialogOpen && <MeetingDialog />}
       <CreateMeetingPopup
         onClosePopup={() => {
