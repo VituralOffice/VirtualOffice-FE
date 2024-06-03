@@ -37,9 +37,15 @@ export interface IChair extends Schema {
   connectedUser: string
 }
 
+export interface IWhiteboard extends Schema {
+  roomId: string
+  connectedUser: SetSchema<string>
+}
+
 export interface IOfficeState extends Schema {
   players: MapSchema<IPlayer>
   chairs: MapSchema<IChair>
   meetings: MapSchema<IMeeting>
+  whiteboards: MapSchema<IWhiteboard>
   // mapMessages: MapSchema<IChatMessage>
 }

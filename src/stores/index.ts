@@ -4,6 +4,7 @@ import userReducer from './UserStore'
 import meetingReducer from './MeetingStore'
 import chatReducer from './ChatStore'
 import roomReducer from './RoomStore'
+import whiteboardReducer from './WhiteboardStore'
 import uiReducer from './UIStore'
 
 enableMapSet()
@@ -12,6 +13,7 @@ const store = configureStore({
   reducer: {
     user: userReducer,
     meeting: meetingReducer,
+    whiteboard: whiteboardReducer,
     chat: chatReducer,
     room: roomReducer,
     ui: uiReducer
