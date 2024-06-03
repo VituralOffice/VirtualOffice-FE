@@ -54,17 +54,11 @@ export default class MyPlayer extends Player {
 
   setCharacterId(id: number) {
     this.characterId = id
-    phaserEvents.emit(
-      GameEvent.MY_PLAYER_CHARACTER_ID_CHANGE,
-      id
-    )
+    phaserEvents.emit(GameEvent.MY_PLAYER_CHARACTER_ID_CHANGE, id)
   }
 
   setPlayerIsInMeeting(isInMeeting: boolean) {
-    phaserEvents.emit(
-      GameEvent.MY_PLAYER_MEETING_STATUS_CHANGE,
-      isInMeeting
-    )
+    phaserEvents.emit(GameEvent.MY_PLAYER_MEETING_STATUS_CHANGE, isInMeeting)
   }
 
   isPlayerInMeeting() {
@@ -82,8 +76,8 @@ export default class MyPlayer extends Player {
 
     //force leave chair
     if (this.forceLeaveCurrentChair) {
-      this.leaveCurrentChair(playerSelector, cursors, network);
-      return;
+      this.leaveCurrentChair(playerSelector, cursors, network)
+      return
     }
 
     const item = playerSelector.selectedItem
@@ -204,12 +198,15 @@ export default class MyPlayer extends Player {
           break
         }
 
-        if (Phaser.Input.Keyboard.JustDown(keyR) && this.chairOnSit) {
+        if (
+          Phaser.Input.Keyboard.JustDown(keyR) &&
+          this.chairOnSit &&
+          this.chairOnSit.groupId !== '-1'
+        ) {
           const meeting = Game.getInstance()?.meetingMap.get(this.chairOnSit.groupId!) as Meeting
           if (meeting.isOpen) {
             meeting.openDialog(this.getPlayerId()!, network)
-          }
-          else {
+          } else {
             meeting.createMeeting(this.getPlayerId()!, network)
           }
           break
@@ -231,11 +228,11 @@ export default class MyPlayer extends Player {
   }
 
   setLeaveCurrentChair(leave: boolean) {
-    this.forceLeaveCurrentChair = leave;
+    this.forceLeaveCurrentChair = leave
   }
 
   leaveCurrentChair(playerSelector: PlayerSelector, cursors: NavKeys, network: Network) {
-    if (!this.chairOnSit) return;
+    if (!this.chairOnSit) return
     if (this.playerBehavior === PlayerBehavior.SITTING) {
       // back to idle if player press E while sitting
       const parts = this.anims.currentAnim!.key.split('_')
@@ -248,7 +245,7 @@ export default class MyPlayer extends Player {
       playerSelector.update(this, cursors)
       network.updatePlayer(this.x, this.y, this.anims.currentAnim!.key)
     }
-    this.forceLeaveCurrentChair = false;
+    this.forceLeaveCurrentChair = false
   }
 
   // disconnectPlayer(network: Network) {

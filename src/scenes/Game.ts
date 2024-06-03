@@ -18,6 +18,7 @@ import { PlayerBehavior } from '../types/PlayerBehaviour'
 import { IPlayer } from '../types/ISpaceState'
 import { ItemType } from '../types/Items'
 import { Meeting } from '../web/meeting/Meeting'
+import Whiteboard from '../items/WhiteBoard'
 
 export default class Game extends Phaser.Scene {
   private static instance: Game | null = null // Biến static instance
@@ -34,6 +35,7 @@ export default class Game extends Phaser.Scene {
   meetingMap = new Map<string, Meeting>()
   chairMap = new Map<string, Chair>()
   chairGroups = new Map<string, Array<Chair>>()
+  whiteboardMap = new Map<string, Whiteboard>()
 
   constructor() {
     super('game')
@@ -96,57 +98,51 @@ export default class Game extends Phaser.Scene {
     // import chair objects from Tiled map to Phaser
     const chairs = this.physics.add.staticGroup({ classType: Chair })
     const chairLayer = this.map.getObjectLayer('Chair')
-    // chairLayer!.objects.forEach((chairObj) => {
-    //   const item = this.addObjectFromTiled(chairs, chairObj, 'chairs', 'chair') as Chair
-    //   // custom properties[0] is the object direction specified in Tiled
-    //   item.itemDirection = chairObj.properties[0].value
-    // })
-
     chairLayer!.objects.forEach((chairObj, index) => {
-      const item = this.addObjectFromTiled(chairs, chairObj, 'chairs', 'chair') as Chair;
-      const chairGroupID = chairObj.properties[0].value;
-      item.groupId = chairGroupID;
-      item.itemDirection = chairObj.properties[1].value
-      item.chairId = index.toString();
-
-      this.chairMap.set(String(index), item);
-
-      if (!this.chairGroups.has(chairGroupID)) {
-        this.chairGroups.set(chairGroupID, []);
+      const item = this.addObjectFromTiled(chairs, chairObj, 'chairs', 'chair') as Chair
+      item.itemDirection = chairObj.properties[0].value
+      item.chairId = index.toString()
+      if (chairObj.properties[1]) {
+        const chairGroupID = chairObj.properties[1].value
+        item.groupId = chairGroupID
+        if (!this.chairGroups.has(chairGroupID)) {
+          this.chairGroups.set(chairGroupID, [])
+        }
+        this.chairGroups.get(chairGroupID)!.push(item)
       }
-      this.chairGroups.get(chairGroupID)!.push(item);
-    });
+
+      this.chairMap.set(String(index), item)
+    })
+
+    // import whiteboards objects from Tiled map to Phaser
+    const whiteboards = this.physics.add.staticGroup({ classType: Whiteboard })
+    const whiteboardLayer = this.map.getObjectLayer('Whiteboard')
+    whiteboardLayer!.objects.forEach((obj, i) => {
+      const item = this.addObjectFromTiled(
+        whiteboards,
+        obj,
+        'whiteboards',
+        'whiteboard'
+      ) as Whiteboard
+      const id = `${i}`
+      item.id = id
+      this.whiteboardMap.set(id, item)
+    })
 
     // init meeting manager
     for (let i = 0; i < 5; i++) {
       this.meetingMap.set(String(i), new Meeting(String(i)))
     }
 
-    // // import meetings objects from Tiled map to Phaser
-    // const meetings = this.physics.add.staticGroup({ classType: Meeting })
-    // const meetingLayer = this.map.getObjectLayer('Meeting')
-    // meetingLayer!.objects.forEach((obj, i) => {
-    //   const item = this.addObjectFromTiled(meetings, obj, 'tiles_wall', 'FloorAndGround') as Meeting
-    //   // Manually set width and height based on Tiled object properties
-    //   item.setDisplaySize(obj.width!, obj.height!)
-    //   item!.body!.setSize(obj.width, obj.height)
-    //   item!.body!.setOffset(-obj.width! * 0.5, -obj.height! * 0.27)
-
-    //   console.log(`Object ID: ${obj.id}, Width: ${obj.width}, Height: ${obj.height}`)
-    //   console.log(`Phaser Item Width: ${item.width}, Height: ${item.height}`)
-    //   // item.setDepth(item.y + item.height * 0.27)
-    //   const id = `${i}`
-    //   item.id = id
-    //   this.meetingMap.set(id, item)
-    // })
-
     // import other objects from Tiled map to Phaser
     this.addGroupFromTiled('Wall', 'tiles_wall', 'FloorAndGround', false)
-    this.addGroupFromTiled('Objects', 'office', 'Modern_Office_Black_Shadow', false)
     this.addGroupFromTiled('ObjectsOnCollide', 'office', 'Modern_Office_Black_Shadow', true)
-    this.addGroupFromTiled('GenericObjects', 'generic', 'Generic', false)
+    this.addGroupFromTiled('Objects', 'office', 'Modern_Office_Black_Shadow', false)
     this.addGroupFromTiled('GenericObjectsOnCollide', 'generic', 'Generic', true)
-    this.addGroupFromTiled('Basement', 'basement', 'Basement', true)
+    this.addGroupFromTiled('GenericObjects', 'generic', 'Generic', false)
+    this.addGroupFromTiled('BasementOnCollide', 'basement', 'Basement', true)
+    this.addGroupFromTiled('Basement', 'basement', 'Basement', false)
+    this.addGroupFromTiled('VendingMachine', 'vendingmachines', 'vendingmachine', true)
 
     this.otherPlayers = this.physics.add.group({ classType: OtherPlayer })
 
@@ -158,7 +154,7 @@ export default class Game extends Phaser.Scene {
     this.physics.add.overlap(
       this.playerSelector,
       // [chairs, meetings],
-      [chairs],
+      [chairs, whiteboards],
       this.handleItemSelectorOverlap,
       undefined,
       this
@@ -287,6 +283,9 @@ export default class Game extends Phaser.Scene {
     if (itemType === ItemType.MEETING) {
       const meeting = this.meetingMap.get(itemId)
       meeting?.addCurrentUser(playerId)
+    } else if (itemType === ItemType.WHITEBOARD) {
+      const whiteboard = this.whiteboardMap.get(itemId)
+      whiteboard?.addCurrentUser(playerId)
     }
   }
 
@@ -322,6 +321,9 @@ export default class Game extends Phaser.Scene {
     if (itemType === ItemType.MEETING) {
       const meeting = this.meetingMap.get(itemId)
       meeting?.removeCurrentUser(playerId)
+    } else if (itemType === ItemType.WHITEBOARD) {
+      const whiteboard = this.whiteboardMap.get(itemId)
+      whiteboard?.removeCurrentUser(playerId)
     }
   }
 
@@ -332,18 +334,15 @@ export default class Game extends Phaser.Scene {
 
   async handleSitOnChair(chair: Chair) {
     // const chairGroupID = chair.groupId!;
-
     // if (!this.meetingMap.has(chairGroupID)) {
     //   // No meeting exists for this group, create one
     //   const meeting = await createMeeting(chairGroupID);
     //   this.meetingMap.set(chairGroupID, meeting);
-
     //   // Update all chairs in the group with the new meeting ID
     //   const chairGroup = this.chairGroups.get(chairGroupID)!;
     //   chairGroup.forEach(chair => {
     //     chair.meetingID = meeting._id;
     //   });
-
     //   console.log(`Created new meeting with ID: ${meeting.id} for chair group: ${chairGroupID}`);
     // } else {
     //   // Meeting already exists, join the meeting
