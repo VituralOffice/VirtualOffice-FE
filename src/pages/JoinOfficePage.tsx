@@ -67,7 +67,7 @@ const EmailButton = styled.div<ButtonProps>`
       transition: all 0.25s ease-in-out 0s;
       overflow: hidden;
       background-color: ${(props) =>
-    props.isEnabled ? 'rgba(255, 255, 255, 0.1)' : 'transparent'};
+        props.isEnabled ? 'rgba(255, 255, 255, 0.1)' : 'transparent'};
       &:hover {
         background-color: rgba(255, 255, 255, 0.1);
       }
@@ -305,7 +305,6 @@ function EmailMenu() {
 //     }
 // `
 
-
 // function PasswordRequirePanel() {
 
 //   return (
@@ -321,23 +320,32 @@ export function JoinOfficePage({ handleJoinRoom }) {
   const [playerName, setPlayerName] = useState(user.username)
   // const [passwordRequired, setPasswordRequired] = useState(false);
   // const [password, setPassword] = useState('')
-  const [menuShow, setMenuShow] = useState(false);
+  const [menuShow, setMenuShow] = useState(false)
   const navigate = useNavigate()
 
+  let lastJoinTime = 0
+
   const handleJoin = async () => {
-    try {
-      console.log('Join! Name:', playerName, 'Avatar:', avatars[user.character_id].name)
-      await handleJoinRoom()
-      Game.getInstance()?.registerKeys()
-      Game.getInstance()?.myPlayer.setPlayerName(playerName)
-      Game.getInstance()?.myPlayer.setPlayerTexture(avatars[user.character_id].name)
-      Game.getInstance()?.myPlayer.setCharacterId(user.character_id)
-      Game.getInstance()?.network.readyToConnect()
-      setPlayerNameInRedux(playerName)
-    }
-    catch (e: any) {
-      console.log(e)
-      navigate('/')
+    const now = Date.now()
+    const timeSinceLastJoin = now - lastJoinTime
+
+    if (timeSinceLastJoin >= 1000) {
+      try {
+        console.log('Join! Name:', playerName, 'Avatar:', avatars[user.character_id].name)
+        await handleJoinRoom()
+        Game.getInstance()?.registerKeys()
+        Game.getInstance()?.myPlayer.setPlayerName(playerName)
+        Game.getInstance()?.myPlayer.setPlayerTexture(avatars[user.character_id].name)
+        Game.getInstance()?.myPlayer.setCharacterId(user.character_id)
+        Game.getInstance()?.network.readyToConnect()
+        setPlayerNameInRedux(playerName)
+        lastJoinTime = now
+      } catch (e: any) {
+        console.log(e)
+        navigate('/')
+      }
+    } else {
+      console.log('Join request ignored (rate limited)') // Inform user about throttling
     }
   }
 
@@ -399,7 +407,7 @@ export function JoinOfficePage({ handleJoinRoom }) {
                         >
                           <div className="avatar-block">
                             <div className="shadow"></div>
-                            <img src={"/" + avatars[user.character_id].img} alt="" />
+                            <img src={'/' + avatars[user.character_id].img} alt="" />
                           </div>
                           <div className="edit-button">
                             <span>Edit</span>
@@ -429,11 +437,9 @@ export function JoinOfficePage({ handleJoinRoom }) {
         </Background>
       </div>
       {/* )} */}
-      {
-        isEditUserCharacterPopupShow && (
-          <EditUserCharacterPopup onClosePopup={() => setEditUserCharacterPopupShow(false)} />
-        )
-      }
+      {isEditUserCharacterPopupShow && (
+        <EditUserCharacterPopup onClosePopup={() => setEditUserCharacterPopupShow(false)} />
+      )}
     </>
   )
 }
