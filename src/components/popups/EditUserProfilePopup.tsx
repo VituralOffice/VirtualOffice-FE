@@ -6,6 +6,8 @@ import { avatars } from '../../utils/util'
 import { useDispatch } from 'react-redux'
 import { setUsername } from '../../stores/UserStore'
 import { useState } from 'react'
+import ApiService from '../../apis/ApiService'
+import { toast } from 'react-toastify'
 
 const Layout = styled.div`
   width: 100%;
@@ -225,13 +227,18 @@ const ButtonFinish = styled.div`
 `
 
 const EditUserProfilePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
-  const user = useAppSelector((state) => state.user);
-  const [username, setUserName] = useState(user.username);
-  const dispatch = useDispatch();
+  const user = useAppSelector((state) => state.user)
+  const [username, setUserName] = useState(user.username)
+  const dispatch = useDispatch()
 
-  const handleFinish = () => {
-    dispatch(setUsername(username))
-    onClosePopup();
+  const handleFinish = async () => {
+    try {
+      await ApiService.getInstance().patch('/users/profile', { fullname: username })
+      dispatch(setUsername(username))
+      onClosePopup()
+    } catch (error) {
+      toast(`Update error`)
+    }
   }
 
   return (
@@ -244,7 +251,7 @@ const EditUserProfilePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
         </IconCloseContainer>
         <PopupContent>
           <UpperContentContainer>
-            <img src={"/" + avatars[user.character_id].img} />
+            <img src={user.character?.avatar} />
             <UserShadow />
           </UpperContentContainer>
           <UsernameTopDisplay>
@@ -296,7 +303,13 @@ const EditUserProfilePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
             >
               <UserInputBar>
                 <div>
-                  <input type="text" maxLength={50} placeholder="Enter your name" onChange={(event) => setUserName(event.target.value)} value={username}></input>
+                  <input
+                    type="text"
+                    maxLength={50}
+                    placeholder="Enter your name"
+                    onChange={(event) => setUserName(event.target.value)}
+                    value={username}
+                  ></input>
                 </div>
               </UserInputBar>
             </div>

@@ -15,7 +15,7 @@ export default function TestSpace() {
   const JoinOffice = (playerName: string) => {
     Game.getInstance()?.registerKeys()
     Game.getInstance()?.myPlayer.setPlayerName(playerName)
-    Game.getInstance()?.myPlayer.setPlayerTexture(avatars[user.character_id].name)
+    //Game.getInstance()?.myPlayer.setPlayerTexture(user.character?.avatar)
     Game.getInstance()?.network.readyToConnect()
     setPreJoinPageShow(false)
   }
@@ -23,14 +23,14 @@ export default function TestSpace() {
   useEffect(() => {
     if (!lobbyJoined || !user.loggedIn) {
       navigate('/app')
-    return
+      return
     }
     const boostIntoGame = () => {
       Bootstrap.getInstance()?.launchGame()
     }
     // todo: create/get room to get roomId
-    Bootstrap.getInstance()?.network
-      .createCustom({
+    Bootstrap.getInstance()
+      ?.network.createCustom({
         name: 'Sky office',
         id: `662612dd90ff2c6a324dc39a`,
         map: `6623f6a93981dda1700fc844`,

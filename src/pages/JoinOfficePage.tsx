@@ -338,15 +338,14 @@ export function JoinOfficePage({
 
     if (timeSinceLastJoin >= 1000) {
       try {
-        console.log('Join! Name:', playerName, 'Avatar:', avatars[user.character_id].name)
+        console.log('Join! Name:', playerName, 'Avatar:', user.character?.name)
         await handleJoinRoom()
         Game.getInstance()?.registerKeys()
         Game.getInstance()?.myPlayer.setPlayerName(playerName)
-        Game.getInstance()?.myPlayer.setPlayerTexture(avatars[user.character_id].name)
-        Game.getInstance()?.myPlayer.setCharacterId(user.character_id)
+        Game.getInstance()?.myPlayer.setPlayerTexture(user.character?.name as string)
+        Game.getInstance()?.myPlayer.setCharacter(user.character?._id as string)
         Game.getInstance()?.network.readyToConnect()
         setPlayerNameInRedux(playerName)
-        lastJoinTime = now
       } catch (e: any) {
         console.log(e)
         navigate('/')
@@ -414,7 +413,7 @@ export function JoinOfficePage({
                         >
                           <div className="avatar-block">
                             <div className="shadow"></div>
-                            <img src={'/' + avatars[user.character_id].img} alt="" />
+                            <img src={user.character?.avatar} alt="" />
                           </div>
                           <div className="edit-button">
                             <span>Edit</span>

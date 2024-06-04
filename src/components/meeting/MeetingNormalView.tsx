@@ -102,7 +102,7 @@ const AvatarImg = styled.img`
 
 interface VideoProps {
   playerName: string
-  avatarLink: string
+  avatarLink?: string
   stream: MediaStream
   onClick?: () => void
   canZoomIn: boolean
@@ -122,7 +122,15 @@ function VideoContainer({
       {stream.getVideoTracks()[0] ? (
         <Video srcObject={stream} autoPlay></Video>
       ) : (
-        <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
           <AvatarContainer>
             <AvatarBackground>
               <AvatarImg src={'/' + avatarLink} />
@@ -156,7 +164,7 @@ export const MeetingNormalView = () => {
         <VideoContainer
           stream={myStream}
           playerName="You"
-          avatarLink={getAvatarById(user.character_id).img}
+          avatarLink={user.character?.avatar}
           onClick={() => handleVideoContainerClick(0)}
           canInteract={totalDisplays > 1}
           canZoomIn={false}
@@ -169,9 +177,7 @@ export const MeetingNormalView = () => {
           <VideoContainer
             key={id}
             playerName={playerName!}
-            avatarLink={
-              getAvatarById(playerAvatarMap.get(id)!).img
-            }
+            avatarLink={user.character?.avatar}
             stream={stream}
             onClick={() => handleVideoContainerClick(index + 1)}
             canInteract={totalDisplays > 1}
@@ -206,9 +212,7 @@ export const MeetingNormalView = () => {
             <VideoContainer
               key={id}
               playerName={playerName!}
-              avatarLink={
-                getAvatarById(playerAvatarMap.get(id)!).img
-              }
+              avatarLink={user.character?.avatar}
               stream={stream}
               canInteract={totalDisplays > 1}
               canZoomIn={true}
@@ -228,7 +232,5 @@ export const MeetingNormalView = () => {
     setTotalDisplays(total)
   }, [myStream, peerStreams])
 
-  return (
-    <>{activeScreenIndex === -1 ? renderAllVideos() : renderSingleVideo()}</>
-  )
+  return <>{activeScreenIndex === -1 ? renderAllVideos() : renderSingleVideo()}</>
 }
