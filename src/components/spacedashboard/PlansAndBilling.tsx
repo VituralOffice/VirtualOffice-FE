@@ -218,7 +218,9 @@ export default function PlansAndBilling() {
   const [subscriptions, setSubscriptions] = useState<ISubscription[]>([])
   const fetchSubscription = async () => {
     try {
-      const res = await ApiService.getInstance().get(`/subscriptions?status=pending,active,expired`)
+      const res = await ApiService.getInstance().get(
+        `/subscriptions?status=pending,active,expired&freePlan=false`
+      )
       setSubscriptions(res.result)
     } catch (error) {}
   }
@@ -301,7 +303,7 @@ export default function PlansAndBilling() {
       <ContentBody>
         <div style={{ display: 'flex' }}>
           {subscriptions.map((subscription) => (
-            <SubcriptionOrder>
+            <SubcriptionOrder key={subscription._id}>
               <div className="subcription-header">
                 <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '8px' }}>
                   <div
@@ -319,7 +321,7 @@ export default function PlansAndBilling() {
                         lineHeight: '26px',
                       }}
                     >
-                      Premium
+                      {subscription.plan.name}
                     </span>
                     {/* <AutoRenew>AUTO RENEWS</AutoRenew> */}
                   </div>

@@ -4,11 +4,12 @@ import { PopupProps } from '../../interfaces/Interfaces'
 import Slider from 'react-slick'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
-import { avatars } from '../../utils/util'
 import { useAppSelector } from '../../hook'
-import { useState } from 'react'
-import { setCharacterId } from '../../stores/UserStore'
+import { useEffect, useState } from 'react'
+import { setCharacter as setUserCharacter } from '../../stores/UserStore'
 import { useDispatch } from 'react-redux'
+import ApiService from '../../apis/ApiService'
+import { ICharacter } from '../../interfaces/character'
 
 const Layout = styled.div`
   width: 100%;
@@ -201,17 +202,19 @@ const StyledSlider = styled(Slider)`
     right: 0;
     z-index: 1;
   }
-  .slick-prev:before, .slick-next:before {
+  .slick-prev:before,
+  .slick-next:before {
     font-size: 40px;
   }
-`;
+`
 
 const SelectSkinContainer = styled.div``
 
 const EditUserCharacterPopup: React.FC<PopupProps> = ({ onClosePopup }) => {
-  const user = useAppSelector((state) => state.user);
-  const [avatarIdx, setAvatarIdx] = useState(user.character_id);
-  const dispatch = useDispatch();
+  const user = useAppSelector((state) => state.user)
+  const [characters, setCharacters] = useState<ICharacter[]>([])
+  const [character, setCharacter] = useState<ICharacter>()
+  const dispatch = useDispatch()
 
   const settings = {
     dots: false,
@@ -221,17 +224,34 @@ const EditUserCharacterPopup: React.FC<PopupProps> = ({ onClosePopup }) => {
     slidesToScroll: 1,
     arrows: true,
     // fade: true,
-    initialSlide: avatarIdx,
+    initialSlide: 0,
     afterChange: (currentIdx: number) => {
-      setAvatarIdx(currentIdx);
+      if (characters.length === 0) return
+      setCharacter(characters[currentIdx])
     },
   }
-
-  const handleFinish = () => {
-    dispatch(setCharacterId(avatarIdx));
-    onClosePopup();
+  const fetchCharacter = async () => {
+    try {
+      const res = await ApiService.getInstance().get('/characters')
+      if (res.message === `Success`) {
+        setCharacters(res.result)
+        setCharacter(res.result[0])
+      }
+    } catch (error) {}
   }
-
+  const handleFinish = async () => {
+    try {
+      await ApiService.getInstance().patch(`/users/profile`, { character: character?._id })
+      setCharacter(character)
+      dispatch(setUserCharacter(character))
+      onClosePopup()
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  useEffect(() => {
+    fetchCharacter()
+  }, [])
   return (
     <Layout>
       <PopupContainer>
@@ -242,7 +262,7 @@ const EditUserCharacterPopup: React.FC<PopupProps> = ({ onClosePopup }) => {
         </IconCloseContainer>
         <PopupContent>
           <UpperContentContainer>
-            <img src={"/" + avatars[avatarIdx].img} />
+            <img src={character?.avatar} />
             <UserShadow />
           </UpperContentContainer>
           <UsernameTopDisplay>
@@ -251,9 +271,19 @@ const EditUserCharacterPopup: React.FC<PopupProps> = ({ onClosePopup }) => {
           <LowerContentContainer>
             <SelectSkinContainer>
               <StyledSlider {...settings} style={{ maxWidth: '100%' }}>
-                {avatars.map((avatar, index) => (
+                {characters.map((character, index) => (
                   <div key={index}>
-                    <img src={"/" + avatar.img} alt={`Skin ${index}`} style={{ margin: '0 auto', imageRendering: 'pixelated', width: '96px', height: '144px', objectFit: 'cover' }} />
+                    <img
+                      src={character.avatar}
+                      alt={`Skin ${index}`}
+                      style={{
+                        margin: '0 auto',
+                        imageRendering: 'pixelated',
+                        width: '96px',
+                        height: '144px',
+                        objectFit: 'cover',
+                      }}
+                    />
                   </div>
                 ))}
               </StyledSlider>

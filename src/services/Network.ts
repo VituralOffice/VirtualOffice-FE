@@ -19,11 +19,7 @@ import { IChair, IMeeting, IOfficeState, IPlayer, IWhiteboard } from '../types/I
 import WebRTC from '../web/WebRTC'
 import { GameEvent, phaserEvents } from '../events/EventCenter'
 import { IRoomData, RoomType, IMessagePayload } from '../types/Rooms'
-import {
-  addChatAndSetActive,
-  loadMapChatMessage,
-  pushChatMessage,
-} from '../stores/ChatStore'
+import { addChatAndSetActive, loadMapChatMessage, pushChatMessage } from '../stores/ChatStore'
 import { ItemType } from '../types/Items'
 import { Message } from '../types/Messages'
 import { ACCESS_TOKEN_KEY } from '../utils/util'
@@ -388,7 +384,7 @@ export default class Network {
     this.room?.send(Message.UPDATE_PLAYER_NAME, { name: currentName })
   }
 
-  updatePlayerCharacterId(id: number) {
+  updatePlayerCharacterId(id: string) {
     this.room?.send(Message.UPDATE_PLAYER_CHARACTER_ID, { id })
   }
 

@@ -1,5 +1,5 @@
 export interface ICharacter {
-  id: string
+  _id: string
   name: string
   avatar: string
 }

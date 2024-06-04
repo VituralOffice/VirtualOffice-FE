@@ -43,7 +43,7 @@ export default class MyPlayer extends Player {
   }
 
   setPlayerTexture(texture: string) {
-    this.playerTexture = texture
+    this.playerTexture = texture.toLowerCase()
     this.anims.play(`${this.playerTexture}_idle_down`, true)
     phaserEvents.emit(
       GameEvent.MY_PLAYER_TEXTURE_CHANGE,
@@ -53,7 +53,7 @@ export default class MyPlayer extends Player {
     )
   }
 
-  setCharacterId(id: number) {
+  setCharacter(id: string) {
     this.characterId = id
     phaserEvents.emit(GameEvent.MY_PLAYER_CHARACTER_ID_CHANGE, id)
   }

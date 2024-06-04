@@ -252,7 +252,7 @@ export default function Header() {
             <ButtonItem isEnabled={isUserMenuShow} onClick={() => setUserMenuShow(!isUserMenuShow)}>
               <AvatarContainer>
                 <AvatarBackground>
-                  <AvatarImg src={"/" + getAvatarById(user.character_id).img} />
+                  <AvatarImg src={user.character?.avatar} />
                 </AvatarBackground>
               </AvatarContainer>
               <Text>{user.username}</Text>
