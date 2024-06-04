@@ -26,7 +26,11 @@ export default class Chair extends Item {
     this.clearDialogBox()
     if (Game.getInstance()?.meetingMap.get(this.groupId!)?.isOpen) {
       this.setDialogBox('Press E to leave\nPress R to join meeting')
-    } else this.setDialogBox('Press E to leave\nPress R to hold a meeting')
+    } else if(this.groupId !== '-1') {
+      this.setDialogBox('Press E to leave\nPress R to hold a meeting')
+    } else {
+      this.setDialogBox('Press E to leave')
+    }
     network.connectToChair(this.chairId!)
   }
 

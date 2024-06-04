@@ -330,19 +330,28 @@ export function JoinOfficePage({
   const [menuShow, setMenuShow] = useState(false)
   const navigate = useNavigate()
 
+  let lastJoinTime = 0
+
   const handleJoin = async () => {
-    try {
-      console.log('Join! Name:', playerName, 'Avatar:', user.character?.name)
-      await handleJoinRoom()
-      Game.getInstance()?.registerKeys()
-      Game.getInstance()?.myPlayer.setPlayerName(playerName)
-      Game.getInstance()?.myPlayer.setPlayerTexture(user.character?.name as string)
-      Game.getInstance()?.myPlayer.setCharacter(user.character?._id as string)
-      Game.getInstance()?.network.readyToConnect()
-      setPlayerNameInRedux(playerName)
-    } catch (e: any) {
-      console.log(e)
-      navigate('/')
+    const now = Date.now()
+    const timeSinceLastJoin = now - lastJoinTime
+
+    if (timeSinceLastJoin >= 1000) {
+      try {
+        console.log('Join! Name:', playerName, 'Avatar:', user.character?.name)
+        await handleJoinRoom()
+        Game.getInstance()?.registerKeys()
+        Game.getInstance()?.myPlayer.setPlayerName(playerName)
+        Game.getInstance()?.myPlayer.setPlayerTexture(user.character?.name as string)
+        Game.getInstance()?.myPlayer.setCharacter(user.character?._id as string)
+        Game.getInstance()?.network.readyToConnect()
+        setPlayerNameInRedux(playerName)
+      } catch (e: any) {
+        console.log(e)
+        navigate('/')
+      }
+    } else {
+      console.log('Join request ignored (rate limited)') // Inform user about throttling
     }
   }
 
