@@ -48,7 +48,6 @@ function App() {
             <>
               <Route path="/user/settings" element={<UserSettingPage />} />
               <Route path="/dashboard" element={<SpaceDashboardPage />} />
-              <Route path="/test-space" element={<TestSpace />} />
               <Route path="/room/:roomId" element={<OfficeSpace />} />
               <Route path="/rooms/:roomId/join" element={<JoinRoomByLink />} />
             </>
