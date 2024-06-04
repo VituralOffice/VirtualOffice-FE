@@ -15,7 +15,7 @@ import {
   removeAvailableRooms,
   updateMember,
 } from '../stores/RoomStore'
-import { IChair, IMeeting, IOfficeState, IPlayer } from '../types/ISpaceState'
+import { IChair, IMeeting, IOfficeState, IPlayer, IWhiteboard } from '../types/ISpaceState'
 import WebRTC from '../web/WebRTC'
 import { GameEvent, phaserEvents } from '../events/EventCenter'
 import { IRoomData, RoomType, IMessagePayload } from '../types/Rooms'
@@ -28,6 +28,7 @@ import Cookies from 'js-cookie'
 import { disconnectMeeting } from '../stores/MeetingStore'
 import { GetMsgByChatId, GetOneChat } from '../apis/ChatApis'
 import { isApiSuccess } from '../apis/util'
+import { setWhiteboardUrls } from '../stores/WhiteboardStore'
 
 export default class Network {
   private static instance: Network | null = null // Biến static instance
@@ -133,7 +134,7 @@ export default class Network {
 
     console.log('Initilize Network')
 
-    this.lobby.leave()
+    this.lobby?.leave()
     this.mySessionId = this.room.sessionId
     store.dispatch(setSessionId(this.room.sessionId))
     this.webRTC = new WebRTC(this.mySessionId, this)
@@ -211,17 +212,22 @@ export default class Network {
       }
     }
 
-    // this.room.state.mapMessages.onChange = (item, key: string) => {
-    //   // console.log(`mapMessages change`, item, key)
-    // }
-    // // new instance added to the chatMessages ArraySchema
-    // this.room.state.mapMessages.onAdd = (item, key: string) => {
-    //   // console.log(`mapMessages onAdd`, item, key)
-    //   // item.onChange = (changes) => {
-    //   //   changes.forEach((change) => console.log({ change }))
-    //   // }
-    //   // store.dispatch(pushChatMessage({ chatId: key, message: item }))
-    // }
+    // new instance added to the whiteboards MapSchema
+    this.room.state.whiteboards.onAdd = (whiteboard: IWhiteboard, key: string) => {
+      store.dispatch(
+        setWhiteboardUrls({
+          whiteboardId: key,
+          roomId: whiteboard.roomId,
+        })
+      )
+      // track changes on every child object's connectedUser
+      whiteboard.connectedUser.onAdd = (item, index) => {
+        phaserEvents.emit(GameEvent.ITEM_USER_ADDED, item, key, ItemType.WHITEBOARD)
+      }
+      whiteboard.connectedUser.onRemove = (item, index) => {
+        phaserEvents.emit(GameEvent.ITEM_USER_REMOVED, item, key, ItemType.WHITEBOARD)
+      }
+    }
 
     // when the server sends room data
     this.room.onMessage(Message.SEND_ROOM_DATA, (content) => {
@@ -428,10 +434,6 @@ export default class Network {
     this.room?.send(Message.DISCONNECT_FROM_MEETING, { meetingId: id })
     this.webRTC?.checkPreviousPermission()
   }
-
-  // changeMeetingInfo(meetingId: string, title?: string, chatId?: string) {
-  //   this.room?.send(Message.MEETING_CHANGE_INFO, { meetingId, title, chatId })
-  // }
 
   connectToWhiteboard(id: string) {
     this.room?.send(Message.CONNECT_TO_WHITEBOARD, { whiteboardId: id })

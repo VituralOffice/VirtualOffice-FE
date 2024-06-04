@@ -13,6 +13,7 @@ import { ItemType } from '../types/Items'
 import { PlayerBehavior } from '../types/PlayerBehaviour'
 import Game from '../scenes/Game'
 import { Meeting } from '../web/meeting/Meeting'
+import Whiteboard from '../items/WhiteBoard'
 
 export default class MyPlayer extends Player {
   private playContainerBody: Phaser.Physics.Arcade.Body
@@ -133,6 +134,15 @@ export default class MyPlayer extends Player {
           }
         }
 
+        if (Phaser.Input.Keyboard.JustDown(keyR)) {
+          switch (item?.itemType) {
+            case ItemType.WHITEBOARD:
+              const whiteboard = item as Whiteboard
+              whiteboard.openDialog(network)
+              break
+          }
+        }
+
         // handle movement
         const speed = 200
         let vx = 0
@@ -198,7 +208,11 @@ export default class MyPlayer extends Player {
           break
         }
 
-        if (Phaser.Input.Keyboard.JustDown(keyR) && this.chairOnSit) {
+        if (
+          Phaser.Input.Keyboard.JustDown(keyR) &&
+          this.chairOnSit &&
+          this.chairOnSit.groupId !== '-1'
+        ) {
           const meeting = Game.getInstance()?.meetingMap.get(this.chairOnSit.groupId!) as Meeting
           if (meeting.isOpen) {
             meeting.openDialog(this.getPlayerId()!, network)
