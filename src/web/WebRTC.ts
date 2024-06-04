@@ -6,11 +6,17 @@ import { PEER_CONNECT_OPTIONS } from '../constant'
 import Game from '../scenes/Game'
 
 export default class WebRTC {
-  private static instance: WebRTC | null = null; // Biến static instance
+  private static instance: WebRTC | null = null // Biến static instance
 
   private myPeer: Peer
-  private peers = new Map<string, { call: MediaConnection; uiBlock: HTMLElement; video: HTMLVideoElement }>()
-  private onCalledPeers = new Map<string, { call: MediaConnection; uiBlock: HTMLElement; video: HTMLVideoElement }>()
+  private peers = new Map<
+    string,
+    { call: MediaConnection; uiBlock: HTMLElement; video: HTMLVideoElement }
+  >()
+  private onCalledPeers = new Map<
+    string,
+    { call: MediaConnection; uiBlock: HTMLElement; video: HTMLVideoElement }
+  >()
   private myVideoGrid = document.querySelector('.my-video-grid')
   private othersVideoGrid = document.querySelector('.others-video-grid')
   // private buttonGrid = document.querySelector('.button-grid')
@@ -19,8 +25,8 @@ export default class WebRTC {
   private network: Network
 
   constructor(userId: string, network: Network) {
-    console.log("Construct WebRTC")
-    WebRTC.instance = this;
+    console.log('Construct WebRTC')
+    WebRTC.instance = this
     const sanitizedId = this.replaceInvalidId(userId)
     this.myPeer = new Peer(sanitizedId, PEER_CONNECT_OPTIONS)
     this.network = network
@@ -39,7 +45,7 @@ export default class WebRTC {
   }
 
   static getInstance(): WebRTC | null {
-    return WebRTC.instance;
+    return WebRTC.instance
   }
 
   // PeerJS throws invalid_id error if it contains some characters such as that colyseus generates.
@@ -55,15 +61,15 @@ export default class WebRTC {
         call.answer(this.myStream)
 
         // Access username from call metadata
-        const username = call.metadata?.username || 'Unknown User';
+        const username = call.metadata?.username || 'Unknown User'
 
         // Create elements
-        const uiBlock = document.createElement('div');
-        const video = document.createElement('video');
-        const p = document.createElement('p');
-        p.textContent = username;
-        uiBlock.appendChild(video);
-        uiBlock.appendChild(p);
+        const uiBlock = document.createElement('div')
+        const video = document.createElement('video')
+        const p = document.createElement('p')
+        p.textContent = username
+        uiBlock.appendChild(video)
+        uiBlock.appendChild(p)
         this.onCalledPeers.set(call.peer, { call, uiBlock, video })
 
         call.on('stream', (userVideoStream) => {
@@ -89,23 +95,24 @@ export default class WebRTC {
     })
     this.onCalledPeers.clear()
 
-    this.myVideo.remove();
+    this.myVideo.remove()
   }
 
   // check if permission has been granted before
   checkPreviousPermission() {
-    const permissionName = 'microphone' as PermissionName
-    navigator.permissions?.query({ name: permissionName }).then((result) => {
-      if (result.state === 'granted') this.getUserMedia(false)
-    })
+    // const permissionName = 'microphone' as PermissionName
+    // navigator.permissions?.query({ name: permissionName }).then((result) => {
+    //   if (result.state === 'granted') this.getUserMedia(false)
+    // })
+    this.getUserMedia(store.getState().user.cameraON, store.getState().user.microphoneON, false)
   }
 
-  getUserMedia(alertOnError = true) {
+  getUserMedia(video, audio, alertOnError = true) {
     // ask the browser to get user media
     navigator.mediaDevices
       ?.getUserMedia({
-        video: true,
-        audio: true,
+        video: video,
+        audio: audio,
       })
       .then((stream) => {
         this.myStream = stream
@@ -126,14 +133,16 @@ export default class WebRTC {
       const sanitizedId = this.replaceInvalidId(userId)
       if (!this.peers.has(sanitizedId)) {
         console.log('calling', username)
-        const call = this.myPeer.call(sanitizedId, this.myStream, { metadata: { username: store.getState().user.playerName } })
+        const call = this.myPeer.call(sanitizedId, this.myStream, {
+          metadata: { username: store.getState().user.playerName },
+        })
         // Create elements
-        const uiBlock = document.createElement('div');
-        const video = document.createElement('video');
-        const p = document.createElement('p');
-        p.textContent = username;
-        uiBlock.appendChild(video);
-        uiBlock.appendChild(p);
+        const uiBlock = document.createElement('div')
+        const video = document.createElement('video')
+        const p = document.createElement('p')
+        p.textContent = username
+        uiBlock.appendChild(video)
+        uiBlock.appendChild(p)
         this.peers.set(sanitizedId, { call, uiBlock, video })
 
         call.on('stream', (userVideoStream) => {
@@ -181,18 +190,18 @@ export default class WebRTC {
   }
 
   turnMic(isOn: boolean): boolean {
-    if (!this.myStream) return false;
+    if (!this.myStream) return false
     let tracks = this.myStream.getAudioTracks()
-    if (tracks.length == 0) return false;
-    tracks.forEach((track) => track.enabled = isOn)
-    return true;
+    if (tracks.length == 0) return false
+    tracks.forEach((track) => (track.enabled = isOn))
+    return true
   }
   turnCam(isOn: boolean): boolean {
-    if (!this.myStream) return false;
+    if (!this.myStream) return false
     let tracks = this.myStream.getVideoTracks()
-    if (tracks.length == 0) return false;
-    tracks.forEach((track) => track.enabled = isOn)
-    return true;
+    if (tracks.length == 0) return false
+    tracks.forEach((track) => (track.enabled = isOn))
+    return true
   }
 
   // // method to set up mute/unmute and video on/off buttons

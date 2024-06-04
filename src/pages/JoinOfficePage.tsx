@@ -12,6 +12,7 @@ import EditUserCharacterPopup from '../components/popups/EditUserCharacterPopup'
 import UserDeviceSettings from '../components/officeJoin/UserDeviceSettings'
 import { setPlayerName as setPlayerNameInRedux } from '../stores/UserStore'
 import Game from '../scenes/Game'
+import { IRoomData } from '../types/Rooms'
 
 //#region
 const Background = styled.div`
@@ -314,7 +315,13 @@ function EmailMenu() {
 //   )
 // }
 
-export function JoinOfficePage({ handleJoinRoom }) {
+export function JoinOfficePage({
+  handleJoinRoom,
+  room,
+}: {
+  room: IRoomData
+  handleJoinRoom: Function
+}) {
   const [isEditUserCharacterPopupShow, setEditUserCharacterPopupShow] = useState(false)
   const user = useAppSelector((state) => state.user)
   const [playerName, setPlayerName] = useState(user.username)
@@ -389,7 +396,7 @@ export function JoinOfficePage({ handleJoinRoom }) {
               </EmailButton>
             </TopContent>
             <WelcomeTitle>
-              Welcome to <span>test space</span>
+              Welcome to <span>{room.name}</span>
             </WelcomeTitle>
             <BodyContent>
               <div>
