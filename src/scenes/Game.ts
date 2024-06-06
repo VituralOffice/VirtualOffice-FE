@@ -92,7 +92,7 @@ export default class Game extends Phaser.Scene {
 
     // debugDraw(groundLayer, this)
 
-    this.myPlayer = this.add.myPlayer(640, 500, 'adam', this.network.mySessionId)
+    this.myPlayer = this.add.myPlayer(this.map.widthInPixels / 2, this.map.heightInPixels / 2, 'adam', this.network.mySessionId)
     this.playerSelector = new PlayerSelector(this, 0, 0, 16, 16)
 
     // import chair objects from Tiled map to Phaser
@@ -261,12 +261,12 @@ export default class Game extends Phaser.Scene {
     }
   }
 
-  private handleMyPlayerReady() {
-    this.myPlayer.readyToConnect = true
+  private handleMyPlayerReady(ready: boolean) {
+    this.myPlayer.readyToConnect = ready
   }
 
-  private handleMyMediaConnected() {
-    this.myPlayer.mediaConnected = true
+  private handleMyMediaConnected(connected: boolean) {
+    this.myPlayer.mediaConnected = connected
   }
 
   // function to update target position upon receiving player updates

@@ -20,7 +20,7 @@ export default class WebRTC {
   private myVideoGrid = document.querySelector('.my-video-grid')
   private othersVideoGrid = document.querySelector('.others-video-grid')
   // private buttonGrid = document.querySelector('.button-grid')
-  private myVideo = document.createElement('video')
+  private myVideo
   private myStream?: MediaStream
   private network: Network
 
@@ -36,9 +36,6 @@ export default class WebRTC {
       console.log(err.type)
       console.error(err)
     })
-
-    // mute your own video stream (you don't want to hear yourself)
-    this.myVideo.muted = true
 
     // config peerJS
     this.initialize()
@@ -95,7 +92,7 @@ export default class WebRTC {
     })
     this.onCalledPeers.clear()
 
-    this.myVideo.remove()
+    if(this.myVideo) this.myVideo.remove()
   }
 
   // check if permission has been granted before
@@ -108,6 +105,7 @@ export default class WebRTC {
   }
 
   getUserMedia(video, audio, alertOnError = true) {
+    console.log(`get user media, video: ${video}, audio: ${audio}`)
     // ask the browser to get user media
     navigator.mediaDevices
       ?.getUserMedia({
@@ -115,16 +113,42 @@ export default class WebRTC {
         audio: audio,
       })
       .then((stream) => {
-        this.myStream = stream
-        this.addVideoStream(this.myVideo, this.myVideo, this.myStream, true)
-        store.dispatch(setMicrophoneON(stream.getAudioTracks().length > 0))
-        store.dispatch(setCameraON(stream.getVideoTracks().length > 0))
+        // const hasCam = stream.getVideoTracks().length > 0
+        // const hasMic = stream.getAudioTracks().length > 0
+        // console.log(`has cam: ${hasCam}, has mic: ${hasMic}`)
+        store.dispatch(setMicrophoneON(audio))
+        store.dispatch(setCameraON(video))
         store.dispatch(setMediaConnected(true))
-        this.network.mediaConnected()
+        this.network.mediaConnected(true)
+        this.myStream = stream
+
+        // mute your own video stream (you don't want to hear yourself)
+        if (!this.myVideo) {
+          this.myVideo = document.createElement('video')
+          this.myVideo.muted = true
+        }
+        this.addVideoStream(this.myVideo, this.myVideo, this.myStream, true)
       })
       .catch((error) => {
+        if (video && store.getState().user.cameraON) {
+          store.dispatch(setCameraON(false))
+        }
+        if (audio && store.getState().user.microphoneON) {
+          store.dispatch(setMicrophoneON(false))
+        }
+        if (!video && !audio) {
+          store.dispatch(setCameraON(false))
+          store.dispatch(setMicrophoneON(false))
+        }
         if (alertOnError) window.alert('No webcam or microphone found, or permission is blocked')
       })
+  }
+
+  removeUserVideo() {
+    console.log("remove user video")
+    this.myVideo.remove();
+    this.myVideo = undefined;
+    this.myStream = undefined;
   }
 
   // method to call a peer
@@ -189,19 +213,11 @@ export default class WebRTC {
     }
   }
 
-  turnMic(isOn: boolean): boolean {
-    if (!this.myStream) return false
-    let tracks = this.myStream.getAudioTracks()
-    if (tracks.length == 0) return false
-    tracks.forEach((track) => (track.enabled = isOn))
-    return true
+  public turnMic(isOn: boolean) {
+    this.getUserMedia(store.getState().user.cameraON, isOn, false)
   }
-  turnCam(isOn: boolean): boolean {
-    if (!this.myStream) return false
-    let tracks = this.myStream.getVideoTracks()
-    if (tracks.length == 0) return false
-    tracks.forEach((track) => (track.enabled = isOn))
-    return true
+  public turnCam(isOn: boolean) {
+    this.getUserMedia(isOn, store.getState().user.microphoneON, false)
   }
 
   // // method to set up mute/unmute and video on/off buttons

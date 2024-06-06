@@ -15,9 +15,9 @@ import OfficeLogoMenuPopup from '../popups/OfficeLogoMenuPopup'
 import { OfficeParticipantSidebar } from '../sidebars/office/OfficeParticipantSidebar'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { setShowChat } from '../../stores/ChatStore'
-import { useToggleCamera, useToggleMicrophone } from '../../web/utils'
 import Chat from '../chat/Chat'
 import { ToolbarButton, ToolbarExitButton } from '../buttons'
+import WebRTC from '../../web/WebRTC'
 
 const LayoutContainer = styled.div<{ isExpanded: boolean }>`
   position: absolute;
@@ -102,18 +102,16 @@ const OfficeToolbar = () => {
   const [showLogoMenu, setShowLogoMenu] = useState(false)
   const [showParticipantSidebar, setShowParticipantSidebar] = useState(false)
   const [isToolbarExpanded, setIsToolbarExpanded] = useState(true);
-  const toggleMic = useToggleMicrophone();
-  const toggleCam = useToggleCamera();
   const showChat = useAppSelector((state) => state.chat.showChat)
 
   const toggetMic = () => {
     const nextState = !user.microphoneON;
-    toggleMic(nextState);
+    WebRTC.getInstance()?.turnMic(nextState)
   }
 
   const toggetCam = () => {
     const nextState = !user.cameraON;
-    toggleCam(nextState);
+    WebRTC.getInstance()?.turnCam(nextState)
   }
 
   return (

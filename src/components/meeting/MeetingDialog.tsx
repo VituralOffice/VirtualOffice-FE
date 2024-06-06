@@ -7,7 +7,6 @@ import { useAppDispatch, useAppSelector } from '../../hook'
 import Video from '../videos/Video'
 import { closeMeetingDialog } from '../../stores/MeetingStore'
 import { CustomToggleButton } from '../buttons/CustomToggleButton'
-import { useToggleCamera, useToggleMicrophone } from '../../web/utils'
 import MicRoundedIcon from '@mui/icons-material/MicRounded'
 import MicOffRoundedIcon from '@mui/icons-material/MicOffRounded'
 import VideocamRoundedIcon from '@mui/icons-material/VideocamRounded'
@@ -24,6 +23,7 @@ import ScreenshotMonitorRoundedIcon from '@mui/icons-material/ScreenshotMonitorR
 import PresentToAllIcon from '@mui/icons-material/PresentToAll';
 import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
 import MeetingChatSidebar from './chat/MeetingChatSidebar'
+import WebRTC from '../../web/WebRTC'
 
 const Backdrop = styled.div`
   position: fixed;
@@ -124,11 +124,9 @@ export default function MeetingDialog() {
   const userMediaManager = useAppSelector((state) => state.meeting.userMediaManager)
 
   const user = useAppSelector((state) => state.user)
-  const toggleMic = useToggleMicrophone()
-  const toggleCam = useToggleCamera()
   const toggetMic = () => {
     const nextState = !user.microphoneON
-    toggleMic(nextState)
+    WebRTC.getInstance()?.turnMic(nextState)
   }
   const peerDisplayStreams = useAppSelector((state) => state.meeting.peerDisplayStreams)
   const myPeerDisplayStream = useAppSelector((state) => state.meeting.myDisplayStream)
@@ -140,7 +138,7 @@ export default function MeetingDialog() {
 
   const toggetCam = () => {
     const nextState = !user.cameraON
-    toggleCam(nextState)
+    WebRTC.getInstance()?.turnCam(nextState)
   }
 
   useEffect(() => {

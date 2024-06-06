@@ -68,7 +68,7 @@ const EmailButton = styled.div<ButtonProps>`
       transition: all 0.25s ease-in-out 0s;
       overflow: hidden;
       background-color: ${(props) =>
-        props.isEnabled ? 'rgba(255, 255, 255, 0.1)' : 'transparent'};
+    props.isEnabled ? 'rgba(255, 255, 255, 0.1)' : 'transparent'};
       &:hover {
         background-color: rgba(255, 255, 255, 0.1);
       }
@@ -330,28 +330,23 @@ export function JoinOfficePage({
   const [menuShow, setMenuShow] = useState(false)
   const navigate = useNavigate()
 
-  let lastJoinTime = 0
+  let joinClicked = false;
 
   const handleJoin = async () => {
-    const now = Date.now()
-    const timeSinceLastJoin = now - lastJoinTime
-
-    if (timeSinceLastJoin >= 1000) {
-      try {
-        console.log('Join! Name:', playerName, 'Avatar:', user.character?.name)
-        await handleJoinRoom()
-        Game.getInstance()?.registerKeys()
-        Game.getInstance()?.myPlayer.setPlayerName(playerName)
-        Game.getInstance()?.myPlayer.setPlayerTexture(user.character?.name as string)
-        Game.getInstance()?.myPlayer.setCharacter(user.character?._id as string)
-        Game.getInstance()?.network.readyToConnect()
-        setPlayerNameInRedux(playerName)
-      } catch (e: any) {
-        console.log(e)
-        navigate('/')
-      }
-    } else {
-      console.log('Join request ignored (rate limited)') // Inform user about throttling
+    if (joinClicked) return;
+    joinClicked = true;
+    try {
+      console.log('Join! Name:', playerName, 'Avatar:', user.character?.name)
+      await handleJoinRoom()
+      Game.getInstance()?.registerKeys()
+      Game.getInstance()?.myPlayer.setPlayerName(playerName)
+      Game.getInstance()?.myPlayer.setPlayerTexture(user.character?.name as string)
+      Game.getInstance()?.myPlayer.setCharacter(user.character?._id as string)
+      Game.getInstance()?.network.readyToConnect()
+      setPlayerNameInRedux(playerName)
+    } catch (e: any) {
+      console.log(e)
+      navigate('/')
     }
   }
 
