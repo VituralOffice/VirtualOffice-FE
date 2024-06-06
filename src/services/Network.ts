@@ -432,7 +432,7 @@ export default class Network {
   disconnectFromMeeting(id: string) {
     console.log('DISCONNECT_FROM_MEETING, id: ' + id)
     this.room?.send(Message.DISCONNECT_FROM_MEETING, { meetingId: id })
-    this.webRTC?.checkPreviousPermission()
+    // this.webRTC?.checkPreviousPermission()
   }
 
   connectToWhiteboard(id: string) {
