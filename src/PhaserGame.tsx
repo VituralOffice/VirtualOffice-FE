@@ -67,14 +67,16 @@ export const InitGame = async () => {
 }
 
 export const DestroyGame = () => {
-  // Bootstrap.getInstance()?.network.disconnectPlayer()
-  Bootstrap.getInstance()?.network.disconnectMeeting()
-  Bootstrap.getInstance()?.network.disconnectWebRTC()
-  Bootstrap.getInstance()?.network.disconnectNetwork()
-  if (PhaserGame) PhaserGame.destroy(true)
-  PhaserGame = null
-  ;(window as any).game = null
-  console.log('Destroy Phaser Game')
+  try {
+    // Bootstrap.getInstance()?.network.disconnectPlayer()
+    Bootstrap.getInstance()?.network.disconnectMeeting()
+    Bootstrap.getInstance()?.network.disconnectWebRTC()
+    Bootstrap.getInstance()?.network.disconnectNetwork()
+    if (PhaserGame) PhaserGame.destroy(true)
+    console.log('Destroy Phaser Game')
+  } catch (error) {
+    console.log(`Destroy game error:`, error)
+  }
 }
 export const PhaserGameInstance = async () => {
   if (PhaserGame === null) {

@@ -46,17 +46,14 @@ export const meetingSlice = createSlice({
   name: 'meeting',
   initialState,
   reducers: {
-    openMeetingDialog: (
-      state,
-      action: PayloadAction<{ meetingId: string; myUserId: string }>
-    ) => {
+    openMeetingDialog: (state, action: PayloadAction<{ meetingId: string; myUserId: string }>) => {
       if (!state.shareScreenManager) {
         state.shareScreenManager = new ShareScreenManager(action.payload.myUserId)
       }
       if (!state.userMediaManager) {
         state.userMediaManager = new UserMediaManager(action.payload.myUserId)
       }
-      Game.getInstance()?.myPlayer.setPlayerIsInMeeting(true);
+      Game.getInstance()?.myPlayer.setPlayerIsInMeeting(true)
       Game.getInstance()?.disableKeys()
       state.shareScreenManager.onOpen()
       state.userMediaManager.onOpen()
@@ -70,7 +67,7 @@ export const meetingSlice = createSlice({
       if (!state.userMediaManager) {
         state.userMediaManager = new UserMediaManager(action.payload.myUserId)
       }
-      Game.getInstance()?.myPlayer.setPlayerIsInMeeting(true);
+      Game.getInstance()?.myPlayer.setPlayerIsInMeeting(true)
       Game.getInstance()?.disableKeys()
       state.shareScreenManager.onOpen()
       state.userMediaManager.onOpen()
@@ -81,8 +78,8 @@ export const meetingSlice = createSlice({
       // Tell server the meeting dialog is closed.
       Game.getInstance()?.enableKeys()
       Network.getInstance()?.disconnectFromMeeting(state.activeMeetingId!)
-      Game.getInstance()?.myPlayer.setPlayerIsInMeeting(false);
-      Game.getInstance()?.myPlayer.setLeaveCurrentChair(true);
+      Game.getInstance()?.myPlayer.setPlayerIsInMeeting(false)
+      Game.getInstance()?.myPlayer.setLeaveCurrentChair(true)
       for (const { call } of state.peerDisplayStreams.values()) {
         call.close()
       }
@@ -129,7 +126,7 @@ export const meetingSlice = createSlice({
       state.peerCameraStreams.delete(sanitizeId(action.payload))
     },
     disconnectMeeting: (state) => {
-      Network.getInstance()?.disconnectFromMeeting(state.activeMeetingId!)
+      //Network.getInstance()?.disconnectFromMeeting(state.activeMeetingId!)
       for (const { call } of state.peerDisplayStreams.values()) {
         call.close()
       }
@@ -144,7 +141,7 @@ export const meetingSlice = createSlice({
       state.activeMeetingId = null
       state.peerDisplayStreams.clear()
       state.peerCameraStreams.clear()
-    }
+    },
   },
 })
 
