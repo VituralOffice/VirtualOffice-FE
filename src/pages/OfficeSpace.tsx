@@ -85,7 +85,8 @@ export const OfficeSpace = () => {
     fetchData()
 
     return () => {
-      DestroyGame()
+      Bootstrap.getInstance()?.network?.disconnectFromMeeting(meeting.activeMeetingId!)
+      return DestroyGame()
     }
   }, [])
 
