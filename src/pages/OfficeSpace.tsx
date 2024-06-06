@@ -16,6 +16,9 @@ import { setRoomId } from '../stores/RoomStore'
 import { GetAllChats, GetAllChatsWithMessage } from '../apis/ChatApis'
 import { setListChat, setMessageMaps } from '../stores/ChatStore'
 import WhiteboardDialog from '../components/whiteboards/WhiteboardDialog'
+import { setMediaConnected } from '../stores/UserStore'
+import Network from '../services/Network'
+import WebRTC from '../web/WebRTC'
 
 export const OfficeSpace = () => {
   let { roomId } = useParams()
@@ -28,6 +31,7 @@ export const OfficeSpace = () => {
   const roomStore = useAppSelector((state) => state.room)
   const whiteboardDialogOpen = useAppSelector((state) => state.whiteboard.whiteboardDialogOpen)
   const meeting = useAppSelector((state) => state.meeting)
+  const user = useAppSelector((state) => state.user)
 
   const handleJoinRoom = async () => {
     try {
@@ -105,6 +109,14 @@ export const OfficeSpace = () => {
 
     loadUserChat()
   }, [])
+
+  useEffect(() => {
+    if (!user.cameraON && !user.microphoneON) {
+      dispatch(setMediaConnected(false))
+      Network.getInstance()?.mediaConnected(false);
+      WebRTC.getInstance()?.removeUserVideo();
+    }
+  }, [user.cameraON, user.microphoneON])
 
   return (
     <>

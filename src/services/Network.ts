@@ -357,12 +357,12 @@ export default class Network {
   }
 
   // method to register event listener and call back function when myPlayer is ready to connect
-  onMyPlayerReady(callback: (key: string) => void, context?: any) {
+  onMyPlayerReady(callback: (ready: boolean) => void, context?: any) {
     phaserEvents.on(GameEvent.MY_PLAYER_READY, callback, context)
   }
 
   // method to register event listener and call back function when my video is connected
-  onMyPlayerMediaConnected(callback: (key: string) => void, context?: any) {
+  onMyPlayerMediaConnected(callback: (connected: boolean) => void, context?: any) {
     phaserEvents.on(GameEvent.MY_PLAYER_VIDEO_CONNECTED, callback, context)
   }
 
@@ -400,9 +400,9 @@ export default class Network {
   }
 
   // method to send ready-to-connect signal to Colyseus server
-  mediaConnected() {
-    this.room?.send(Message.VIDEO_CONNECTED)
-    phaserEvents.emit(GameEvent.MY_PLAYER_VIDEO_CONNECTED)
+  mediaConnected(connected: boolean) {
+    this.room?.send(Message.VIDEO_CONNECTED, { connected })
+    phaserEvents.emit(GameEvent.MY_PLAYER_VIDEO_CONNECTED, { connected })
   }
 
   // method to send stream-disconnection signal to Colyseus server
@@ -430,6 +430,7 @@ export default class Network {
   }
 
   disconnectFromMeeting(id: string) {
+    if (!id) return;
     console.log('DISCONNECT_FROM_MEETING, id: ' + id)
     this.room?.send(Message.DISCONNECT_FROM_MEETING, { meetingId: id })
     // this.webRTC?.checkPreviousPermission()

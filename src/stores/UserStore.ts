@@ -5,6 +5,7 @@ import { sanitizeId } from '../utils/util'
 import { UserData } from '../types'
 import WebRTC from '../web/WebRTC'
 import { ICharacter } from '../interfaces/character'
+import Network from '../services/Network'
 
 export function getInitialBackgroundMode() {
   const currentHour = new Date().getHours()
@@ -89,9 +90,11 @@ export const userSlice = createSlice({
       state.playerName = action.payload
     },
     setMicrophoneON: (state, action: PayloadAction<boolean>) => {
+      console.log("set microphone : ", action.payload)
       state.microphoneON = action.payload
     },
     setCameraON: (state, action: PayloadAction<boolean>) => {
+      console.log("set camera : ", action.payload)
       state.cameraON = action.payload
     },
 

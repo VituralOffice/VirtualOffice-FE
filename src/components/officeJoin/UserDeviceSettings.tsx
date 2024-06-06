@@ -6,6 +6,8 @@ import MicOffRoundedIcon from '@mui/icons-material/MicOffRounded'
 import VideocamRoundedIcon from '@mui/icons-material/VideocamRounded'
 import VideocamOffRoundedIcon from '@mui/icons-material/VideocamOffRounded'
 import { CustomToggleButton } from '../buttons/CustomToggleButton'
+import { useDispatch } from 'react-redux'
+import { setCameraON, setMicrophoneON } from '../../stores/UserStore'
 
 const BodyLeftContent = styled.div`
   width: 100%;
@@ -99,11 +101,15 @@ export default function UserDeviceSettings() {
 
   const videoRef = useRef<HTMLVideoElement>(null)
 
+  const dispatch = useDispatch();
+
   const toggetMic = () => {
     const nextState = !micEnabled
     if (!nextState) {
       if (micMS) micMS.getTracks().forEach((track) => track.stop())
+      setMicMS(null)
       setMicEnabled(false)
+      dispatch(setMicrophoneON(false));
     } else {
       getMicMS()
     }
@@ -113,7 +119,9 @@ export default function UserDeviceSettings() {
     const nextState = !camEnabled
     if (!nextState) {
       if (camMS) camMS.getTracks().forEach((track) => track.stop())
+      setCamMS(null)
       setCamEnabled(false)
+      dispatch(setCameraON(false));
     } else {
       getCamMS()
     }
@@ -129,12 +137,14 @@ export default function UserDeviceSettings() {
         if (videoRef.current) videoRef.current.srcObject = stream
         setCamMS(stream)
         setCamEnabled(true)
+        dispatch(setCameraON(true));
       })
       .catch((error) => {
         console.log(error)
         if (alertOnError) window.alert('No webcam found, or permission is blocked')
         setCamMS(null)
         setCamEnabled(false)
+        dispatch(setCameraON(false));
       })
   }
 
@@ -195,12 +205,14 @@ export default function UserDeviceSettings() {
         // audioSource.connect(audioWorkletNode!).connect(audioContext!.destination);
         setMicMS(stream)
         setMicEnabled(true)
+        dispatch(setMicrophoneON(true));
       })
       .catch((error) => {
         console.log(error)
         if (alertOnError) window.alert('No microphone found, or permission is blocked')
         setMicMS(null)
         setMicEnabled(false)
+        dispatch(setMicrophoneON(false));
       })
   }
 
