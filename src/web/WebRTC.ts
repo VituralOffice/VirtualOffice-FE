@@ -146,9 +146,12 @@ export default class WebRTC {
 
   removeUserVideo() {
     console.log("remove user video")
-    this.myVideo.remove();
+    this.myVideo?.remove();
     this.myVideo = undefined;
     this.myStream = undefined;
+  }
+  cleanupStream () {
+    if(this.myStream) this.myStream.getTracks().forEach(track => track.stop())
   }
 
   // method to call a peer

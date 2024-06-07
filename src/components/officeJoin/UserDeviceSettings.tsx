@@ -98,7 +98,6 @@ export default function UserDeviceSettings() {
 
   // const [micId, setMidId] = useState<string>('');
   // const [camId, setCamId] = useState<string>('');
-
   const videoRef = useRef<HTMLVideoElement>(null)
 
   const dispatch = useDispatch();
@@ -215,61 +214,12 @@ export default function UserDeviceSettings() {
         dispatch(setMicrophoneON(false));
       })
   }
-
-  const UnregisterMicrophoneEvents = () => {
-    // console.log(micMS != null)
-    // if (micMS) {
-    //   console.log("hihi")
-    //   const trackPromises = micMS.getTracks().map(track => track.stop());
-    //   await Promise.all(trackPromises);
-    // }
-    micMS?.getTracks().forEach((track) => track.stop())
-    // if (audioWorkletNode) {
-    //   audioWorkletNode.port.close(); // Disconnect worklet port
-    //   audioWorkletNode.disconnect(); // Disconnect worklet from pipeline
-    // }
-    // if (audioSource) {
-    //   audioSource.disconnect(); // Disconnect audio source from pipeline
-    // }
-    // if (audioContext) {
-    //   await audioContext.close(); // Close audio context
-    // }
-    // audioSource = null;
-    // audioWorkletNode = null;
-    // audioContext = null;
-  }
-  const UnregisterCameraEvents = () => {
-    // console.log(camMS != null)
-    // if (camMS) {
-    //   console.log("haha")
-    //   const trackPromises = camMS.getTracks().map(track => track.stop());
-    //   await Promise.all(trackPromises);
-    // }
-    camMS?.getTracks().forEach((track) => track.stop())
-    if (videoRef && videoRef.current) videoRef.current.srcObject = null
-  }
   useEffect(() => {
-    const initialize = async () => {
-      getCamMS()
-      getMicMS()
-    }
-
-    initialize()
+    getCamMS()
+    getMicMS()
 
     // Hàm dọn dẹp trước khi trang unload
-    const handleBeforeUnload = async () => {
-      UnregisterMicrophoneEvents()
-      UnregisterCameraEvents()
-      // console.log("stop all")
-    }
-
     // addStopAllTrackBeforeUnloadEvent();
-
-    return () => {
-      // window.alert('No microphone found, or permission is blocked')
-      handleBeforeUnload()
-    }
-
     // window.addEventListener('beforeunload', async (event) => {
     //   event.preventDefault(); // Prevent the default behavior (e.g., showing a confirmation dialog)
 
@@ -278,7 +228,14 @@ export default function UserDeviceSettings() {
     //   await UnregisterCameraEvents();
     // });
   }, [])
-
+  useEffect(() => {
+    return () => {
+      camMS?.getTracks().forEach((track) => track.stop())
+    }
+  }, [camMS])
+  useEffect(() => {
+    micMS?.getTracks().forEach((track) => track.stop())
+  }, [micMS])
   return (
     <BodyLeftContent>
       <CameraDisplay isActive={hasSoundInput}>

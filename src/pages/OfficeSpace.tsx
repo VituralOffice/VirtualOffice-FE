@@ -116,6 +116,9 @@ export const OfficeSpace = () => {
       Network.getInstance()?.mediaConnected(false);
       WebRTC.getInstance()?.removeUserVideo();
     }
+    return () => {
+      WebRTC.getInstance()?.cleanupStream();
+    }
   }, [user.cameraON, user.microphoneON])
 
   return (
