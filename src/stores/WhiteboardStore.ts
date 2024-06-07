@@ -29,7 +29,7 @@ export const whiteboardSlice = createSlice({
     },
     closeWhiteboardDialog: (state) => {
       Game.getInstance()?.enableKeys()
-      Game.getInstance()?.network.disconnectFromWhiteboard(state.whiteboardId!)
+      Network.getInstance()?.disconnectFromWhiteboard(state.whiteboardId!)
       state.whiteboardDialogOpen = false
       state.whiteboardId = null
       state.whiteboardUrl = null

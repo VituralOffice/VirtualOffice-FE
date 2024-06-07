@@ -7,6 +7,7 @@ import {
     removeCameraStream,
 } from '../../stores/MeetingStore'
 import { PEER_CONNECT_OPTIONS } from '../../constant'
+import Network from '../../services/Network'
 
 export default class UserMediaManager {
     private myPeer: Peer
@@ -83,7 +84,7 @@ export default class UserMediaManager {
         if (shouldDispatch) {
             store.dispatch(setMyCameraStream(null))
             // Manually let all other existing users know screen sharing is stopped
-            Game.getInstance()?.network.onStopCameraShare(store.getState().meeting.activeMeetingId!)
+            Network.getInstance()?.onStopCameraShare(store.getState().meeting.activeMeetingId!)
         }
     }
 

@@ -13,6 +13,7 @@ import UserDeviceSettings from '../components/officeJoin/UserDeviceSettings'
 import { setPlayerName as setPlayerNameInRedux } from '../stores/UserStore'
 import Game from '../scenes/Game'
 import { IRoomData } from '../types/Rooms'
+import Network from '../services/Network'
 
 //#region
 const Background = styled.div`
@@ -342,7 +343,7 @@ export function JoinOfficePage({
       Game.getInstance()?.myPlayer.setPlayerName(playerName)
       Game.getInstance()?.myPlayer.setPlayerTexture(user.character?.name as string)
       Game.getInstance()?.myPlayer.setCharacter(user.character?._id as string)
-      Game.getInstance()?.network.readyToConnect()
+      Network.getInstance()?.readyToConnect()
       setPlayerNameInRedux(playerName)
     } catch (e: any) {
       console.log(e)
