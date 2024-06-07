@@ -5,6 +5,7 @@ import { useAppSelector } from '../hook'
 import { useNavigate } from 'react-router-dom'
 import { avatars } from '../utils/util'
 import { JoinOfficePage } from './JoinOfficePage'
+import Network from '../services/Network'
 export default function TestSpace() {
   const [preJoinPageShow, setPreJoinPageShow] = useState(true)
   const user = useAppSelector((state) => state.user)
@@ -16,7 +17,7 @@ export default function TestSpace() {
     Game.getInstance()?.registerKeys()
     Game.getInstance()?.myPlayer.setPlayerName(playerName)
     //Game.getInstance()?.myPlayer.setPlayerTexture(user.character?.avatar)
-    Game.getInstance()?.network.readyToConnect()
+    Network.getInstance()?.readyToConnect()
     setPreJoinPageShow(false)
   }
 

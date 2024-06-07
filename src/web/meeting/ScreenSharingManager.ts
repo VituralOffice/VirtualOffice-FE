@@ -3,6 +3,7 @@ import store from '../../stores'
 import Game from '../../scenes/Game'
 import { addDisplayStream, removeDisplayStream, setMyDisplayStream } from '../../stores/MeetingStore'
 import { PEER_CONNECT_OPTIONS } from '../../constant'
+import Network from '../../services/Network'
 
 export default class ShareScreenManager {
   private myPeer: Peer
@@ -83,7 +84,7 @@ export default class ShareScreenManager {
     if (shouldDispatch) {
       store.dispatch(setMyDisplayStream(null))
       // Manually let all other existing users know screen sharing is stopped
-      Game.getInstance()?.network.onStopScreenShare(store.getState().meeting.activeMeetingId!)
+      Network.getInstance()?.onStopScreenShare(store.getState().meeting.activeMeetingId!)
     }
   }
 
