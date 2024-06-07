@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 import Game from '../scenes/Game'
+import Network from '../services/Network'
 
 interface WhiteboardState {
   whiteboardDialogOpen: boolean
