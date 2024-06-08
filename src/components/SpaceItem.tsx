@@ -229,7 +229,7 @@ export const SpaceItem: React.FC<SpaceItemProps> = ({
                 lineHeight: '18px',
               }}
             >
-              11
+              {room.members.filter((m) => m.online).length}
             </span>
           </OnlineUsersDetail>
         </SpaceMapTopDetails>
