@@ -35,7 +35,7 @@ export default class Network {
   private static instance: Network | null = null // Biến static instance
 
   private client: Client
-  private room?: Room<IOfficeState>
+  room?: Room<IOfficeState>
   private lobby!: Room
   webRTC?: WebRTC
 
@@ -145,7 +145,7 @@ export default class Network {
     // new instance added to the players MapSchema
     this.room.state.players.onAdd = (player: IPlayer, key: string) => {
       if (key === this.mySessionId) return
-      store.dispatch(updateMember({ online: true, role: 'user', user: player }))
+      store.dispatch(updateMember({ member: { online: true, role: 'user', user: player } }))
       // track changes on every child object inside the players MapSchema
       player.onChange = (changes) => {
         changes.forEach((change) => {
@@ -173,7 +173,7 @@ export default class Network {
       this.webRTC?.deleteOnCalledVideoStream(key)
       // store.dispatch(pushPlayerLeftMessage(player.playerName))
       store.dispatch(removePlayerNameMap(key))
-      store.dispatch(updateMember({ online: false, role: 'user', user: player }))
+      store.dispatch(updateMember({ member: { online: false, role: 'user', user: player } }))
       store.dispatch(removePlayerAvatarMap(key))
     }
 

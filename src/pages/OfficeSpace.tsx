@@ -110,17 +110,6 @@ export const OfficeSpace = () => {
     loadUserChat()
   }, [])
 
-  useEffect(() => {
-    if (!user.cameraON && !user.microphoneON) {
-      dispatch(setMediaConnected(false))
-      Network.getInstance()?.mediaConnected(false);
-      WebRTC.getInstance()?.removeUserVideo();
-    }
-    return () => {
-      WebRTC.getInstance()?.cleanupStream();
-    }
-  }, [user.cameraON, user.microphoneON])
-
   return (
     <>
       {joinPageShow && room && <JoinOfficePage handleJoinRoom={handleJoinRoom} room={room} />}

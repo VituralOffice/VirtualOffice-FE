@@ -25,6 +25,7 @@ import CancelPresentationIcon from '@mui/icons-material/CancelPresentation'
 import MeetingChatSidebar from './chat/MeetingChatSidebar'
 import WebRTC from '../../web/WebRTC'
 import Game from '../../scenes/Game'
+import { MeetingInfoSidebar } from './chat/MeetingInfoSidebar'
 
 const Backdrop = styled.div`
   position: fixed;
@@ -300,7 +301,7 @@ export default function MeetingDialog() {
           ) : (
             showMeetingInfo && (
               <MeetingSidebarContainer>
-                {/* <MeetingChatSidebar /> */}
+                <MeetingInfoSidebar />
               </MeetingSidebarContainer>
             )
           )}
