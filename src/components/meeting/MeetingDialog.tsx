@@ -20,10 +20,11 @@ import { MeetingNormalView } from './MeetingNormalView'
 import { MeetingScreenShareView } from './MeetingScreenShareView'
 import WidgetsRoundedIcon from '@mui/icons-material/WidgetsRounded'
 import ScreenshotMonitorRoundedIcon from '@mui/icons-material/ScreenshotMonitorRounded'
-import PresentToAllIcon from '@mui/icons-material/PresentToAll';
-import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
+import PresentToAllIcon from '@mui/icons-material/PresentToAll'
+import CancelPresentationIcon from '@mui/icons-material/CancelPresentation'
 import MeetingChatSidebar from './chat/MeetingChatSidebar'
 import WebRTC from '../../web/WebRTC'
+import Game from '../../scenes/Game'
 
 const Backdrop = styled.div`
   position: fixed;
@@ -55,8 +56,6 @@ const Wrapper = styled.div`
   }
 `
 
-
-
 const SeparateLine = styled.div`
   height: 32px;
   width: 2px;
@@ -68,7 +67,7 @@ const SeparateLine = styled.div`
 // <Button
 //             variant="contained"
 //             color="secondary"
-//             
+//
 //           >
 //             {shareScreenManager?.myStream ? 'Stop sharing' : 'Share Screen'}
 //           </Button>
@@ -130,12 +129,30 @@ export default function MeetingDialog() {
   }
   const peerDisplayStreams = useAppSelector((state) => state.meeting.peerDisplayStreams)
   const myPeerDisplayStream = useAppSelector((state) => state.meeting.myDisplayStream)
+  const meeting = useAppSelector((state) => state.meeting)
 
   const [showChat, setShowChat] = useState(true)
   const [showMeetingInfo, setShowMeetingInfo] = useState(false)
   const [activeMeetingView, setActiveMeetingView] = useState(0)
   const [shareScreenAvailable, setShareScreenAvailable] = useState(false)
-
+  const handleLockMeeting = () => {
+    if (meeting.isLocked) Game.getInstance()?.network.unlockMeeting(meeting.activeMeetingId as string)
+    else Game.getInstance()?.network.lockMeeting(meeting.activeMeetingId as string)
+  }
+  //  show when this player is admin
+  const showLockButton = () => {
+    return Game.getInstance()?.myPlayer.getPlayerId() === meeting.adminUser
+  }
+  // hide when room's locked and user's not in `meeting.connectedUser`
+  const hideMeetingDialog = () => {
+    if (!meeting.isLocked) return false
+    if (
+      meeting.isLocked &&
+      meeting.connectedUser.includes(Game.getInstance()?.myPlayer.getPlayerId() || '')
+    )
+      return false
+    return true
+  }
   const toggetCam = () => {
     const nextState = !user.cameraON
     WebRTC.getInstance()?.turnCam(nextState)
@@ -143,20 +160,19 @@ export default function MeetingDialog() {
 
   useEffect(() => {
     if (peerDisplayStreams.size == 0 && myPeerDisplayStream == null) {
-      setShareScreenAvailable(false);
-    }
-    else {
-      setShareScreenAvailable(true);
+      setShareScreenAvailable(false)
+    } else {
+      setShareScreenAvailable(true)
     }
   }, [peerDisplayStreams, myPeerDisplayStream])
 
   useEffect(() => {
-    if (!user.microphoneON && !user.cameraON) userMediaManager!.stopCameraShare();
-    userMediaManager!.startCameraShare(user.cameraON, user.microphoneON);
+    if (!user.microphoneON && !user.cameraON) userMediaManager!.stopCameraShare()
+    userMediaManager!.startCameraShare(user.cameraON, user.microphoneON)
   }, [user.microphoneON, user.cameraON])
 
   return (
-    <Backdrop>
+    <Backdrop hidden={hideMeetingDialog()}>
       <Wrapper>
         {/* <IconButton
           aria-label="close dialog"
@@ -168,49 +184,53 @@ export default function MeetingDialog() {
 
         <MeetingHeader>
           <MeetingTitle>Meeting title</MeetingTitle>
+
           <ToolbarContainer>
-            {
-              shareScreenAvailable && (
-                <ToolbarButton isEnabled={activeMeetingView == 1} onClick={() => setActiveMeetingView(1)}>
-                  <div>
-                    <span>
-                      <ScreenshotMonitorRoundedIcon />
-                    </span>
-                  </div>
-                </ToolbarButton>
-              )
-            }
-            {
-              shareScreenAvailable && (
-                <ToolbarButton isEnabled={activeMeetingView == 0} onClick={() => setActiveMeetingView(0)}>
-                  <div>
-                    <span>
-                      <WidgetsRoundedIcon />
-                    </span>
-                  </div>
-                </ToolbarButton>
-              )
-            }
-            {
-              shareScreenAvailable && (
-                <SeparateLine />
-              )
-            }
-            <ToolbarButton onClick={() => {
-              if (shareScreenManager?.myStream) {
-                shareScreenManager?.stopScreenShare()
-              } else {
-                shareScreenManager?.startScreenShare()
-                setActiveMeetingView(1);
-              }
-            }}>
+            {showLockButton() && (
+              <ToolbarButton isEnabled={activeMeetingView == 1} onClick={handleLockMeeting}>
+                <div>
+                  <span>{meeting.isLocked ? 'Unlock' : 'Lock'}</span>
+                </div>
+              </ToolbarButton>
+            )}
+            {shareScreenAvailable && (
+              <ToolbarButton
+                isEnabled={activeMeetingView == 1}
+                onClick={() => setActiveMeetingView(1)}
+              >
+                <div>
+                  <span>
+                    <ScreenshotMonitorRoundedIcon />
+                  </span>
+                </div>
+              </ToolbarButton>
+            )}
+            {shareScreenAvailable && (
+              <ToolbarButton
+                isEnabled={activeMeetingView == 0}
+                onClick={() => setActiveMeetingView(0)}
+              >
+                <div>
+                  <span>
+                    <WidgetsRoundedIcon />
+                  </span>
+                </div>
+              </ToolbarButton>
+            )}
+            {shareScreenAvailable && <SeparateLine />}
+            <ToolbarButton
+              onClick={() => {
+                if (shareScreenManager?.myStream) {
+                  shareScreenManager?.stopScreenShare()
+                } else {
+                  shareScreenManager?.startScreenShare()
+                  setActiveMeetingView(1)
+                }
+              }}
+            >
               <div>
                 <span>
-                  {
-                    myPeerDisplayStream ?
-                      <CancelPresentationIcon />
-                      : <PresentToAllIcon />
-                  }
+                  {myPeerDisplayStream ? <CancelPresentationIcon /> : <PresentToAllIcon />}
                 </span>
               </div>
             </ToolbarButton>
@@ -253,7 +273,7 @@ export default function MeetingDialog() {
             <SeparateLine />
             <ToolbarExitButton
               onClick={() => {
-                dispatch(closeMeetingDialog());
+                dispatch(closeMeetingDialog())
               }}
             >
               <div>
@@ -267,7 +287,11 @@ export default function MeetingDialog() {
 
         <MeetingBody>
           <MeetingView>
-            {activeMeetingView == 0 ? <MeetingNormalView /> : (activeMeetingView == 1 && <MeetingScreenShareView />)}
+            {activeMeetingView == 0 ? (
+              <MeetingNormalView />
+            ) : (
+              activeMeetingView == 1 && <MeetingScreenShareView />
+            )}
           </MeetingView>
           {showChat ? (
             <MeetingSidebarContainer>
@@ -282,6 +306,6 @@ export default function MeetingDialog() {
           )}
         </MeetingBody>
       </Wrapper>
-    </Backdrop >
+    </Backdrop>
   )
 }
