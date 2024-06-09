@@ -24,9 +24,10 @@ export default class Chair extends Item {
     console.log('Sit on chair with index: ' + this.chairId)
     // this.connectedUser = playerId
     this.clearDialogBox()
-    if (Game.getInstance()?.meetingMap.get(this.groupId!)?.isOpen) {
+    let meeting = Game.getInstance()?.meetingMap.get(this.groupId!);
+    if (meeting?.isOpen && !meeting?.isLocked) {
       this.setDialogBox('Press E to leave\nPress R to join meeting')
-    } else if(this.groupId !== '-1') {
+    } else if(this.groupId !== '-1' && !meeting?.isLocked) {
       this.setDialogBox('Press E to leave\nPress R to hold a meeting')
     } else {
       this.setDialogBox('Press E to leave')

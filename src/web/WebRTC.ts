@@ -164,8 +164,10 @@ export default class WebRTC {
     this.myStream = undefined;
   }
   cleanupStream() {
-    console.log("WebRTC::cleanupStream")
-    if (this.myStream) this.myStream.getTracks().forEach(track => track.stop())
+    if (this.myStream) {
+      console.log("WebRTC::cleanupStream")
+      this.myStream.getTracks().forEach(track => track.stop())
+    }
   }
 
   // method to call a peer

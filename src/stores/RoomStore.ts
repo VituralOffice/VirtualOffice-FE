@@ -84,7 +84,7 @@ export const roomSlice = createSlice({
     // },
     updateMember: (state, action: PayloadAction<{ member: IRoomMember }>) => {
       const { member } = action.payload;
-      console.log(`RoomStore::UpdateMember  update member with id: ${member.user._id}, online: ${member.online}`)
+      // console.log(`RoomStore::UpdateMember  update member with id: ${member.user._id}, online: ${member.online}`)
       state.members = [
         ...state.members.filter((m) => m.user._id !== member.user._id),
         member,

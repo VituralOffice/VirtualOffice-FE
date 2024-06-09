@@ -178,6 +178,8 @@ export default class Game extends Phaser.Scene {
     this.network.onSetMeetingState(this.handleSetMeetingState, this)
     this.network.onSetMeetingTitle(this.handleMeetingTitleChange, this)
     this.network.onSetMeetingChatId(this.handleMeetingChatIdChange, this)
+    this.network.onSetMeetingAdmin(this.handleMeetingAdminChange, this)
+    this.network.onSetMeetingIsLock(this.handleMeetingIsLockChange, this)
     this.network.onItemUserRemoved(this.handleItemUserRemoved, this)
     this.network.onChatMessageAdded(this.handleChatMessageAdded, this)
     this.network.onChairConnectedUserChange(this.handleChairUserConnectedChange, this)
@@ -314,6 +316,20 @@ export default class Game extends Phaser.Scene {
     if (itemType === ItemType.MEETING) {
       const meeting = this.meetingMap.get(itemId)
       meeting?.setChatId(chatId)
+    }
+  }
+
+  private handleMeetingAdminChange(adminId: string, itemId: string, itemType: ItemType) {
+    if (itemType === ItemType.MEETING) {
+      const meeting = this.meetingMap.get(itemId)
+      meeting?.setAdminId(adminId)
+    }
+  }
+
+  private handleMeetingIsLockChange(isLock: boolean, itemId: string, itemType: ItemType) {
+    if (itemType === ItemType.MEETING) {
+      const meeting = this.meetingMap.get(itemId)
+      meeting?.setIsLock(isLock)
     }
   }
 
