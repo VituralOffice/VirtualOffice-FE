@@ -212,7 +212,10 @@ export default class Network {
             phaserEvents.emit(GameEvent.MEETING_CHATID_CHANGE, c.value, key, ItemType.MEETING)
           }
           if (c.field === 'isLocked') {
-            if (c.value === true) toast(`The meeting is locked`)
+            if (meeting.connectedUser.has(this.mySessionId)) {
+              if (c.value === true) toast(`The meeting is locked`)
+              else toast(`The meeting is locked`)
+            }
             store.dispatch(
               updateMeetingLock({
                 meetingId: key,

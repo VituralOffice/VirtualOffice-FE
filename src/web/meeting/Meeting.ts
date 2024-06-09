@@ -4,7 +4,7 @@ import { openMeetingDialog, createMeeting } from '../../stores/MeetingStore'
 import { setShowCreateMeeting, setCreateMeetingCallback } from '../../stores/UIStore'
 
 export class Meeting {
-  id?: string
+  id: string
   currentUsers = new Set<string>()
   isOpen: boolean
   title: string

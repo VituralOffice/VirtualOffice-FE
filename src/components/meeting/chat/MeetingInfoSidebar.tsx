@@ -64,9 +64,9 @@ export const MeetingInfoSidebar = () => {
     const [connectedUser, setConnectedUser] = useState<(any)[]>()
 
     useEffect(() => {
+      console.log(meeting.connectedUser)
         const players = Network.getInstance()?.room?.state.players;
         let hehe = meeting.connectedUser.map((sessionId) => {
-            console.log(sessionId)
             return { online: true, user: players?.get(sessionId)!, role: meeting.adminUser == sessionId ? 'admin' : 'user' }
         })
         setConnectedUser(hehe)

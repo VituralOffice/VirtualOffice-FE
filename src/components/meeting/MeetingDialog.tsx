@@ -26,6 +26,9 @@ import MeetingChatSidebar from './chat/MeetingChatSidebar'
 import WebRTC from '../../web/WebRTC'
 import Game from '../../scenes/Game'
 import { MeetingInfoSidebar } from './chat/MeetingInfoSidebar'
+import LockIcon from '@mui/icons-material/Lock';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
+import Network from '../../services/Network'
 
 const Backdrop = styled.div`
   position: fixed;
@@ -137,8 +140,8 @@ export default function MeetingDialog() {
   const [activeMeetingView, setActiveMeetingView] = useState(0)
   const [shareScreenAvailable, setShareScreenAvailable] = useState(false)
   const handleLockMeeting = () => {
-    if (meeting.isLocked) Game.getInstance()?.network.unlockMeeting(meeting.activeMeetingId as string)
-    else Game.getInstance()?.network.lockMeeting(meeting.activeMeetingId as string)
+    if (meeting.isLocked) Network.getInstance()?.unlockMeeting(meeting.activeMeetingId as string)
+    else Network.getInstance()?.lockMeeting(meeting.activeMeetingId as string)
   }
   //  show when this player is admin
   const showLockButton = () => {
@@ -188,9 +191,9 @@ export default function MeetingDialog() {
 
           <ToolbarContainer>
             {showLockButton() && (
-              <ToolbarButton isEnabled={activeMeetingView == 1} onClick={handleLockMeeting}>
+              <ToolbarButton onClick={handleLockMeeting}>
                 <div>
-                  <span>{meeting.isLocked ? 'Unlock' : 'Lock'}</span>
+                  <span>{meeting.isLocked ? <LockIcon /> : <LockOpenIcon />}</span>
                 </div>
               </ToolbarButton>
             )}
