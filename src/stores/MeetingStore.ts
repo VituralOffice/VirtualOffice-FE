@@ -6,10 +6,14 @@ import ShareScreenManager from '../web/meeting/ScreenSharingManager'
 import UserMediaManager from '../web/meeting/UserMediaManager'
 import WebRTC from '../web/WebRTC'
 import Network from '../services/Network'
+import { toast } from 'react-toastify'
 
 interface MeetingState {
   meetingDialogOpen: boolean
   activeMeetingId: null | string
+  isLocked: boolean
+  connectedUser: string[]
+  adminUser?: string
   myDisplayStream: null | MediaStream
   myCameraStream: null | MediaStream
   peerDisplayStreams: Map<
@@ -33,7 +37,8 @@ interface MeetingState {
 const initialState: MeetingState = {
   meetingDialogOpen: false,
   activeMeetingId: null,
-
+  isLocked: false,
+  connectedUser: [],
   myDisplayStream: null,
   myCameraStream: null,
   peerDisplayStreams: new Map(),
@@ -142,6 +147,38 @@ export const meetingSlice = createSlice({
       state.peerDisplayStreams.clear()
       state.peerCameraStreams.clear()
     },
+    updateMeetingLock: (state, action: PayloadAction<{ meetingId: string; isLocked: boolean }>) => {
+      if (state.activeMeetingId === action.payload.meetingId) state.isLocked = action.payload.isLocked
+    },
+    updateMeetingAdmin: (
+      state,
+      action: PayloadAction<{ meetingId: string; adminUser: string }>
+    ) => {
+      if (state.activeMeetingId === action.payload.meetingId) state.adminUser = action.payload.adminUser
+    },
+    addMeetingUser: (state, action: PayloadAction<{ meetingId: string; user: string }>) => {
+      if (state.activeMeetingId === action.payload.meetingId)
+        state.connectedUser = [
+          ...state.connectedUser.filter((u) => u != action.payload.user),
+          action.payload.user,
+        ]
+    },
+    removeMeetingUser: (state, action: PayloadAction<{ meetingId: string; user: string }>) => {
+      if (state.activeMeetingId === action.payload.meetingId)
+        state.connectedUser = state.connectedUser.filter((u) => u != action.payload.user)
+    },
+    setMeetingState: (
+      state,
+      action: PayloadAction<{
+        connectedUser: Set<string>
+        adminUser: string
+        isLocked: boolean
+      }>
+    ) => {
+      state.adminUser = action.payload.adminUser
+      state.connectedUser = [...action.payload.connectedUser.values()]
+      state.isLocked = action.payload.isLocked
+    },
   },
 })
 
@@ -156,6 +193,11 @@ export const {
   removeCameraStream,
   disconnectMeeting,
   createMeeting,
+  updateMeetingLock,
+  updateMeetingAdmin,
+  addMeetingUser,
+  removeMeetingUser,
+  setMeetingState,
 } = meetingSlice.actions
 
 export default meetingSlice.reducer

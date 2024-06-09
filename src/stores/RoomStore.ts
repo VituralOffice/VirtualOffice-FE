@@ -23,6 +23,7 @@ export const roomSlice = createSlice({
     roomDescription: '',
     availableRooms: new Array<RoomAvailable>(),
     members: new Array<IRoomMember>(),
+    // onlineMemberMap: new Map<string, IRoomMember>(),
   },
   reducers: {
     setLobbyJoined: (state, action: PayloadAction<boolean>) => {
@@ -47,6 +48,10 @@ export const roomSlice = createSlice({
       state.roomName = action.payload.name
       state.roomDescription = action.payload.description
       state.members = action.payload.members
+      // state.onlineMemberMap.clear()
+      // action.payload.members.forEach((m) => {
+      //   if (m.online) state.onlineMemberMap.set(m.user._id, m);
+      // })
     },
     setAvailableRooms: (state, action: PayloadAction<RoomAvailable[]>) => {
       state.availableRooms = action.payload.filter((room) => isCustomRoom(room))
@@ -65,20 +70,30 @@ export const roomSlice = createSlice({
     removeAvailableRooms: (state, action: PayloadAction<string>) => {
       state.availableRooms = state.availableRooms.filter((room) => room.roomId !== action.payload)
     },
-    setMembers: (state, action: PayloadAction<IRoomMember[]>) => {
-      state.members = action.payload
-    },
-    addMember: (state, action: PayloadAction<IRoomMember>) => {
-      state.members = [...state.members, action.payload]
-    },
-    removeMember: (state, action: PayloadAction<IRoomMember>) => {
-      state.members = state.members.filter((m) => m.user.id !== action.payload.user.id)
-    },
-    updateMember: (state, action: PayloadAction<IRoomMember>) => {
+    // setMembers: (state, action: PayloadAction<IRoomMember[]>) => {
+    //   state.members = action.payload
+    //   action.payload.forEach((m) => state.onlineMemberMap.set(m.user._id, m))
+    // },
+    // addMember: (state, action: PayloadAction<IRoomMember>) => {
+    //   state.members = [...state.members, action.payload]
+    //   state.onlineMemberMap.set(action.payload.user._id, action.payload)
+    // },
+    // removeMember: (state, action: PayloadAction<IRoomMember>) => {
+    //   state.members = state.members.filter((m) => m.user._id !== action.payload.user._id)
+    //   state.onlineMemberMap.delete(action.payload.user._id)
+    // },
+    updateMember: (state, action: PayloadAction<{ member: IRoomMember }>) => {
+      const { member } = action.payload;
+      console.log(`RoomStore::UpdateMember  update member with id: ${member.user._id}, online: ${member.online}`)
       state.members = [
-        ...state.members.filter((m) => m.user._id !== action.payload.user?.id),
-        action.payload,
+        ...state.members.filter((m) => m.user._id !== member.user._id),
+        member,
       ]
+      // if (member.online) {
+      //   state.onlineMemberMap.set(member.user._id, member)
+      // } else if (state.onlineMemberMap.has(member.user._id)) {
+      //   state.onlineMemberMap.delete(member.user._id)
+      // }
     },
   },
 })
@@ -90,9 +105,9 @@ export const {
   setAvailableRooms,
   addAvailableRooms,
   removeAvailableRooms,
-  setMembers,
-  addMember,
-  removeMember,
+  // setMembers,
+  // addMember,
+  // removeMember,
   updateMember,
   setRoomId,
 } = roomSlice.actions

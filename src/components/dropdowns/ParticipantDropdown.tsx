@@ -62,7 +62,7 @@ const ParticipantsBox = styled.div`
 `
 
 interface DropdownProps {
-  members: IRoomMember[]
+  members: any[]
   title: string
 }
 

@@ -61,3 +61,13 @@ const colorArr = [
 export function getColorByString(string: string) {
   return colorArr[Math.floor(string.charCodeAt(0) % colorArr.length)]
 }
+
+export function castObject<A extends object, B extends object>(source: A): B {
+  const result = {} as B;
+  Object.keys(source).forEach((key) => {
+    const sourceKey = key as keyof A;
+    const targetKey = key as keyof B;
+    result[targetKey] = source[sourceKey] as unknown as B[keyof B];
+  });
+  return result;
+}

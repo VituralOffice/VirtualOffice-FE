@@ -4,6 +4,7 @@ import { getAvatarById } from '../../utils/util'
 import { ButtonProps } from '../../interfaces/Interfaces'
 import { IUser } from '../../interfaces/user'
 import { ICharacter } from '../../interfaces/character'
+import { IPlayer } from '../../types/ISpaceState'
 
 const LayoutContainer = styled.div<ButtonProps>`
   height: 56px;
@@ -93,7 +94,7 @@ const Username = styled.div`
 `
 
 interface Props {
-  user: IUser
+  user: any
   isOnline: boolean
   isKing: boolean
 }
@@ -105,7 +106,7 @@ export const ParticipantItem = ({ user, isOnline, isKing }: Props) => {
         <div>
           <div className="background">
             {/* <img src={'/' + getAvatarById(user.character_id).img} /> */}
-            <img src={(user.character as ICharacter).avatar} />
+            <img src={user.characterAvatar} />
           </div>
           <div className="status-dot">
             <FiberManualRecordRoundedIcon />

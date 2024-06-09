@@ -9,16 +9,23 @@ export class Meeting {
   isOpen: boolean
   title: string
   chatId: string
+  isLocked: boolean
+  adminUser?: string
 
   constructor(meetingId: string) {
     this.id = meetingId
     this.isOpen = false
     this.title = ''
     this.chatId = ''
+    this.isLocked = false
   }
 
   addCurrentUser(userId: string) {
     if (!this.currentUsers || this.currentUsers.has(userId)) return
+    // assume admin is first user join meeting
+    // handle lock on player press R
+    if (this.isLocked) return
+    if (this.currentUsers.size === 0) this.adminUser = userId
     this.currentUsers.add(userId)
     const meetingState = store.getState().meeting
     if (meetingState.activeMeetingId === this.id) {
@@ -30,6 +37,8 @@ export class Meeting {
   removeCurrentUser(userId: string) {
     if (!this.currentUsers || !this.currentUsers.has(userId)) return
     this.currentUsers.delete(userId)
+    // give authority to random user when admin left
+    if (this.adminUser === userId) this.adminUser = this.currentUsers[this.currentUsers.keys[0]]
     const meetingState = store.getState().meeting
     if (meetingState.activeMeetingId === this.id) {
       meetingState.shareScreenManager?.onUserLeft(userId)
