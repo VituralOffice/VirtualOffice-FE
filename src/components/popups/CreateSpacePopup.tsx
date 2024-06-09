@@ -13,27 +13,24 @@ import { UNKNOWN_ERROR } from '../../constant'
 import { IMap } from '../../interfaces/map'
 import ApiService from '../../apis/ApiService'
 import { ISubscription } from '../../interfaces/plan'
-
+import store from '../../stores'
+import { setStyledMap } from '../../stores/MapStore'
+import { useAppSelector } from '../../hook'
+export interface StyleMap {
+  style: string
+  maps: IMap[]
+}
 export const CreateSpacePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
   const navigate = useNavigate()
   const totalSteps = 2
+  const styledMap = useAppSelector((state) => state.map.styledMaps)
   const titles = ['Choose your office template', 'Create a new office space for your team']
-  const [maps, setMaps] = useState<IMap[]>([])
   const [subscriptions, setSubscriptions] = useState<ISubscription[]>([])
-  console.log({ subscriptions })
   const [spaceName, setSpaceName] = useState('')
   const [securitySelectedOption, setSecuritySelectedOption] = useState(0)
   const spaceOptions = ['Anyone with the office URL can enter', 'Only invited members can enter']
-
-  const mapIds = [
-    '6623f6a93981dda1700fc844',
-    '6623f6a93981dda1700fc845',
-    '6623f6a93981dda1700fc846',
-    '6623f6a93981dda1700fc847',
-  ]
-  const [mapId, setMapId] = useState(mapIds[0])
+  const [mapId, setMapId] = useState('')
   const [mapSize, setMapSize] = useState(10)
-
   const [formComplete, setFormComplete] = useState(false)
   const fetchSubscription = async () => {
     try {
@@ -43,9 +40,9 @@ export const CreateSpacePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
   }
   const fetchListMap = async () => {
     try {
-      const res = await ApiService.getInstance().get(`/maps`)
+      const res = await ApiService.getInstance().get(`/maps?groupBy=style`)
       if (res.message === `Success`) {
-        setMaps(res.result)
+        store.dispatch(setStyledMap(res.result))
       }
     } catch (error) {}
   }
@@ -65,10 +62,10 @@ export const CreateSpacePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
     try {
       if (!checkSpaceName() || !checkSecurityOption() || !checkMapId() || !checkMapSize()) return
       const response = await CreateRoom({
-        map: '6623f6a93981dda1700fc844',
+        map: mapId,
         name: spaceName,
         private: securitySelectedOption == 1,
-        plan: '663277c9401c17854a17ec7a', //todo: 
+        plan: '663277c9401c17854a17ec7a', //todo:
       })
       console.log('Room created: ', response)
       await Bootstrap.getInstance()?.network.createCustom({
@@ -85,13 +82,7 @@ export const CreateSpacePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
   }
 
   const PopupContents = [
-    <ChooseMap
-      mapIds={mapIds}
-      mapId={mapId}
-      setMapId={setMapId}
-      mapSize={mapSize}
-      setMapSize={setMapSize}
-    />,
+    <ChooseMap mapSize={mapSize} setMapId={setMapId} setMapSize={setMapSize} />,
     <CreateRoomPanel
       spaceName={spaceName}
       setSpaceName={setSpaceName}
