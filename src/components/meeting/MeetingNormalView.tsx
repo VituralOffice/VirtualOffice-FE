@@ -148,7 +148,7 @@ export const MeetingNormalView = () => {
   const myStream = useAppSelector((state) => state.meeting.myCameraStream)
   const peerStreams = useAppSelector((state) => state.meeting.peerCameraStreams)
   const playerNameMap = useAppSelector((state) => state.user.playerNameMap)
-  const playerAvatarMap = useAppSelector((state) => state.user.playerAvatarMap)
+  // const playerAvatarMap = useAppSelector((state) => state.user.playerAvatarMap)
   const user = useAppSelector((state) => state.user)
 
   const [activeScreenIndex, setActiveScreenIndex] = useState(-1)

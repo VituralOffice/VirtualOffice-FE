@@ -1,11 +1,11 @@
 import Network from '../../services/Network'
 import store from '../../stores'
-import { openMeetingDialog, createMeeting } from '../../stores/MeetingStore'
+import { openMeetingDialog, createMeeting, addMeetingUser, removeMeetingUser } from '../../stores/MeetingStore'
 import { setShowCreateMeeting, setCreateMeetingCallback } from '../../stores/UIStore'
 
 export class Meeting {
   id: string
-  currentUsers = new Set<string>()
+  currentUsers = new Array<string>()
   isOpen: boolean
   title: string
   chatId: string
@@ -21,28 +21,30 @@ export class Meeting {
   }
 
   addCurrentUser(userId: string) {
-    if (!this.currentUsers || this.currentUsers.has(userId)) return
+    if (!this.currentUsers || this.currentUsers.includes(userId)) return
     // assume admin is first user join meeting
     // handle lock on player press R
     if (this.isLocked) return
-    if (this.currentUsers.size === 0) this.adminUser = userId
-    this.currentUsers.add(userId)
+    if (this.currentUsers.length === 0) this.adminUser = userId
+    this.currentUsers = [...this.currentUsers, userId]
     const meetingState = store.getState().meeting
     if (meetingState.activeMeetingId === this.id) {
       meetingState.shareScreenManager?.onUserJoined(userId)
       meetingState.userMediaManager?.onUserJoined(userId)
+      store.dispatch(addMeetingUser({ meetingId: this.id, user: userId }))
     }
   }
 
   removeCurrentUser(userId: string) {
-    if (!this.currentUsers || !this.currentUsers.has(userId)) return
-    this.currentUsers.delete(userId)
+    if (!this.currentUsers || !this.currentUsers.includes(userId)) return
+    this.currentUsers = this.currentUsers.filter(u => u !== userId)
     // give authority to random user when admin left
     if (this.adminUser === userId) this.adminUser = this.currentUsers[this.currentUsers.keys[0]]
     const meetingState = store.getState().meeting
     if (meetingState.activeMeetingId === this.id) {
       meetingState.shareScreenManager?.onUserLeft(userId)
       meetingState.userMediaManager?.onUserLeft(userId)
+      store.dispatch(removeMeetingUser({ meetingId: this.id, user: userId }))
     }
   }
 
@@ -56,6 +58,14 @@ export class Meeting {
 
   setChatId(chatId: string) {
     this.chatId = chatId
+  }
+
+  setAdminId(adminId: string) {
+    this.adminUser = adminId
+  }
+
+  setIsLock(isLock: boolean) {
+    this.isLocked = isLock
   }
 
   openDialog(playerId: string, network: Network) {

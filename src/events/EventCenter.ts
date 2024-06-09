@@ -20,4 +20,6 @@ export enum GameEvent {
   MEETING_STATE_CHANGE = 'meeting-state-change',
   MEETING_TITLE_CHANGE = 'meeting-title-change',
   MEETING_CHATID_CHANGE = 'meeting-chatid-change',
+  MEETING_ADMIN_CHANGE = 'meeting-admin-change',
+  MEETING_ISLOCK_CHANGE = 'meeting-islock-change',
 }
