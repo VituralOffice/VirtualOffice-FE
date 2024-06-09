@@ -55,12 +55,12 @@ export default class Network {
     const endpoint = API_URL.replace(`http`, `ws`)
     this.client = new Client(endpoint)
     this.client.auth.token = Cookies.get(ACCESS_TOKEN_KEY) as string
-    this.joinLobbyRoom()
-      .then(() => {
-        console.log('Lobby joined')
-        store.dispatch(setLobbyJoined(true))
-      })
-      .catch((err) => console.log(err))
+    // this.joinLobbyRoom()
+    //   .then(() => {
+    //     console.log('Lobby joined')
+    //     store.dispatch(setLobbyJoined(true))
+    //   })
+    //   .catch((err) => console.log(err))
 
     phaserEvents.on(GameEvent.MY_PLAYER_NAME_CHANGE, this.updatePlayerName, this)
     phaserEvents.on(GameEvent.MY_PLAYER_MEETING_STATUS_CHANGE, this.updatePlayerMeetingStatus, this)
@@ -99,15 +99,12 @@ export default class Network {
    */
   async joinLobbyRoom() {
     this.lobby = await this.client.joinOrCreate(RoomType.LOBBY)
-
     this.lobby.onMessage('rooms', (rooms) => {
       store.dispatch(setAvailableRooms(rooms))
     })
-
     this.lobby.onMessage('+', ([roomId, room]) => {
       store.dispatch(addAvailableRooms({ roomId, room }))
     })
-
     this.lobby.onMessage('-', (roomId) => {
       store.dispatch(removeAvailableRooms(roomId))
     })

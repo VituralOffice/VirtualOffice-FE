@@ -57,10 +57,10 @@ export const OfficeSpace = () => {
       navigate('/')
       return
     }
-    if (!lobbyJoined) {
-      navigate('/app')
-      return
-    }
+    // if (!lobbyJoined) {
+    //   navigate('/app')
+    //   return
+    // }
   }
 
   useEffect(() => {
