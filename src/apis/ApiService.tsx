@@ -6,7 +6,8 @@ import Cookies from 'js-cookie'
 class ApiService {
   private static instance: ApiService | null = null // Biến static để lưu trữ instance của ApiService
   private axiosInstance: AxiosInstance
-
+  private isRefreshingToken: boolean = false
+  private requestQueue: (() => void)[] = []
   private constructor(baseUrl: string) {
     this.axiosInstance = axios.create({
       baseURL: baseUrl,
@@ -33,16 +34,24 @@ class ApiService {
         const originalRequest = error?.config
         const status = error?.response?.status
         const errorMessage = error?.response?.data?.message
-        if (status === 401 && errorMessage === 'token expired') {
-          const refreshFromCookie = Cookies.get(REFRESH_TOKEN_KEY)
-          if (!refreshFromCookie) return error
-          // call refresh token and save to cookie
-          const { accessToken, refreshToken } = await this.refreshToken(refreshFromCookie)
-          Cookies.set(REFRESH_TOKEN_KEY, refreshToken)
-          Cookies.set(ACCESS_TOKEN_KEY, accessToken)
-          originalRequest.headers['Authorization'] = 'Bearer ' + accessToken
-          // retry pre failed request
-          return this.axiosInstance.request(originalRequest)
+        if (status === 401 && errorMessage === 'token expired' && !originalRequest._retry) {
+          originalRequest._retry = true
+          if (!this.isRefreshingToken) {
+            this.isRefreshingToken = true
+            const refreshFromCookie = Cookies.get(REFRESH_TOKEN_KEY)
+            if (!refreshFromCookie) return error
+            const { accessToken, refreshToken } = await this.refreshToken(refreshFromCookie)
+            this.requestQueue.forEach((req) => req())
+            this.isRefreshingToken = false
+            this.requestQueue = []
+            Cookies.set(REFRESH_TOKEN_KEY, refreshToken)
+            Cookies.set(ACCESS_TOKEN_KEY, accessToken)
+            return this.axiosInstance.request(originalRequest)
+          } else {
+            return new Promise((resolve) => {
+              this.requestQueue.push(() => resolve(this.axiosInstance.request(originalRequest)))
+            })
+          }
         }
         return Promise.reject(error)
       }
@@ -100,8 +109,8 @@ class ApiService {
     try {
       const { data } = await this.axiosInstance.post('/auth/refresh', { refreshToken: token })
       return {
-        accessToken: data.accessToken,
-        refreshToken: data.refreshToken,
+        accessToken: data.result.accessToken,
+        refreshToken: data.result.refreshToken,
       }
     } catch (error) {
       throw error
