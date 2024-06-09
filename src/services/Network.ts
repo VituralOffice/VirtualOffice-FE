@@ -25,7 +25,14 @@ import { Message } from '../types/Messages'
 import { ACCESS_TOKEN_KEY } from '../utils/util'
 import { API_URL } from '../constant'
 import Cookies from 'js-cookie'
-import { addMeetingUser, disconnectMeeting, removeMeetingUser, setMeetingState, updateMeetingAdmin, updateMeetingLock } from '../stores/MeetingStore'
+import {
+  addMeetingUser,
+  disconnectMeeting,
+  removeMeetingUser,
+  setMeetingState,
+  updateMeetingAdmin,
+  updateMeetingLock,
+} from '../stores/MeetingStore'
 import { GetMsgByChatId, GetOneChat } from '../apis/ChatApis'
 import { isApiSuccess } from '../apis/util'
 import { setWhiteboardUrls } from '../stores/WhiteboardStore'
@@ -48,10 +55,12 @@ export default class Network {
     const endpoint = API_URL.replace(`http`, `ws`)
     this.client = new Client(endpoint)
     this.client.auth.token = Cookies.get(ACCESS_TOKEN_KEY) as string
-    this.joinLobbyRoom().then(() => {
-      console.log('Lobby joined')
-      store.dispatch(setLobbyJoined(true))
-    })
+    this.joinLobbyRoom()
+      .then(() => {
+        console.log('Lobby joined')
+        store.dispatch(setLobbyJoined(true))
+      })
+      .catch((err) => console.log(err))
 
     phaserEvents.on(GameEvent.MY_PLAYER_NAME_CHANGE, this.updatePlayerName, this)
     phaserEvents.on(GameEvent.MY_PLAYER_MEETING_STATUS_CHANGE, this.updatePlayerMeetingStatus, this)
@@ -473,7 +482,7 @@ export default class Network {
   }
 
   disconnectFromMeeting(id: string) {
-    if (!id) return;
+    if (!id) return
     console.log('DISCONNECT_FROM_MEETING, id: ' + id)
     this.room?.send(Message.DISCONNECT_FROM_MEETING, { meetingId: id })
     // this.webRTC?.checkPreviousPermission()
