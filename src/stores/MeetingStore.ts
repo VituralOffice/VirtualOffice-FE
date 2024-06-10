@@ -14,6 +14,8 @@ interface MeetingState {
   isLocked: boolean
   connectedUser: string[]
   adminUser?: string
+  chatId?:string
+  title?:string
   myDisplayStream: null | MediaStream
   myCameraStream: null | MediaStream
   peerDisplayStreams: Map<
@@ -39,6 +41,9 @@ const initialState: MeetingState = {
   activeMeetingId: null,
   isLocked: false,
   connectedUser: [],
+  adminUser: '',
+  chatId: '',
+  title: '',
   myDisplayStream: null,
   myCameraStream: null,
   peerDisplayStreams: new Map(),
@@ -52,8 +57,6 @@ export const meetingSlice = createSlice({
   initialState,
   reducers: {
     openMeetingDialog: (state, action: PayloadAction<{ meetingId: string; myUserId: string }>) => {
-      state.meetingDialogOpen = true
-      state.activeMeetingId = action.payload.meetingId
       if (!state.shareScreenManager) {
         state.shareScreenManager = new ShareScreenManager(action.payload.myUserId)
       }
@@ -64,33 +67,35 @@ export const meetingSlice = createSlice({
       Game.getInstance()?.disableKeys()
       state.shareScreenManager.onOpen()
       state.userMediaManager.onOpen()
-
+      state.meetingDialogOpen = true
+      console.log(`MeetingStore::openMeetingDialog set activeMeetingId : ${action.payload.meetingId}`)
+      state.activeMeetingId = action.payload.meetingId
       let meeting = Game.getInstance()?.meetingMap.get(action.payload.meetingId)
-      state.adminUser = meeting?.adminUser
-      state.isLocked = meeting?.isLocked!
-      state.connectedUser = meeting?.currentUsers!
+      state.adminUser = meeting?.adminUser || ''
+      state.isLocked = meeting?.isLocked! || false
+      state.connectedUser = meeting?.currentUsers! || []
     },
-    createMeeting: (state, action: PayloadAction<{ meetingId: string; myUserId: string }>) => {
-      if (!state.shareScreenManager) {
-        state.shareScreenManager = new ShareScreenManager(action.payload.myUserId)
-      }
-      if (!state.userMediaManager) {
-        state.userMediaManager = new UserMediaManager(action.payload.myUserId)
-      }
-      Game.getInstance()?.myPlayer.setPlayerIsInMeeting(true)
-      Game.getInstance()?.disableKeys()
-      state.shareScreenManager.onOpen()
-      state.userMediaManager.onOpen()
-      state.meetingDialogOpen = true
-      state.connectedUser = []
-      state.adminUser = ''
-      state.isLocked = false
-      state.activeMeetingId = action.payload.meetingId
-    },
+    // createMeeting: (state, action: PayloadAction<{ meetingId: string; myUserId: string }>) => {
+    //   if (!state.shareScreenManager) {
+    //     state.shareScreenManager = new ShareScreenManager(action.payload.myUserId)
+    //   }
+    //   if (!state.userMediaManager) {
+    //     state.userMediaManager = new UserMediaManager(action.payload.myUserId)
+    //   }
+    //   Game.getInstance()?.myPlayer.setPlayerIsInMeeting(true)
+    //   Game.getInstance()?.disableKeys()
+    //   state.shareScreenManager.onOpen()
+    //   state.userMediaManager.onOpen()
+    //   state.meetingDialogOpen = true
+    //   state.connectedUser = []
+    //   state.adminUser = ''
+    //   state.isLocked = false
+    //   state.activeMeetingId = action.payload.meetingId
+    // },
     closeMeetingDialog: (state) => {
       // Tell server the meeting dialog is closed.
-      Game.getInstance()?.enableKeys()
       Network.getInstance()?.disconnectFromMeeting(state.activeMeetingId!)
+      Game.getInstance()?.enableKeys()
       Game.getInstance()?.myPlayer.setPlayerIsInMeeting(false)
       Game.getInstance()?.myPlayer.setLeaveCurrentChair(true)
       for (const { call } of state.peerDisplayStreams.values()) {
@@ -107,6 +112,8 @@ export const meetingSlice = createSlice({
       state.activeMeetingId = null
       state.connectedUser = []
       state.adminUser = ''
+      state.chatId = ''
+      state.title = ''
       state.isLocked = false
       state.peerDisplayStreams.clear()
       state.peerCameraStreams.clear()
@@ -157,6 +164,8 @@ export const meetingSlice = createSlice({
       state.activeMeetingId = null
       state.connectedUser = []
       state.adminUser = ''
+      state.chatId = ''
+      state.title = ''
       state.isLocked = false
       state.peerDisplayStreams.clear()
       state.peerCameraStreams.clear()
@@ -181,6 +190,34 @@ export const meetingSlice = createSlice({
     removeMeetingUser: (state, action: PayloadAction<{ meetingId: string; user: string }>) => {
       if (state.activeMeetingId === action.payload.meetingId)
         state.connectedUser = state.connectedUser.filter((u) => u != action.payload.user)
+    },
+    setMeetingIsLocked: (
+      state,
+      action: PayloadAction<{ meetingId: string; isLocked: boolean }>
+    ) => {
+      if (state.activeMeetingId === action.payload.meetingId)
+        state.isLocked = action.payload.isLocked
+    },
+    setAdminUser: (
+      state,
+      action: PayloadAction<{ meetingId: string; adminUser: string }>
+    ) => {
+      if (state.activeMeetingId === action.payload.meetingId)
+        state.adminUser = action.payload.adminUser
+    },
+    setChatId: (
+      state,
+      action: PayloadAction<{ meetingId: string; chatId: string }>
+    ) => {
+      if (state.activeMeetingId === action.payload.meetingId)
+        state.chatId = action.payload.chatId
+    },
+    setTitle: (
+      state,
+      action: PayloadAction<{ meetingId: string; title: string }>
+    ) => {
+      if (state.activeMeetingId === action.payload.meetingId)
+        state.title = action.payload.title
     },
     // setMeetingState: (
     //   state,
@@ -207,12 +244,16 @@ export const {
   addCameraStream,
   removeCameraStream,
   disconnectMeeting,
-  createMeeting,
+  // createMeeting,
   // updateMeetingLock,
   // updateMeetingAdmin,
   addMeetingUser,
   removeMeetingUser,
   // setMeetingState,
+  setMeetingIsLocked,
+  setAdminUser,
+  setChatId,
+  setTitle,
 } = meetingSlice.actions
 
 export default meetingSlice.reducer

@@ -25,9 +25,7 @@ import { Message } from '../types/Messages'
 import { ACCESS_TOKEN_KEY } from '../utils/util'
 import { API_URL } from '../constant'
 import Cookies from 'js-cookie'
-import {
-  disconnectMeeting,
-} from '../stores/MeetingStore'
+import { disconnectMeeting } from '../stores/MeetingStore'
 import { GetMsgByChatId, GetOneChat } from '../apis/ChatApis'
 import { isApiSuccess } from '../apis/util'
 import { setWhiteboardUrls } from '../stores/WhiteboardStore'
@@ -45,17 +43,17 @@ export default class Network {
 
   constructor() {
     Network.instance = this
-    console.log('Construct Network')
+    console.log('Network::constructor Construct Network')
     // const endpoint = API_URL.replace('https', `wss`)
     const endpoint = API_URL.replace(`http`, `ws`)
     this.client = new Client(endpoint)
     this.client.auth.token = Cookies.get(ACCESS_TOKEN_KEY) as string
     // this.joinLobbyRoom()
     //   .then(() => {
-    //     console.log('Lobby joined')
+    //     console.log('Network:: Lobby joined')
     //     store.dispatch(setLobbyJoined(true))
     //   })
-    //   .catch((err) => console.log(err))
+    //   .catch((err) => console.log(eNetwork:: rr))
 
     phaserEvents.on(GameEvent.MY_PLAYER_NAME_CHANGE, this.updatePlayerName, this)
     phaserEvents.on(GameEvent.MY_PLAYER_MEETING_STATUS_CHANGE, this.updatePlayerMeetingStatus, this)
@@ -69,22 +67,22 @@ export default class Network {
   }
 
   // public disconnectPlayer() {
-  //   console.log('Disconnecting my player')
+  //   console.log('Network:: Disconnecting my player')
   //   Game.getInstance()?.myPlayer.disconnectPlayer(this)
   // }
 
   public disconnectNetwork() {
-    console.log('Disconnecting network')
+    console.log('Network::disconnectNetwork Disconnecting network')
     this.room?.leave()
   }
 
   public disconnectWebRTC() {
-    console.log('Disconnecting webRTC')
+    console.log('Network::disconnectWebRTC Disconnecting webRTC')
     this.webRTC?.disconnect()
   }
 
   public disconnectMeeting() {
-    console.log('Disconnecting meeting')
+    console.log('Network::disconnectMeeting Disconnecting meeting')
     store.dispatch(disconnectMeeting())
   }
 
@@ -126,7 +124,7 @@ export default class Network {
   // method to create a custom room
   async createCustom(roomData: IRoomData) {
     this.room = await this.client.create(RoomType.CUSTOM, roomData)
-    console.log('Room created')
+    console.log('Network::createCustom Room created')
     this.initialize()
   }
 
@@ -134,7 +132,7 @@ export default class Network {
   async initialize() {
     if (!this.room) return
 
-    console.log('Initilize Network')
+    console.log('Network::initialize Initilize Network')
 
     this.lobby?.leave()
     this.mySessionId = this.room.sessionId
@@ -207,7 +205,7 @@ export default class Network {
             phaserEvents.emit(GameEvent.MEETING_TITLE_CHANGE, c.value, key, ItemType.MEETING)
           }
           if (c.field === 'chatId') {
-            // console.log('GameEvent.MEETING_CHATID_CHANGE', c.value)
+            // console.log('Network:: GameEvent.MEETING_CHATID_CHANGE', c.value)
             phaserEvents.emit(GameEvent.MEETING_CHATID_CHANGE, c.value, key, ItemType.MEETING)
           }
           if (c.field === 'isLocked') {
@@ -244,7 +242,7 @@ export default class Network {
 
     // when the server sends room data
     this.room.onMessage(Message.SEND_ROOM_DATA, (content) => {
-      console.log(`server sends room data`, { content })
+      console.log(`Network::onMessage SEND_ROOM_DATA`, { content })
       store.dispatch(setJoinedRoomData(content))
     })
     // when the server sends room data
@@ -286,7 +284,7 @@ export default class Network {
       Message.CONNECT_TO_MEETING,
       async (message: { meetingId: string; chatId: string; title: string }) => {
         console.log(
-          `on event Message.CONNECT_TO_MEETING: meetingId: ${message.meetingId}, chatId: ${message.chatId}, title: ${message.title}`
+          `Network::onMessage CONNECT_TO_MEETING: meetingId: ${message.meetingId}, chatId: ${message.chatId}, title: ${message.title}`
         )
         const chatResponse = await GetOneChat({
           roomId: store.getState().room.roomId,
@@ -297,8 +295,8 @@ export default class Network {
           chatId: message.chatId,
         })
         if (isApiSuccess(chatResponse) && isApiSuccess(msgResponse)) {
-          // console.log(`on event Message.CONNECT_TO_MEETING success`, chatResponse.result)
-          // console.log('mapMessages of chat: ', msgResponse.result)
+          // console.log(`Network:: on event Message.CONNECT_TO_MEETING success`, chatResponse.result)
+          // console.log('Network:: mapMessages of chat: ', msgResponse.result)
           store.dispatch(
             addChatAndSetActive({ chat: chatResponse.result, mapMessage: msgResponse.result })
           )
@@ -480,9 +478,8 @@ export default class Network {
 
   disconnectFromMeeting(id: string) {
     if (!id) return
-    console.log('DISCONNECT_FROM_MEETING, id: ' + id)
+    console.log('Network::disconnectFromMeeting DISCONNECT_FROM_MEETING, id: ' + id)
     this.room?.send(Message.DISCONNECT_FROM_MEETING, { meetingId: id })
-    // this.webRTC?.checkPreviousPermission()
   }
 
   connectToWhiteboard(id: string) {
@@ -502,7 +499,7 @@ export default class Network {
   }
 
   addChatMessage(payload: IMessagePayload) {
-    console.log('send messgae', payload)
+    console.log('Network::addChatMessage send messgae', payload)
     this.room?.send(Message.ADD_CHAT_MESSAGE, payload)
   }
   // loadChat() {

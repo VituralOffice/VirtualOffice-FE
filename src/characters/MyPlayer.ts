@@ -214,12 +214,11 @@ export default class MyPlayer extends Player {
           this.chairOnSit.groupId !== '-1'
         ) {
           const meeting = Game.getInstance()?.meetingMap.get(this.chairOnSit.groupId!) as Meeting
-          console.log(meeting)
           if (meeting.isLocked) break
           if (meeting.isOpen) {
-            meeting.openDialog(this.getPlayerId()!, network)
+            meeting.openDialog(network)
           } else {
-            meeting.createMeeting(this.getPlayerId()!, network)
+            meeting.createMeeting(network)
           }
           break
         }
