@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
@@ -172,10 +172,26 @@ export default function MeetingDialog() {
     }
   }, [peerDisplayStreams, myPeerDisplayStream])
 
+  //TODO: optimize this: temp delay first start camera because userMediaManager hasn't been initialized yet
+  const isFirstRun = useRef(true);
   useEffect(() => {
-    if (!user.microphoneON && !user.cameraON) userMediaManager!.stopCameraShare()
-    userMediaManager!.startCameraShare(user.cameraON, user.microphoneON)
-  }, [user.microphoneON, user.cameraON])
+    if (isFirstRun.current) {
+      setTimeout(() => {
+        if (!user.microphoneON && !user.cameraON) {
+          userMediaManager!.stopCameraShare();
+        } else {
+          userMediaManager!.startCameraShare(user.cameraON, user.microphoneON);
+        }
+        isFirstRun.current = false;
+      }, 1000);
+    } else {
+      if (!user.microphoneON && !user.cameraON) {
+        userMediaManager!.stopCameraShare();
+      } else {
+        userMediaManager!.startCameraShare(user.cameraON, user.microphoneON);
+      }
+    }
+  }, [user.microphoneON, user.cameraON, userMediaManager]);
 
   return (
     <>

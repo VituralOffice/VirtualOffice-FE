@@ -6,6 +6,7 @@ import {
   removePlayerNameMap,
   setPlayerAvatarMap,
   removePlayerAvatarMap,
+  selectUserId,
 } from '../stores/UserStore'
 import {
   setLobbyJoined,
@@ -14,6 +15,7 @@ import {
   addAvailableRooms,
   removeAvailableRooms,
   updateMember,
+  selectRoomId,
 } from '../stores/RoomStore'
 import { IChair, IMeeting, IOfficeState, IPlayer, IWhiteboard } from '../types/ISpaceState'
 import WebRTC from '../web/WebRTC'
@@ -460,10 +462,10 @@ export default class Network {
     this.room?.send(Message.DISCONNECT_FROM_CHAIR, { chairId: id })
   }
 
-  connectToMeeting(meetingId: string, title?: string) {
+  connectToMeeting(userId: string, roomId: string, meetingId: string, title?: string) {
     this.room?.send(Message.CONNECT_TO_MEETING, {
-      roomId: store.getState().room.roomId,
-      userId: store.getState().user.userId,
+      roomId,
+      userId,
       meetingId,
       title,
     })

@@ -7,6 +7,10 @@ import UserMediaManager from '../web/meeting/UserMediaManager'
 import WebRTC from '../web/WebRTC'
 import Network from '../services/Network'
 import { toast } from 'react-toastify'
+import { selectRoomId } from './RoomStore'
+import { selectUserId } from './UserStore'
+import { AppThunk } from '.'
+import { Meeting } from '../web/meeting/Meeting'
 
 interface MeetingState {
   meetingDialogOpen: boolean
@@ -14,8 +18,8 @@ interface MeetingState {
   isLocked: boolean
   connectedUser: string[]
   adminUser?: string
-  chatId?:string
-  title?:string
+  chatId?: string
+  title?: string
   myDisplayStream: null | MediaStream
   myCameraStream: null | MediaStream
   peerDisplayStreams: Map<
@@ -56,7 +60,7 @@ export const meetingSlice = createSlice({
   name: 'meeting',
   initialState,
   reducers: {
-    openMeetingDialog: (state, action: PayloadAction<{ meetingId: string; myUserId: string }>) => {
+    openMeetingDialog: (state, action: PayloadAction<{ meeting: Meeting; myUserId: string }>) => {
       if (!state.shareScreenManager) {
         state.shareScreenManager = new ShareScreenManager(action.payload.myUserId)
       }
@@ -68,13 +72,33 @@ export const meetingSlice = createSlice({
       state.shareScreenManager.onOpen()
       state.userMediaManager.onOpen()
       state.meetingDialogOpen = true
-      console.log(`MeetingStore::openMeetingDialog set activeMeetingId : ${action.payload.meetingId}`)
-      state.activeMeetingId = action.payload.meetingId
-      let meeting = Game.getInstance()?.meetingMap.get(action.payload.meetingId)
-      state.adminUser = meeting?.adminUser || ''
-      state.isLocked = meeting?.isLocked! || false
-      state.connectedUser = meeting?.currentUsers! || []
+      state.activeMeetingId = action.payload.meeting.id
+      state.adminUser = action.payload.meeting?.adminUser || ''
+      state.isLocked = action.payload.meeting?.isLocked! || false
+      state.connectedUser = action.payload.meeting?.currentUsers! || []
+      state.chatId = action.payload.meeting?.chatId || ''
+      state.title = action.payload.meeting?.title || ''
+      console.log(`MeetingStore::openMeetingDialog set activeMeetingId : ${action.payload.meeting.id}`)
     },
+    // refreshMeeting: (state) => {
+    //   if (!state.shareScreenManager) {
+    //     state.shareScreenManager = new ShareScreenManager(action.payload.myUserId)
+    //   }
+    //   if (!state.userMediaManager) {
+    //     state.userMediaManager = new UserMediaManager(action.payload.myUserId)
+    //   }
+    //   Game.getInstance()?.myPlayer.setPlayerIsInMeeting(true)
+    //   Game.getInstance()?.disableKeys()
+    //   state.shareScreenManager.onOpen()
+    //   state.userMediaManager.onOpen()
+    //   state.meetingDialogOpen = true
+    //   console.log(`MeetingStore::openMeetingDialog set activeMeetingId : ${action.payload.meetingId}`)
+    //   state.activeMeetingId = action.payload.meetingId
+    //   let meeting = Game.getInstance()?.meetingMap.get(action.payload.meetingId)
+    //   state.adminUser = meeting?.adminUser || ''
+    //   state.isLocked = meeting?.isLocked! || false
+    //   state.connectedUser = meeting?.currentUsers! || []
+    // }
     // createMeeting: (state, action: PayloadAction<{ meetingId: string; myUserId: string }>) => {
     //   if (!state.shareScreenManager) {
     //     state.shareScreenManager = new ShareScreenManager(action.payload.myUserId)
@@ -181,15 +205,21 @@ export const meetingSlice = createSlice({
     // },
     addMeetingUser: (state, action: PayloadAction<{ meetingId: string; user: string }>) => {
       // console.log(`MeetingStore::addMeetingUser state.activeMeetingId: ${state.activeMeetingId}, action.payload.meetingId: ${action.payload.meetingId}`)
-      if (state.activeMeetingId === action.payload.meetingId)
+      if (state.activeMeetingId === action.payload.meetingId) {
         state.connectedUser = [
           ...state.connectedUser.filter((u) => u != action.payload.user),
           action.payload.user,
         ]
+        state.shareScreenManager?.onUserJoined(action.payload.user)
+        state.userMediaManager?.onUserJoined(action.payload.user)
+      }
     },
     removeMeetingUser: (state, action: PayloadAction<{ meetingId: string; user: string }>) => {
-      if (state.activeMeetingId === action.payload.meetingId)
+      if (state.activeMeetingId === action.payload.meetingId) {
         state.connectedUser = state.connectedUser.filter((u) => u != action.payload.user)
+        state.shareScreenManager?.onUserLeft(action.payload.user)
+        state.userMediaManager?.onUserLeft(action.payload.user)
+      }
     },
     setMeetingIsLocked: (
       state,
@@ -233,6 +263,28 @@ export const meetingSlice = createSlice({
     // },
   },
 })
+
+// Thunk to handle side effects
+export const openMeetingWithDependencies = (meetingId: string, myPlayerId: string, meetingTitle?: string): AppThunk => (dispatch, getState) => {
+  const state = getState();
+  const userId = selectUserId(state);
+  const roomId = selectRoomId(state);
+
+  const meeting = Game.getInstance()?.meetingMap.get(meetingId);
+  dispatch(openMeetingDialog({ meeting: meeting!, myUserId: myPlayerId }));
+
+  // Perform side effects after dispatching the action
+  Network.getInstance()?.connectToMeeting(
+    userId,
+    roomId,
+    meetingId,
+    meetingTitle ? meetingTitle : meeting?.title!
+  );
+  // setTimeout(() => {
+  //   console.log("MeetingStore::openMeetingWithDependencies Network.getInstance()?.connectToMeeting")
+
+  // }, 0);
+};
 
 export const {
   closeMeetingDialog,

@@ -23,15 +23,14 @@ export default class UserMediaManager {
         })
 
         this.myPeer.on('call', (call) => {
-            console.log("receive call")
+            console.log(`receive call from ${call.peer}`)
             call.answer()
             call.on('stream', (userVideoStream) => {
+                console.log(`UserMediaManager::on stream ${call.peer}`)
                 store.dispatch(addCameraStream({ id: call.peer, call, stream: userVideoStream }))
             })
             // we handled on close on our own
         })
-
-        
     }
 
     onOpen() {
@@ -54,6 +53,7 @@ export default class UserMediaManager {
 
     startCameraShare(video: boolean, microphone: boolean) {
         if (!video && !microphone) return;
+        console.log(`UserMediaManager::startCameraShare`)
         // @ts-ignore
         navigator.mediaDevices
             ?.getUserMedia({
@@ -89,10 +89,11 @@ export default class UserMediaManager {
     }
 
     onUserJoined(userId: string) {
-        if (!this.myStream || userId === this.userId) return
-        console.log("meeting camera call " + userId);
+        if (!this.myStream || userId == this.userId) return
+        console.log(`UserMediaManager::onUserJoined userId: ${this.userId}, peerId: ${userId}`);
 
         const sanatizedId = this.makeId(userId)
+        console.log(`UserMediaManager::onuserJoined call ${sanatizedId}`)
         this.myPeer.call(sanatizedId, this.myStream)
     }
 

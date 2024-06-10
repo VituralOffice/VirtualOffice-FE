@@ -3,9 +3,8 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { BackgroundMode } from '../types/BackgroundMode'
 import { sanitizeId } from '../utils/util'
 import { UserData } from '../types'
-import WebRTC from '../web/WebRTC'
 import { ICharacter } from '../interfaces/character'
-import Network from '../services/Network'
+import { RootState } from '.'
 
 export function getInitialBackgroundMode() {
   const currentHour = new Date().getHours()
@@ -132,6 +131,8 @@ export const userSlice = createSlice({
     },
   },
 })
+
+export const selectUserId = (state: RootState) => state.user.userId;
 
 export const {
   toggleBackgroundMode,
