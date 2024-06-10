@@ -9,6 +9,7 @@ import {
   setAdminUser,
   setChatId,
   setTitle,
+  openMeetingWithDependencies,
 } from '../../stores/MeetingStore'
 import { setShowCreateMeeting, setCreateMeetingCallback } from '../../stores/UIStore'
 
@@ -39,8 +40,6 @@ export class Meeting {
     const meetingState = store.getState().meeting
     console.log(`Meeting::addCurrentUser add user ${userId}`)
     if (meetingState.activeMeetingId === this.id) {
-      meetingState.shareScreenManager?.onUserJoined(userId)
-      meetingState.userMediaManager?.onUserJoined(userId)
       store.dispatch(addMeetingUser({ meetingId: this.id, user: userId }))
     }
   }
@@ -52,8 +51,6 @@ export class Meeting {
     if (this.adminUser === userId) this.adminUser = this.currentUsers[this.currentUsers.keys[0]]
     const meetingState = store.getState().meeting
     if (meetingState.activeMeetingId === this.id) {
-      meetingState.shareScreenManager?.onUserLeft(userId)
-      meetingState.userMediaManager?.onUserLeft(userId)
       store.dispatch(removeMeetingUser({ meetingId: this.id, user: userId }))
     }
   }
@@ -84,16 +81,14 @@ export class Meeting {
 
   openDialog(network: Network) {
     if (!this.id) return
-    store.dispatch(openMeetingDialog({ meetingId: this.id, myUserId: network.mySessionId }))
-    network.connectToMeeting(this.id)
+    store.dispatch(openMeetingWithDependencies(this.id, network.mySessionId))
   }
 
   createMeeting(network: Network) {
     if (!this.id) return
 
     const createMeetingCallback = (title: string) => {
-      store.dispatch(openMeetingDialog({ meetingId: this.id, myUserId: network.mySessionId }))
-      network.connectToMeeting(this.id!, title)
+      store.dispatch(openMeetingWithDependencies(this.id, network.mySessionId, title))
     }
 
     store.dispatch(setCreateMeetingCallback(createMeetingCallback))

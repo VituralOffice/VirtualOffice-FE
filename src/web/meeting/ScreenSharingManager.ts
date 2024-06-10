@@ -19,8 +19,10 @@ export default class ShareScreenManager {
     })
 
     this.myPeer.on('call', (call) => {
+      console.log("ScreenShareingManager::receive call")
       call.answer()
       call.on('stream', (userVideoStream) => {
+        console.log(`ScreenShareingManager::on stream ${call.peer}`)
         store.dispatch(addDisplayStream({ id: call.peer, call, stream: userVideoStream }))
       })
       // we handled on close on our own
@@ -79,7 +81,8 @@ export default class ShareScreenManager {
   // from onClose, it causes redux reducer cycle, this may be fixable by using thunk
   // or something.
   stopScreenShare(shouldDispatch = true) {
-    this.myStream?.getTracks().forEach((track) => track.stop())
+    if (!this.myStream) return;
+    this.myStream.getTracks().forEach((track) => track.stop())
     this.myStream = undefined
     if (shouldDispatch) {
       store.dispatch(setMyDisplayStream(null))

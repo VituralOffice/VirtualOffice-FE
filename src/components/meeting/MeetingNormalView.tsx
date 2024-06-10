@@ -172,7 +172,7 @@ export const MeetingNormalView = () => {
       )}
       {[...peerStreams.entries()].map(([id, { stream }], index) => {
         const playerName = playerNameMap.get(id)
-        console.log(Game.getInstance()?.otherPlayerMap.get(id)?.playerNameText.text)
+        // console.log(Game.getInstance()?.otherPlayerMap.get(id)?.playerNameText.text)
         return (
           <VideoContainer
             key={id}

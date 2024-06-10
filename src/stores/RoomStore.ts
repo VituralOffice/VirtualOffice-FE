@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RoomAvailable } from 'colyseus.js'
 import { IRoomMember, RoomType } from '../types/Rooms'
+import { RootState } from '.'
 
 interface RoomInterface extends RoomAvailable {
   name?: string
@@ -97,6 +98,8 @@ export const roomSlice = createSlice({
     },
   },
 })
+
+export const selectRoomId = (state: RootState) => state.room.roomId;
 
 export const {
   setLobbyJoined,
