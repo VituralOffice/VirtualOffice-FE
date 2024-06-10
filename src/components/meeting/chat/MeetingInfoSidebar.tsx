@@ -58,40 +58,40 @@ const ParticipantContentLayout = styled.div`
 `
 
 export const MeetingInfoSidebar = () => {
-    const [searchUserTxt, setSearchUserTxt] = useState<string>('')
-    const user = useAppSelector((state) => state.user)
-    const meeting = useAppSelector((state) => state.meeting)
-    const [connectedUser, setConnectedUser] = useState<(any)[]>()
+  const [searchUserTxt, setSearchUserTxt] = useState<string>('')
+  // const user = useAppSelector((state) => state.user)
+  const meeting = useAppSelector((state) => state.meeting)
+  const [connectedUser, setConnectedUser] = useState<(any)[]>()
 
-    useEffect(() => {
-        const players = Network.getInstance()?.room?.state.players;
-        let hehe = meeting.connectedUser.map((sessionId) => {
-            console.log(sessionId)
-            return { online: true, user: players?.get(sessionId)!, role: meeting.adminUser == sessionId ? 'admin' : 'user' }
-        })
-        setConnectedUser(hehe)
-    }, [meeting.connectedUser])
+  useEffect(() => {
+    const players = Network.getInstance()?.room?.state.players;
+    let hehe = meeting.connectedUser.map((sessionId) => {
+      return { online: true, user: players?.get(sessionId)!, role: meeting.adminUser == sessionId ? 'admin' : 'user' }
+    })
+    setConnectedUser(hehe)
+  }, [meeting.connectedUser])
 
-    return (
-        <Wrapper>
-            <div
-                style={{
-                    display: 'flex',
-                    gap: '10px',
-                    marginBottom: '16px',
-                    paddingLeft: '16px',
-                    paddingRight: '16px',
-                }}
-            >
-                <SearchBar search={searchUserTxt} setSearch={setSearchUserTxt} />
-            </div>
-            <ParticipantContentLayout>
-                <ParticipantDropdown
-                    key={1}
-                    title="Members"
-                    members={connectedUser?.filter((m) => m?.online || false) || []}
-                />
-            </ParticipantContentLayout>
-        </Wrapper>
-    )
+  return (
+    <Wrapper>
+      <div
+        style={{
+          display: 'flex',
+          gap: '10px',
+          marginBottom: '16px',
+          paddingLeft: '16px',
+          paddingRight: '16px',
+        }}
+      >
+        <SearchBar search={searchUserTxt} setSearch={setSearchUserTxt} />
+      </div>
+      <ParticipantContentLayout>
+        <ParticipantDropdown
+          key={1}
+          title="Members"
+          members={connectedUser?.filter((m) => m?.online || false) || []}
+          enabledByDefault={true}
+        />
+      </ParticipantContentLayout>
+    </Wrapper>
+  )
 }

@@ -64,10 +64,11 @@ const ParticipantsBox = styled.div`
 interface DropdownProps {
   members: any[]
   title: string
+  enabledByDefault?: boolean
 }
 
-export const ParticipantDropdown = ({ members, title }: DropdownProps) => {
-  const [enabled, setEnabled] = useState<boolean>(false)
+export const ParticipantDropdown = ({ members, title, enabledByDefault }: DropdownProps) => {
+  const [enabled, setEnabled] = useState<boolean>(enabledByDefault ? enabledByDefault : false)
 
   return (
     <ParticipantsBox>

@@ -52,6 +52,8 @@ export const meetingSlice = createSlice({
   initialState,
   reducers: {
     openMeetingDialog: (state, action: PayloadAction<{ meetingId: string; myUserId: string }>) => {
+      state.meetingDialogOpen = true
+      state.activeMeetingId = action.payload.meetingId
       if (!state.shareScreenManager) {
         state.shareScreenManager = new ShareScreenManager(action.payload.myUserId)
       }
@@ -62,8 +64,11 @@ export const meetingSlice = createSlice({
       Game.getInstance()?.disableKeys()
       state.shareScreenManager.onOpen()
       state.userMediaManager.onOpen()
-      state.meetingDialogOpen = true
-      state.activeMeetingId = action.payload.meetingId
+
+      let meeting = Game.getInstance()?.meetingMap.get(action.payload.meetingId)
+      state.adminUser = meeting?.adminUser
+      state.isLocked = meeting?.isLocked!
+      state.connectedUser = meeting?.currentUsers!
     },
     createMeeting: (state, action: PayloadAction<{ meetingId: string; myUserId: string }>) => {
       if (!state.shareScreenManager) {
@@ -77,6 +82,9 @@ export const meetingSlice = createSlice({
       state.shareScreenManager.onOpen()
       state.userMediaManager.onOpen()
       state.meetingDialogOpen = true
+      state.connectedUser = []
+      state.adminUser = ''
+      state.isLocked = false
       state.activeMeetingId = action.payload.meetingId
     },
     closeMeetingDialog: (state) => {
@@ -97,6 +105,9 @@ export const meetingSlice = createSlice({
       state.myDisplayStream = null
       state.myCameraStream = null
       state.activeMeetingId = null
+      state.connectedUser = []
+      state.adminUser = ''
+      state.isLocked = false
       state.peerDisplayStreams.clear()
       state.peerCameraStreams.clear()
     },
@@ -144,19 +155,23 @@ export const meetingSlice = createSlice({
       state.myDisplayStream = null
       state.myCameraStream = null
       state.activeMeetingId = null
+      state.connectedUser = []
+      state.adminUser = ''
+      state.isLocked = false
       state.peerDisplayStreams.clear()
       state.peerCameraStreams.clear()
     },
-    updateMeetingLock: (state, action: PayloadAction<{ meetingId: string; isLocked: boolean }>) => {
-      if (state.activeMeetingId === action.payload.meetingId) state.isLocked = action.payload.isLocked
-    },
-    updateMeetingAdmin: (
-      state,
-      action: PayloadAction<{ meetingId: string; adminUser: string }>
-    ) => {
-      if (state.activeMeetingId === action.payload.meetingId) state.adminUser = action.payload.adminUser
-    },
+    // updateMeetingLock: (state, action: PayloadAction<{ meetingId: string; isLocked: boolean }>) => {
+    //   if (state.activeMeetingId === action.payload.meetingId) state.isLocked = action.payload.isLocked
+    // },
+    // updateMeetingAdmin: (
+    //   state,
+    //   action: PayloadAction<{ meetingId: string; adminUser: string }>
+    // ) => {
+    //   if (state.activeMeetingId === action.payload.meetingId) state.adminUser = action.payload.adminUser
+    // },
     addMeetingUser: (state, action: PayloadAction<{ meetingId: string; user: string }>) => {
+      // console.log(`MeetingStore::addMeetingUser state.activeMeetingId: ${state.activeMeetingId}, action.payload.meetingId: ${action.payload.meetingId}`)
       if (state.activeMeetingId === action.payload.meetingId)
         state.connectedUser = [
           ...state.connectedUser.filter((u) => u != action.payload.user),
@@ -167,18 +182,18 @@ export const meetingSlice = createSlice({
       if (state.activeMeetingId === action.payload.meetingId)
         state.connectedUser = state.connectedUser.filter((u) => u != action.payload.user)
     },
-    setMeetingState: (
-      state,
-      action: PayloadAction<{
-        connectedUser: Set<string>
-        adminUser: string
-        isLocked: boolean
-      }>
-    ) => {
-      state.adminUser = action.payload.adminUser
-      state.connectedUser = [...action.payload.connectedUser.values()]
-      state.isLocked = action.payload.isLocked
-    },
+    // setMeetingState: (
+    //   state,
+    //   action: PayloadAction<{
+    //     connectedUser: Set<string>
+    //     adminUser: string
+    //     isLocked: boolean
+    //   }>
+    // ) => {
+    //   state.adminUser = action.payload.adminUser
+    //   state.connectedUser = [...action.payload.connectedUser.values()]
+    //   state.isLocked = action.payload.isLocked
+    // },
   },
 })
 
@@ -193,11 +208,11 @@ export const {
   removeCameraStream,
   disconnectMeeting,
   createMeeting,
-  updateMeetingLock,
-  updateMeetingAdmin,
+  // updateMeetingLock,
+  // updateMeetingAdmin,
   addMeetingUser,
   removeMeetingUser,
-  setMeetingState,
+  // setMeetingState,
 } = meetingSlice.actions
 
 export default meetingSlice.reducer

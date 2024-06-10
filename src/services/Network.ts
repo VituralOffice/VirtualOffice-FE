@@ -25,7 +25,9 @@ import { Message } from '../types/Messages'
 import { ACCESS_TOKEN_KEY } from '../utils/util'
 import { API_URL } from '../constant'
 import Cookies from 'js-cookie'
-import { addMeetingUser, disconnectMeeting, removeMeetingUser, setMeetingState, updateMeetingAdmin, updateMeetingLock } from '../stores/MeetingStore'
+import {
+  disconnectMeeting,
+} from '../stores/MeetingStore'
 import { GetMsgByChatId, GetOneChat } from '../apis/ChatApis'
 import { isApiSuccess } from '../apis/util'
 import { setWhiteboardUrls } from '../stores/WhiteboardStore'
@@ -48,10 +50,12 @@ export default class Network {
     const endpoint = API_URL.replace(`http`, `ws`)
     this.client = new Client(endpoint)
     this.client.auth.token = Cookies.get(ACCESS_TOKEN_KEY) as string
-    this.joinLobbyRoom().then(() => {
-      console.log('Lobby joined')
-      store.dispatch(setLobbyJoined(true))
-    })
+    // this.joinLobbyRoom()
+    //   .then(() => {
+    //     console.log('Lobby joined')
+    //     store.dispatch(setLobbyJoined(true))
+    //   })
+    //   .catch((err) => console.log(err))
 
     phaserEvents.on(GameEvent.MY_PLAYER_NAME_CHANGE, this.updatePlayerName, this)
     phaserEvents.on(GameEvent.MY_PLAYER_MEETING_STATUS_CHANGE, this.updatePlayerMeetingStatus, this)
@@ -90,15 +94,12 @@ export default class Network {
    */
   async joinLobbyRoom() {
     this.lobby = await this.client.joinOrCreate(RoomType.LOBBY)
-
     this.lobby.onMessage('rooms', (rooms) => {
       store.dispatch(setAvailableRooms(rooms))
     })
-
     this.lobby.onMessage('+', ([roomId, room]) => {
       store.dispatch(addAvailableRooms({ roomId, room }))
     })
-
     this.lobby.onMessage('-', (roomId) => {
       store.dispatch(removeAvailableRooms(roomId))
     })
@@ -193,11 +194,9 @@ export default class Network {
       // track changes on every child object's connectedUser
       meeting.connectedUser.onAdd = (item, index) => {
         phaserEvents.emit(GameEvent.ITEM_USER_ADDED, item, key, ItemType.MEETING)
-        store.dispatch(addMeetingUser({ meetingId: key, user: item }))
       }
       meeting.connectedUser.onRemove = (item, index) => {
         phaserEvents.emit(GameEvent.ITEM_USER_REMOVED, item, key, ItemType.MEETING)
-        store.dispatch(removeMeetingUser({ meetingId: key, user: item }))
       }
       meeting.onChange = (changes) => {
         changes.forEach((c) => {
@@ -212,22 +211,15 @@ export default class Network {
             phaserEvents.emit(GameEvent.MEETING_CHATID_CHANGE, c.value, key, ItemType.MEETING)
           }
           if (c.field === 'isLocked') {
-            if (c.value === true) toast(`The meeting is locked`)
-            store.dispatch(
-              updateMeetingLock({
-                meetingId: key,
-                isLocked: c.value,
-              })
-            )
+            if (meeting.connectedUser.has(this.mySessionId)) {
+              if (c.value === true) toast(`The meeting is locked`)
+              else toast(`The meeting is locked`)
+            }
+            phaserEvents.emit(GameEvent.MEETING_ISLOCK_CHANGE, c.value, key, ItemType.MEETING)
           }
           if (c.field === 'adminUser') {
             if (c.value === this.mySessionId) toast(`You're now admin of the meeting`)
-            store.dispatch(
-              updateMeetingAdmin({
-                meetingId: key,
-                adminUser: c.value,
-              })
-            )
+            phaserEvents.emit(GameEvent.MEETING_ADMIN_CHANGE, c.value, key, ItemType.MEETING)
           }
         })
       }
@@ -305,8 +297,8 @@ export default class Network {
           chatId: message.chatId,
         })
         if (isApiSuccess(chatResponse) && isApiSuccess(msgResponse)) {
-          console.log(`on event Message.CONNECT_TO_MEETING success`, chatResponse.result)
-          console.log('mapMessages of chat: ', msgResponse.result)
+          // console.log(`on event Message.CONNECT_TO_MEETING success`, chatResponse.result)
+          // console.log('mapMessages of chat: ', msgResponse.result)
           store.dispatch(
             addChatAndSetActive({ chat: chatResponse.result, mapMessage: msgResponse.result })
           )
@@ -317,21 +309,21 @@ export default class Network {
       }
     )
 
-    // receive meeting state when join
-    this.room.onMessage(
-      Message.MEETING_RECEIVE,
-      ({
-        connectedUser,
-        adminUser,
-        isLocked,
-      }: {
-        connectedUser: Set<string>
-        adminUser: string
-        isLocked: boolean
-      }) => {
-        store.dispatch(setMeetingState({ connectedUser, adminUser, isLocked }))
-      }
-    )
+    // // receive meeting state when join
+    // this.room.onMessage(
+    //   Message.MEETING_RECEIVE,
+    //   ({
+    //     connectedUser,
+    //     adminUser,
+    //     isLocked,
+    //   }: {
+    //     connectedUser: Set<string>
+    //     adminUser: string
+    //     isLocked: boolean
+    //   }) => {
+    //     store.dispatch(setMeetingState({ connectedUser, adminUser, isLocked }))
+    //   }
+    // )
   }
 
   // method to register event listener and call back function when a item user added
@@ -373,6 +365,20 @@ export default class Network {
     context?: any
   ) {
     phaserEvents.on(GameEvent.MEETING_CHATID_CHANGE, callback, context)
+  }
+
+  onSetMeetingAdmin(
+    callback: (adminId: string, itemId: string, itemType: ItemType) => void,
+    context?: any
+  ) {
+    phaserEvents.on(GameEvent.MEETING_ADMIN_CHANGE, callback, context)
+  }
+
+  onSetMeetingIsLock(
+    callback: (isLock: boolean, itemId: string, itemType: ItemType) => void,
+    context?: any
+  ) {
+    phaserEvents.on(GameEvent.MEETING_ISLOCK_CHANGE, callback, context)
   }
 
   // method to register event listener and call back function when a item user removed
@@ -473,7 +479,7 @@ export default class Network {
   }
 
   disconnectFromMeeting(id: string) {
-    if (!id) return;
+    if (!id) return
     console.log('DISCONNECT_FROM_MEETING, id: ' + id)
     this.room?.send(Message.DISCONNECT_FROM_MEETING, { meetingId: id })
     // this.webRTC?.checkPreviousPermission()
