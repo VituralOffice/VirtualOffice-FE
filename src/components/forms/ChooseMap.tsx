@@ -201,7 +201,7 @@ export const ChooseMap = ({ setMapId, mapSize }: Props) => {
                     isEnabled={style === map.style}
                     onClick={() => setStyle(map.style)}
                   >
-                    <span className="icon">🌳</span>
+                    <span className="icon">{map.maps[0]?.icon || '🌳'}</span>
                     <span className="name">{map.style}</span>
                   </ThemeOptionButon>
                 ))}
