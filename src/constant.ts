@@ -5,3 +5,4 @@ export const PEER_CONNECT_OPTIONS = {
   secure: true,
 }
 export const UNKNOWN_ERROR = `An error ocurred`
+export const SENDTRY_DSN = import.meta.env.VITE_SENDTRY_DSN
