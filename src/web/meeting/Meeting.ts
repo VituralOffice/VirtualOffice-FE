@@ -1,6 +1,12 @@
 import Network from '../../services/Network'
 import store from '../../stores'
-import { openMeetingDialog, createMeeting, addMeetingUser, removeMeetingUser } from '../../stores/MeetingStore'
+import {
+  openMeetingDialog,
+  addMeetingUser,
+  removeMeetingUser,
+  closeMeetingDialog,
+  setMeetingIsLocked,
+} from '../../stores/MeetingStore'
 import { setShowCreateMeeting, setCreateMeetingCallback } from '../../stores/UIStore'
 
 export class Meeting {
@@ -37,7 +43,7 @@ export class Meeting {
 
   removeCurrentUser(userId: string) {
     if (!this.currentUsers || !this.currentUsers.includes(userId)) return
-    this.currentUsers = this.currentUsers.filter(u => u !== userId)
+    this.currentUsers = this.currentUsers.filter((u) => u !== userId)
     // give authority to random user when admin left
     if (this.adminUser === userId) this.adminUser = this.currentUsers[this.currentUsers.keys[0]]
     const meetingState = store.getState().meeting
@@ -66,23 +72,21 @@ export class Meeting {
 
   setIsLock(isLock: boolean) {
     this.isLocked = isLock
+    store.dispatch(setMeetingIsLocked({ meetingId: this.id, isLocked: isLock }))
   }
 
-  openDialog(playerId: string, network: Network) {
+  openDialog(network: Network) {
     if (!this.id) return
-
-    store.dispatch(openMeetingDialog({ meetingId: this.id, myUserId: playerId }))
+    store.dispatch(openMeetingDialog({ meetingId: this.id, myUserId: network.mySessionId }))
     network.connectToMeeting(this.id)
   }
 
-  createMeeting(playerId: string, network: Network) {
+  createMeeting(network: Network) {
     if (!this.id) return
 
     const createMeetingCallback = (title: string) => {
-      store.dispatch(createMeeting({ meetingId: this.id!, myUserId: playerId }))
+      store.dispatch(openMeetingDialog({ meetingId: this.id, myUserId: network.mySessionId }))
       network.connectToMeeting(this.id!, title)
-      // network.changeMeetingInfo(this.id!, title, chatId)
-      // this.title = title
     }
 
     store.dispatch(setCreateMeetingCallback(createMeetingCallback))

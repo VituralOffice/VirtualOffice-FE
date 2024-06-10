@@ -133,7 +133,7 @@ function VideoContainer({
         >
           <AvatarContainer>
             <AvatarBackground>
-              <AvatarImg src={'/' + avatarLink} />
+              <AvatarImg src={avatarLink} />
             </AvatarBackground>
           </AvatarContainer>
         </div>

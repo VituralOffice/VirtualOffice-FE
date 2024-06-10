@@ -217,9 +217,9 @@ export default class MyPlayer extends Player {
           console.log(meeting)
           if (meeting.isLocked) break
           if (meeting.isOpen) {
-            meeting.openDialog(this.getPlayerId()!, network)
+            meeting.openDialog(network)
           } else {
-            meeting.createMeeting(this.getPlayerId()!, network)
+            meeting.createMeeting(network)
           }
           break
         }

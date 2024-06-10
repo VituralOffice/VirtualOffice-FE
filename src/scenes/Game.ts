@@ -19,6 +19,7 @@ import { IPlayer } from '../types/ISpaceState'
 import { ItemType } from '../types/Items'
 import { Meeting } from '../web/meeting/Meeting'
 import Whiteboard from '../items/WhiteBoard'
+import { closeMeetingDialog, openMeetingDialog } from '../stores/MeetingStore'
 
 export default class Game extends Phaser.Scene {
   private static instance: Game | null = null // Biến static instance
@@ -92,7 +93,12 @@ export default class Game extends Phaser.Scene {
 
     // debugDraw(groundLayer, this)
 
-    this.myPlayer = this.add.myPlayer(this.map.widthInPixels / 2, this.map.heightInPixels / 2, 'adam', this.network.mySessionId)
+    this.myPlayer = this.add.myPlayer(
+      this.map.widthInPixels / 2,
+      this.map.heightInPixels / 2,
+      'adam',
+      this.network.mySessionId
+    )
     this.playerSelector = new PlayerSelector(this, 0, 0, 16, 16)
 
     // import chair objects from Tiled map to Phaser

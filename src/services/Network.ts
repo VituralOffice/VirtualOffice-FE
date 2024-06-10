@@ -211,6 +211,7 @@ export default class Network {
             phaserEvents.emit(GameEvent.MEETING_CHATID_CHANGE, c.value, key, ItemType.MEETING)
           }
           if (c.field === 'isLocked') {
+            console.log(c.value)
             if (meeting.connectedUser.has(this.mySessionId)) {
               if (c.value === true) toast(`The meeting is locked`)
               else toast(`The meeting is locked`)
@@ -482,7 +483,6 @@ export default class Network {
     if (!id) return
     console.log('DISCONNECT_FROM_MEETING, id: ' + id)
     this.room?.send(Message.DISCONNECT_FROM_MEETING, { meetingId: id })
-    // this.webRTC?.checkPreviousPermission()
   }
 
   connectToWhiteboard(id: string) {
