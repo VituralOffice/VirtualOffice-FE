@@ -40,7 +40,7 @@ export default class Game extends Phaser.Scene {
 
   constructor() {
     super('game')
-    console.log('Construct Game')
+    console.log('Game::constructor Construct Game')
     Game.instance = this
   }
 

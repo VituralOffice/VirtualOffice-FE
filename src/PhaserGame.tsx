@@ -18,7 +18,7 @@ let PhaserGame: Phaser.Game | null = null
 let bootstrapCreatedResolver: (() => void) | null = null
 
 export const InitGame = async () => {
-  console.log('Init Phaser Game')
+  console.log('PhaserGame::InitGame Init Phaser Game')
 
   const Bootstrap = await loadBootstrapScene()
   const Game = await loadGameScene()
@@ -73,9 +73,9 @@ export const DestroyGame = () => {
     Bootstrap.getInstance()?.network.disconnectWebRTC()
     Bootstrap.getInstance()?.network.disconnectNetwork()
     if (PhaserGame) PhaserGame.destroy(true)
-    console.log('Destroy Phaser Game')
+    console.log('PhaserGame::DestroyGame Destroy Phaser Game')
   } catch (error) {
-    console.log(`Destroy game error:`, error)
+    console.log(`PhaserGame::DestroyGame Destroy game error:`, error)
   }
 }
 export const PhaserGameInstance = async () => {

@@ -101,7 +101,7 @@ export const OfficeSpace = () => {
       // const chatResponse = await GetAllChats({ roomId })
       const response = await GetAllChatsWithMessage({ roomId })
 
-      console.log('load all chats:', response.result)
+      // console.log('load all chats:', response.result)
 
       dispatch(setListChat(response.result.chats))
       dispatch(setMessageMaps(response.result.mapMessages))

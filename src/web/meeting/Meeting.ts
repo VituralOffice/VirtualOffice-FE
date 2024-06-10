@@ -6,6 +6,9 @@ import {
   removeMeetingUser,
   closeMeetingDialog,
   setMeetingIsLocked,
+  setAdminUser,
+  setChatId,
+  setTitle,
 } from '../../stores/MeetingStore'
 import { setShowCreateMeeting, setCreateMeetingCallback } from '../../stores/UIStore'
 
@@ -34,6 +37,7 @@ export class Meeting {
     if (this.currentUsers.length === 0) this.adminUser = userId
     this.currentUsers = [...this.currentUsers, userId]
     const meetingState = store.getState().meeting
+    console.log(`Meeting::addCurrentUser add user ${userId}`)
     if (meetingState.activeMeetingId === this.id) {
       meetingState.shareScreenManager?.onUserJoined(userId)
       meetingState.userMediaManager?.onUserJoined(userId)
@@ -60,14 +64,17 @@ export class Meeting {
 
   setTitle(title: string) {
     this.title = title
+    store.dispatch(setTitle({ meetingId: this.id, title: title }))
   }
 
   setChatId(chatId: string) {
     this.chatId = chatId
+    store.dispatch(setChatId({ meetingId: this.id, chatId: chatId }))
   }
 
   setAdminId(adminId: string) {
     this.adminUser = adminId
+    store.dispatch(setAdminUser({ meetingId: this.id, adminUser: adminId }))
   }
 
   setIsLock(isLock: boolean) {

@@ -12,7 +12,7 @@ export default class Bootstrap extends Phaser.Scene {
 
     constructor() {
         super('bootstrap')
-        console.log("Construct Bootstrap")
+        console.log("Bootstrap:: Construct Bootstrap")
         Bootstrap.instance = this;
         // this.network = new Network()
     }
@@ -22,7 +22,7 @@ export default class Bootstrap extends Phaser.Scene {
     }
 
     preload() {
-        console.log("Bootstrap preload")
+        console.log("Bootstrap:: Bootstrap preload")
         this.load.atlas(
             'cloud_day',
             '/assets/background/cloud_day.png',
@@ -94,7 +94,7 @@ export default class Bootstrap extends Phaser.Scene {
     }
 
     init() {
-        console.log("Init bootstrap")
+        console.log("Bootstrap::init Init bootstrap")
         this.network = new Network()
     }
 
@@ -103,7 +103,7 @@ export default class Bootstrap extends Phaser.Scene {
     }
 
     // launchBootstrap() {
-    //     console.log("Launch Bootstrap")
+    //     console.log("Bootstrap::launchBootstrap Launch Bootstrap")
     //     // Check for preload completion before launching game
     // }
 
@@ -119,11 +119,11 @@ export default class Bootstrap extends Phaser.Scene {
 
         // update Redux state
         store.dispatch(setRoomJoined(true))
-        console.log("Launch Game")
+        console.log("Bootstrap::launchGame Launch Game")
     }
 
     stop() {
-        console.log("Stop Game")
+        console.log("Bootstrap::stop Stop Game")
         this.scene.stop('background')
         this.scene.stop('game')
         store.dispatch(setRoomJoined(false))

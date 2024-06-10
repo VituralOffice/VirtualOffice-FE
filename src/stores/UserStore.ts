@@ -90,11 +90,11 @@ export const userSlice = createSlice({
       state.playerName = action.payload
     },
     setMicrophoneON: (state, action: PayloadAction<boolean>) => {
-      console.log("set microphone : ", action.payload)
+      // console.log("set microphone : ", action.payload)
       state.microphoneON = action.payload
     },
     setCameraON: (state, action: PayloadAction<boolean>) => {
-      console.log("set camera : ", action.payload)
+      // console.log("set camera : ", action.payload)
       state.cameraON = action.payload
     },
 

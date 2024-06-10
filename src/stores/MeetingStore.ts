@@ -14,6 +14,8 @@ interface MeetingState {
   isLocked: boolean
   connectedUser: string[]
   adminUser?: string
+  chatId?:string
+  title?:string
   myDisplayStream: null | MediaStream
   myCameraStream: null | MediaStream
   peerDisplayStreams: Map<
@@ -39,6 +41,9 @@ const initialState: MeetingState = {
   activeMeetingId: null,
   isLocked: false,
   connectedUser: [],
+  adminUser: '',
+  chatId: '',
+  title: '',
   myDisplayStream: null,
   myCameraStream: null,
   peerDisplayStreams: new Map(),
@@ -63,6 +68,7 @@ export const meetingSlice = createSlice({
       state.shareScreenManager.onOpen()
       state.userMediaManager.onOpen()
       state.meetingDialogOpen = true
+      console.log(`MeetingStore::openMeetingDialog set activeMeetingId : ${action.payload.meetingId}`)
       state.activeMeetingId = action.payload.meetingId
       let meeting = Game.getInstance()?.meetingMap.get(action.payload.meetingId)
       state.adminUser = meeting?.adminUser || ''
@@ -106,6 +112,8 @@ export const meetingSlice = createSlice({
       state.activeMeetingId = null
       state.connectedUser = []
       state.adminUser = ''
+      state.chatId = ''
+      state.title = ''
       state.isLocked = false
       state.peerDisplayStreams.clear()
       state.peerCameraStreams.clear()
@@ -156,6 +164,8 @@ export const meetingSlice = createSlice({
       state.activeMeetingId = null
       state.connectedUser = []
       state.adminUser = ''
+      state.chatId = ''
+      state.title = ''
       state.isLocked = false
       state.peerDisplayStreams.clear()
       state.peerCameraStreams.clear()
@@ -187,6 +197,27 @@ export const meetingSlice = createSlice({
     ) => {
       if (state.activeMeetingId === action.payload.meetingId)
         state.isLocked = action.payload.isLocked
+    },
+    setAdminUser: (
+      state,
+      action: PayloadAction<{ meetingId: string; adminUser: string }>
+    ) => {
+      if (state.activeMeetingId === action.payload.meetingId)
+        state.adminUser = action.payload.adminUser
+    },
+    setChatId: (
+      state,
+      action: PayloadAction<{ meetingId: string; chatId: string }>
+    ) => {
+      if (state.activeMeetingId === action.payload.meetingId)
+        state.chatId = action.payload.chatId
+    },
+    setTitle: (
+      state,
+      action: PayloadAction<{ meetingId: string; title: string }>
+    ) => {
+      if (state.activeMeetingId === action.payload.meetingId)
+        state.title = action.payload.title
     },
     // setMeetingState: (
     //   state,
@@ -220,6 +251,9 @@ export const {
   removeMeetingUser,
   // setMeetingState,
   setMeetingIsLocked,
+  setAdminUser,
+  setChatId,
+  setTitle,
 } = meetingSlice.actions
 
 export default meetingSlice.reducer

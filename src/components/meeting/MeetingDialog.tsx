@@ -177,10 +177,6 @@ export default function MeetingDialog() {
     userMediaManager!.startCameraShare(user.cameraON, user.microphoneON)
   }, [user.microphoneON, user.cameraON])
 
-  useEffect(() => {
-    console.log( Network.getInstance()?.mySessionId.toString() + " --- " + meeting.adminUser)
-  }, [])
-
   return (
     <>
       <Backdrop hidden={hideMeetingDialog()}>

@@ -25,13 +25,13 @@ export default class WebRTC {
   private network: Network
 
   constructor(userId: string, network: Network) {
-    console.log('Construct WebRTC')
+    console.log('WebRTC::constructor Construct WebRTC')
     WebRTC.instance = this
     const sanitizedId = this.replaceInvalidId(userId)
     this.myPeer = new Peer(sanitizedId, PEER_CONNECT_OPTIONS)
     this.network = network
-    console.log('userId:', userId)
-    console.log('sanitizedId:', sanitizedId)
+    console.log('WebRTC::constructor userId:', userId)
+    console.log('WebRTC::constructor sanitizedId:', sanitizedId)
     this.myPeer.on('error', (err) => {
       console.log(err.type)
       console.error(err)
@@ -54,7 +54,7 @@ export default class WebRTC {
   initialize() {
     this.myPeer.on('call', (call) => {
       if (!this.onCalledPeers.has(call.peer)) {
-        console.log('answer call from ', call.metadata?.username)
+        console.log('WebRTC::initialize answer call from ', call.metadata?.username)
         call.answer(this.myStream)
 
         // Access username from call metadata
@@ -158,7 +158,7 @@ export default class WebRTC {
   }
 
   removeUserVideo() {
-    console.log("remove user video")
+    console.log("WebRTC::removeUserVideo remove user video")
     this.myVideo?.remove();
     this.myVideo = undefined;
     this.myStream = undefined;
@@ -175,7 +175,7 @@ export default class WebRTC {
     if (this.myStream) {
       const sanitizedId = this.replaceInvalidId(userId)
       if (!this.peers.has(sanitizedId)) {
-        console.log('calling', username)
+        console.log('WebRTC::connectToNewUser calling', username)
         const call = this.myPeer.call(sanitizedId, this.myStream, {
           metadata: { username: store.getState().user.playerName },
         })
