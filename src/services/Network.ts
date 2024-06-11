@@ -439,7 +439,7 @@ export default class Network {
   // method to send ready-to-connect signal to Colyseus server
   readyToConnect() {
     this.room?.send(Message.READY_TO_CONNECT)
-    phaserEvents.emit(GameEvent.MY_PLAYER_READY)
+    phaserEvents.emit(GameEvent.MY_PLAYER_READY, true)
   }
 
   // method to send ready-to-connect signal to Colyseus server
@@ -482,7 +482,7 @@ export default class Network {
     if (!id) return
     console.log('Network::disconnectFromMeeting DISCONNECT_FROM_MEETING, id: ' + id)
     this.room?.send(Message.DISCONNECT_FROM_MEETING, { meetingId: id })
-    this.webRTC?.checkPreviousPermission();
+    this.webRTC?.checkPreviousPermission()
   }
 
   connectToWhiteboard(id: string) {

@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios'
+import axios, { AxiosError, AxiosInstance } from 'axios'
 import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from '../utils/util'
 import { API_URL } from '../constant'
 import Cookies from 'js-cookie'
@@ -40,13 +40,23 @@ class ApiService {
             this.isRefreshingToken = true
             const refreshFromCookie = Cookies.get(REFRESH_TOKEN_KEY)
             if (!refreshFromCookie) return error
-            const { accessToken, refreshToken } = await this.refreshToken(refreshFromCookie)
-            this.requestQueue.forEach((req) => req())
-            this.isRefreshingToken = false
-            this.requestQueue = []
-            Cookies.set(REFRESH_TOKEN_KEY, refreshToken)
-            Cookies.set(ACCESS_TOKEN_KEY, accessToken)
-            return this.axiosInstance.request(originalRequest)
+            try {
+              const { accessToken, refreshToken } = await this.refreshToken(refreshFromCookie)
+              this.requestQueue.forEach((req) => req())
+              this.isRefreshingToken = false
+              this.requestQueue = []
+              Cookies.set(REFRESH_TOKEN_KEY, refreshToken)
+              Cookies.set(ACCESS_TOKEN_KEY, accessToken)
+              return this.axiosInstance.request(originalRequest)
+            } catch (error) {
+              // call refresh token error
+              if (error instanceof AxiosError) {
+                Cookies.remove(REFRESH_TOKEN_KEY)
+                Cookies.remove(ACCESS_TOKEN_KEY)
+                // navigate to /signin
+                window.location.href = '/signin'
+              }
+            }
           } else {
             return new Promise((resolve) => {
               this.requestQueue.push(() => resolve(this.axiosInstance.request(originalRequest)))
