@@ -13,7 +13,6 @@ interface ChatState {
   focused: boolean
   showChat: boolean
   listChats: IChat[]
-  activeChatId: string
   mapMessages: Map<string, IMapMessage>
 }
 
@@ -21,7 +20,6 @@ const initialState: ChatState = {
   focused: false,
   showChat: false,
   listChats: [] as IChat[],
-  activeChatId: '',
   mapMessages: new Map<string, IMapMessage>(),
 }
 
@@ -109,9 +107,6 @@ export const chatSlice = createSlice({
       //add map messages
       state.mapMessages.set(action.payload.mapMessage._id, action.payload.mapMessage)
 
-      //set active chatId
-      state.activeChatId = _id
-
       // console.log(state.mapMessages.get(action.payload.mapMessage._id))
     },
     updateChat: (state, action: PayloadAction<IChat>) => {
@@ -120,9 +115,6 @@ export const chatSlice = createSlice({
       if (index === -1) return
       state.listChats.splice(index, 1)
       state.listChats.unshift(chat)
-    },
-    setActiveChat: (state, action: PayloadAction<string>) => {
-      state.activeChatId = action.payload
     },
   },
   extraReducers: {},
@@ -137,7 +129,6 @@ export const {
   setShowChat,
   setListChat,
   loadMapChatMessage,
-  setActiveChat,
   updateChat,
   addChatAndSetActive,
   setMessageMaps,

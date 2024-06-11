@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import CloseIcon from '@mui/icons-material/Close'
 import { useAppSelector } from '../../../hook'
 import { SearchBar } from '../../inputs/SearchBar'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ParticipantDropdown } from '../../dropdowns/ParticipantDropdown'
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1'
 import { ButtonProps } from '../../../interfaces/Interfaces'
@@ -155,6 +155,10 @@ export const OfficeParticipantSidebar = ({ onClose }: SidebarProps) => {
   const [showAddPeoplePopup, setShowAddPeoplePopup] = useState(false)
   const user = useAppSelector((state) => state.user)
   const members = useAppSelector((state) => state.room.members)
+
+  useEffect(() => {
+    console.log(members)
+  }, [])
   return (
     <>
       <LayoutContainer>
