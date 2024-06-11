@@ -38,6 +38,9 @@ interface MeetingState {
   >
   shareScreenManager: null | ShareScreenManager
   userMediaManager: null | UserMediaManager
+  microphoneON: boolean
+  cameraON: boolean
+  initSuccess: boolean
 }
 
 const initialState: MeetingState = {
@@ -54,18 +57,29 @@ const initialState: MeetingState = {
   peerCameraStreams: new Map(),
   shareScreenManager: null,
   userMediaManager: null,
+  microphoneON: false,
+  cameraON: false,
+  initSuccess: false,
 }
 
 export const meetingSlice = createSlice({
   name: 'meeting',
   initialState,
   reducers: {
-    openMeetingDialog: (state, action: PayloadAction<{ meeting: Meeting; myUserId: string }>) => {
+    openMeetingDialog: (
+      state,
+      action: PayloadAction<{
+        meeting: Meeting
+        myPlayerId: string
+        microphoneON: boolean
+        cameraON: boolean
+      }>
+    ) => {
       if (!state.shareScreenManager) {
-        state.shareScreenManager = new ShareScreenManager(action.payload.myUserId)
+        state.shareScreenManager = new ShareScreenManager(action.payload.myPlayerId)
       }
       if (!state.userMediaManager) {
-        state.userMediaManager = new UserMediaManager(action.payload.myUserId)
+        state.userMediaManager = new UserMediaManager(action.payload.myPlayerId)
       }
       Game.getInstance()?.myPlayer.setPlayerIsInMeeting(true)
       Game.getInstance()?.disableKeys()
@@ -78,44 +92,13 @@ export const meetingSlice = createSlice({
       state.connectedUser = action.payload.meeting?.currentUsers! || []
       state.chatId = action.payload.meeting?.chatId || ''
       state.title = action.payload.meeting?.title || ''
-      console.log(`MeetingStore::openMeetingDialog set activeMeetingId : ${action.payload.meeting.id}`)
+      state.microphoneON = action.payload.microphoneON
+      state.cameraON = action.payload.cameraON
+      state.initSuccess = true
+      console.log(
+        `MeetingStore::openMeetingDialog set activeMeetingId : ${action.payload.meeting.id}`
+      )
     },
-    // refreshMeeting: (state) => {
-    //   if (!state.shareScreenManager) {
-    //     state.shareScreenManager = new ShareScreenManager(action.payload.myUserId)
-    //   }
-    //   if (!state.userMediaManager) {
-    //     state.userMediaManager = new UserMediaManager(action.payload.myUserId)
-    //   }
-    //   Game.getInstance()?.myPlayer.setPlayerIsInMeeting(true)
-    //   Game.getInstance()?.disableKeys()
-    //   state.shareScreenManager.onOpen()
-    //   state.userMediaManager.onOpen()
-    //   state.meetingDialogOpen = true
-    //   console.log(`MeetingStore::openMeetingDialog set activeMeetingId : ${action.payload.meetingId}`)
-    //   state.activeMeetingId = action.payload.meetingId
-    //   let meeting = Game.getInstance()?.meetingMap.get(action.payload.meetingId)
-    //   state.adminUser = meeting?.adminUser || ''
-    //   state.isLocked = meeting?.isLocked! || false
-    //   state.connectedUser = meeting?.currentUsers! || []
-    // }
-    // createMeeting: (state, action: PayloadAction<{ meetingId: string; myUserId: string }>) => {
-    //   if (!state.shareScreenManager) {
-    //     state.shareScreenManager = new ShareScreenManager(action.payload.myUserId)
-    //   }
-    //   if (!state.userMediaManager) {
-    //     state.userMediaManager = new UserMediaManager(action.payload.myUserId)
-    //   }
-    //   Game.getInstance()?.myPlayer.setPlayerIsInMeeting(true)
-    //   Game.getInstance()?.disableKeys()
-    //   state.shareScreenManager.onOpen()
-    //   state.userMediaManager.onOpen()
-    //   state.meetingDialogOpen = true
-    //   state.connectedUser = []
-    //   state.adminUser = ''
-    //   state.isLocked = false
-    //   state.activeMeetingId = action.payload.meetingId
-    // },
     closeMeetingDialog: (state) => {
       // Tell server the meeting dialog is closed.
       Network.getInstance()?.disconnectFromMeeting(state.activeMeetingId!)
@@ -141,6 +124,9 @@ export const meetingSlice = createSlice({
       state.isLocked = false
       state.peerDisplayStreams.clear()
       state.peerCameraStreams.clear()
+      state.microphoneON = false
+      state.cameraON = false
+      state.initSuccess = false
     },
     setMyDisplayStream: (state, action: PayloadAction<null | MediaStream>) => {
       state.myDisplayStream = action.payload
@@ -193,16 +179,10 @@ export const meetingSlice = createSlice({
       state.isLocked = false
       state.peerDisplayStreams.clear()
       state.peerCameraStreams.clear()
+      state.microphoneON = false
+      state.cameraON = false
+      state.initSuccess = false
     },
-    // updateMeetingLock: (state, action: PayloadAction<{ meetingId: string; isLocked: boolean }>) => {
-    //   if (state.activeMeetingId === action.payload.meetingId) state.isLocked = action.payload.isLocked
-    // },
-    // updateMeetingAdmin: (
-    //   state,
-    //   action: PayloadAction<{ meetingId: string; adminUser: string }>
-    // ) => {
-    //   if (state.activeMeetingId === action.payload.meetingId) state.adminUser = action.payload.adminUser
-    // },
     addMeetingUser: (state, action: PayloadAction<{ meetingId: string; user: string }>) => {
       // console.log(`MeetingStore::addMeetingUser state.activeMeetingId: ${state.activeMeetingId}, action.payload.meetingId: ${action.payload.meetingId}`)
       if (state.activeMeetingId === action.payload.meetingId) {
@@ -228,63 +208,86 @@ export const meetingSlice = createSlice({
       if (state.activeMeetingId === action.payload.meetingId)
         state.isLocked = action.payload.isLocked
     },
-    setAdminUser: (
-      state,
-      action: PayloadAction<{ meetingId: string; adminUser: string }>
-    ) => {
+    setAdminUser: (state, action: PayloadAction<{ meetingId: string; adminUser: string }>) => {
       if (state.activeMeetingId === action.payload.meetingId)
         state.adminUser = action.payload.adminUser
     },
-    setChatId: (
-      state,
-      action: PayloadAction<{ meetingId: string; chatId: string }>
-    ) => {
-      if (state.activeMeetingId === action.payload.meetingId)
-        state.chatId = action.payload.chatId
+    setChatId: (state, action: PayloadAction<{ meetingId: string; chatId: string }>) => {
+      if (state.activeMeetingId === action.payload.meetingId) state.chatId = action.payload.chatId
     },
-    setTitle: (
-      state,
-      action: PayloadAction<{ meetingId: string; title: string }>
-    ) => {
-      if (state.activeMeetingId === action.payload.meetingId)
-        state.title = action.payload.title
+    setTitle: (state, action: PayloadAction<{ meetingId: string; title: string }>) => {
+      if (state.activeMeetingId === action.payload.meetingId) state.title = action.payload.title
     },
-    // setMeetingState: (
-    //   state,
-    //   action: PayloadAction<{
-    //     connectedUser: Set<string>
-    //     adminUser: string
-    //     isLocked: boolean
-    //   }>
-    // ) => {
-    //   state.adminUser = action.payload.adminUser
-    //   state.connectedUser = [...action.payload.connectedUser.values()]
-    //   state.isLocked = action.payload.isLocked
-    // },
+    setMicrophoneON: (
+      state,
+      action: PayloadAction<boolean>
+    ) => {
+      if (
+        state.initSuccess &&
+        action.payload != state.microphoneON
+      ) {
+        if (!state.cameraON && !action.payload) {
+          state.microphoneON = action.payload
+          state.userMediaManager?.stopCameraShare()
+        } else if (
+          state.userMediaManager?.startCameraShare(state.cameraON, action.payload)
+        ) {
+          state.microphoneON = action.payload
+        } else {
+          state.microphoneON = false;
+        }
+      }
+    },
+    setCameraON: (state, action: PayloadAction<boolean>) => {
+      if (
+        state.initSuccess &&
+        action.payload != state.cameraON
+      ) {
+        if (!state.microphoneON && !action.payload) {
+          state.cameraON = action.payload
+          state.userMediaManager?.stopCameraShare()
+        } else if (
+          state.userMediaManager?.startCameraShare(action.payload, state.microphoneON)
+        ) {
+          state.cameraON = action.payload
+        } else {
+          state.cameraON = false;
+        }
+      }
+    },
   },
 })
 
 // Thunk to handle side effects
-export const openMeetingWithDependencies = (meetingId: string, myPlayerId: string, meetingTitle?: string): AppThunk => (dispatch, getState) => {
-  const state = getState();
-  const userId = selectUserId(state);
-  const roomId = selectRoomId(state);
+export const openMeetingWithDependencies =
+  (meetingId: string, myPlayerId: string, meetingTitle?: string): AppThunk =>
+  (dispatch, getState) => {
+    const state = getState()
+    // const userId = selectUserId(state);
+    // const roomId = selectRoomId(state);
 
-  const meeting = Game.getInstance()?.meetingMap.get(meetingId);
-  dispatch(openMeetingDialog({ meeting: meeting!, myUserId: myPlayerId }));
+    const meeting = Game.getInstance()?.meetingMap.get(meetingId)
+    dispatch(
+      openMeetingDialog({
+        meeting: meeting!,
+        myPlayerId: myPlayerId,
+        microphoneON: state.user.microphoneON,
+        cameraON: state.user.cameraON,
+      })
+    )
 
-  // Perform side effects after dispatching the action
-  Network.getInstance()?.connectToMeeting(
-    userId,
-    roomId,
-    meetingId,
-    meetingTitle ? meetingTitle : meeting?.title!
-  );
-  // setTimeout(() => {
-  //   console.log("MeetingStore::openMeetingWithDependencies Network.getInstance()?.connectToMeeting")
+    // Perform side effects after dispatching the action
+    Network.getInstance()?.connectToMeeting(
+      state.user.userId,
+      state.room.roomId,
+      meetingId,
+      meetingTitle ? meetingTitle : meeting?.title!
+    )
+    // setTimeout(() => {
+    //   console.log("MeetingStore::openMeetingWithDependencies Network.getInstance()?.connectToMeeting")
 
-  // }, 0);
-};
+    // }, 0);
+  }
 
 export const {
   closeMeetingDialog,
@@ -296,16 +299,14 @@ export const {
   addCameraStream,
   removeCameraStream,
   disconnectMeeting,
-  // createMeeting,
-  // updateMeetingLock,
-  // updateMeetingAdmin,
   addMeetingUser,
   removeMeetingUser,
-  // setMeetingState,
   setMeetingIsLocked,
   setAdminUser,
   setChatId,
   setTitle,
+  setMicrophoneON,
+  setCameraON,
 } = meetingSlice.actions
 
 export default meetingSlice.reducer

@@ -1,11 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
-import Button from '@mui/material/Button'
-import IconButton from '@mui/material/IconButton'
-import CloseIcon from '@mui/icons-material/Close'
 import { useAppDispatch, useAppSelector } from '../../hook'
-import Video from '../videos/Video'
-import { closeMeetingDialog } from '../../stores/MeetingStore'
+import { closeMeetingDialog, setCameraON, setMicrophoneON } from '../../stores/MeetingStore'
 import { CustomToggleButton } from '../buttons/CustomToggleButton'
 import MicRoundedIcon from '@mui/icons-material/MicRounded'
 import MicOffRoundedIcon from '@mui/icons-material/MicOffRounded'
@@ -15,7 +11,6 @@ import { ToolbarButton, ToolbarExitButton } from '../buttons'
 import ForumIcon from '@mui/icons-material/Forum'
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom'
-import store from '../../stores'
 import { MeetingNormalView } from './MeetingNormalView'
 import { MeetingScreenShareView } from './MeetingScreenShareView'
 import WidgetsRoundedIcon from '@mui/icons-material/WidgetsRounded'
@@ -23,8 +18,6 @@ import ScreenshotMonitorRoundedIcon from '@mui/icons-material/ScreenshotMonitorR
 import PresentToAllIcon from '@mui/icons-material/PresentToAll'
 import CancelPresentationIcon from '@mui/icons-material/CancelPresentation'
 import MeetingChatSidebar from './chat/MeetingChatSidebar'
-import WebRTC from '../../web/WebRTC'
-import Game from '../../scenes/Game'
 import { MeetingInfoSidebar } from './chat/MeetingInfoSidebar'
 import LockIcon from '@mui/icons-material/Lock'
 import LockOpenIcon from '@mui/icons-material/LockOpen'
@@ -126,21 +119,16 @@ export default function MeetingDialog() {
   const dispatch = useAppDispatch()
   const shareScreenManager = useAppSelector((state) => state.meeting.shareScreenManager)
   const userMediaManager = useAppSelector((state) => state.meeting.userMediaManager)
-
   const user = useAppSelector((state) => state.user)
-  const toggetMic = () => {
-    const nextState = !user.microphoneON
-    WebRTC.getInstance()?.turnMic(nextState)
-  }
   const peerDisplayStreams = useAppSelector((state) => state.meeting.peerDisplayStreams)
   const myPeerDisplayStream = useAppSelector((state) => state.meeting.myDisplayStream)
   const meeting = useAppSelector((state) => state.meeting)
-
   const [showChat, setShowChat] = useState(true)
   const [showMeetingInfo, setShowMeetingInfo] = useState(false)
   const [activeMeetingView, setActiveMeetingView] = useState(0)
   const [shareScreenAvailable, setShareScreenAvailable] = useState(false)
   const [showLeavePopup, setShowLeavePopup] = useState(false)
+
   const handleLockMeeting = () => {
     if (meeting.isLocked) Network.getInstance()?.unlockMeeting(meeting.activeMeetingId as string)
     else Network.getInstance()?.lockMeeting(meeting.activeMeetingId as string)
@@ -159,9 +147,14 @@ export default function MeetingDialog() {
       return false
     return true
   }
+
+  const toggetMic = () => {
+    const nextState = !meeting.microphoneON
+    dispatch(setMicrophoneON(nextState))
+  }
   const toggetCam = () => {
-    const nextState = !user.cameraON
-    WebRTC.getInstance()?.turnCam(nextState)
+    const nextState = !meeting.cameraON
+    dispatch(setCameraON(nextState))
   }
 
   useEffect(() => {
@@ -172,26 +165,26 @@ export default function MeetingDialog() {
     }
   }, [peerDisplayStreams, myPeerDisplayStream])
 
-  //TODO: optimize this: temp delay first start camera because userMediaManager hasn't been initialized yet
-  const isFirstRun = useRef(true);
-  useEffect(() => {
-    if (isFirstRun.current) {
-      setTimeout(() => {
-        if (!user.microphoneON && !user.cameraON) {
-          userMediaManager!.stopCameraShare();
-        } else {
-          userMediaManager!.startCameraShare(user.cameraON, user.microphoneON);
-        }
-        isFirstRun.current = false;
-      }, 1000);
-    } else {
-      if (!user.microphoneON && !user.cameraON) {
-        userMediaManager!.stopCameraShare();
-      } else {
-        userMediaManager!.startCameraShare(user.cameraON, user.microphoneON);
-      }
-    }
-  }, [user.microphoneON, user.cameraON, userMediaManager]);
+  // //TODO: optimize this: temp delay first start camera because userMediaManager hasn't been initialized yet
+  // const isFirstRun = useRef(true);
+  // useEffect(() => {
+  //   if (isFirstRun.current) {
+  //     setTimeout(() => {
+  //       if (!user.microphoneON && !user.cameraON) {
+  //         userMediaManager!.stopCameraShare();
+  //       } else {
+  //         userMediaManager!.startCameraShare(user.cameraON, user.microphoneON);
+  //       }
+  //       isFirstRun.current = false;
+  //     }, 1000);
+  //   } else {
+  //     if (!user.microphoneON && !user.cameraON) {
+  //       userMediaManager!.stopCameraShare();
+  //     } else {
+  //       userMediaManager!.startCameraShare(user.cameraON, user.microphoneON);
+  //     }
+  //   }
+  // }, [user.microphoneON, user.cameraON, userMediaManager]);
 
   return (
     <>
@@ -258,13 +251,13 @@ export default function MeetingDialog() {
                 </div>
               </ToolbarButton>
               <CustomToggleButton
-                enabled={user.microphoneON}
+                enabled={meeting.microphoneON}
                 onToggle={toggetMic}
                 OnIcon={<MicRoundedIcon />}
                 OffIcon={<MicOffRoundedIcon />}
               />
               <CustomToggleButton
-                enabled={user.cameraON}
+                enabled={meeting.cameraON}
                 onToggle={toggetCam}
                 OnIcon={<VideocamRoundedIcon />}
                 OffIcon={<VideocamOffRoundedIcon />}

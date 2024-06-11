@@ -15,7 +15,7 @@ import OfficeLogoMenuPopup from '../popups/OfficeLogoMenuPopup'
 import { OfficeParticipantSidebar } from '../sidebars/office/OfficeParticipantSidebar'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { setShowChat } from '../../stores/ChatStore'
-import Chat from '../chat/Chat'
+import ChatDialog from '../chat/ChatDialog'
 import { ToolbarButton, ToolbarExitButton } from '../buttons'
 import WebRTC from '../../web/WebRTC'
 
@@ -138,7 +138,7 @@ const OfficeToolbar = () => {
                 OnIcon={<VideocamRoundedIcon />}
                 OffIcon={<VideocamOffRoundedIcon />}
               />
-              <ToolbarButton onClick={() => store.dispatch(setShowChat(!showChat))}>
+              <ToolbarButton isEnabled={showChat} onClick={() => store.dispatch(setShowChat(!showChat))}>
                 <div>
                   <span>
                     <ForumIcon />
@@ -175,7 +175,7 @@ const OfficeToolbar = () => {
         <OfficeParticipantSidebar onClose={() => setShowParticipantSidebar(false)} />
       )}
       {showChat && (
-        <Chat />
+        <ChatDialog />
       )}
     </>
   )
