@@ -1,10 +1,8 @@
 import Network from '../../services/Network'
 import store from '../../stores'
 import {
-  openMeetingDialog,
   addMeetingUser,
   removeMeetingUser,
-  closeMeetingDialog,
   setMeetingIsLocked,
   setAdminUser,
   setChatId,

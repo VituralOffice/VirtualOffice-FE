@@ -110,7 +110,6 @@ export const meetingSlice = createSlice({
     },
     closeMeetingDialog: (state) => {
       // Tell server the meeting dialog is closed.
-      Network.getInstance()?.disconnectFromMeeting(state.activeMeetingId!)
       Game.getInstance()?.enableKeys()
       Game.getInstance()?.myPlayer.setPlayerIsInMeeting(false)
       Game.getInstance()?.myPlayer.setLeaveCurrentChair(true)
