@@ -343,7 +343,7 @@ export function JoinOfficePage({
       Game.getInstance()?.myPlayer.setPlayerName(playerName)
       Game.getInstance()?.myPlayer.setPlayerTexture(user.character?.name as string)
       Game.getInstance()?.myPlayer.setCharacter(user.character?._id as string)
-      Network.getInstance()?.readyToConnect()
+      Network.getInstance()?.readyToConnect(true)
       setPlayerNameInRedux(playerName)
     } catch (e: any) {
       console.log(e)
