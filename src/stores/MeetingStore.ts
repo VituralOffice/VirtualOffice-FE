@@ -69,7 +69,7 @@ export const meetingSlice = createSlice({
     openMeetingDialog: (
       state,
       action: PayloadAction<{
-        meeting: Meeting
+        meetingId: string
         myPlayerId: string
         microphoneON: boolean
         cameraON: boolean
@@ -83,20 +83,29 @@ export const meetingSlice = createSlice({
       }
       Game.getInstance()?.myPlayer.setPlayerIsInMeeting(true)
       Game.getInstance()?.disableKeys()
+      const meeting = Game.getInstance()?.meetingMap.get(action.payload.meetingId);
       state.shareScreenManager.onOpen()
       state.userMediaManager.onOpen()
       state.meetingDialogOpen = true
-      state.activeMeetingId = action.payload.meeting.id
-      state.adminUser = action.payload.meeting?.adminUser || ''
-      state.isLocked = action.payload.meeting?.isLocked! || false
-      state.connectedUser = action.payload.meeting?.currentUsers! || []
-      state.chatId = action.payload.meeting?.chatId || ''
-      state.title = action.payload.meeting?.title || ''
+      state.activeMeetingId = action.payload.meetingId
+      state.adminUser = meeting?.adminUser || ''
+      state.isLocked = meeting?.isLocked! || false
+      state.connectedUser = meeting?.currentUsers! || []
+      state.chatId = meeting?.chatId || ''
+      state.title = meeting?.title || ''
       state.microphoneON = action.payload.microphoneON
       state.cameraON = action.payload.cameraON
       state.initSuccess = true
+
+      // Ensure that UserMediaManager is initialized before starting camera share
+      const { microphoneON, cameraON, meetingId } = action.payload;
+      const userMediaManager = state.userMediaManager;
+
+      setTimeout(() => {
+        userMediaManager.startCameraShare(cameraON, microphoneON, meetingId);
+      }, 500);
       console.log(
-        `MeetingStore::openMeetingDialog set activeMeetingId : ${action.payload.meeting.id}`
+        `MeetingStore::openMeetingDialog set activeMeetingId : ${action.payload.meetingId}`
       )
     },
     closeMeetingDialog: (state) => {
@@ -229,8 +238,10 @@ export const meetingSlice = createSlice({
         if (!state.cameraON && !action.payload) {
           state.microphoneON = action.payload
           state.userMediaManager?.stopCameraShare()
+          Network.getInstance()?.onStopCameraShare(state.activeMeetingId!)
+          state.myCameraStream = null
         } else if (
-          state.userMediaManager?.startCameraShare(state.cameraON, action.payload)
+          state.userMediaManager?.startCameraShare(state.cameraON, action.payload, state.activeMeetingId!)
         ) {
           state.microphoneON = action.payload
         } else {
@@ -246,8 +257,10 @@ export const meetingSlice = createSlice({
         if (!state.microphoneON && !action.payload) {
           state.cameraON = action.payload
           state.userMediaManager?.stopCameraShare()
+          Network.getInstance()?.onStopCameraShare(state.activeMeetingId!)
+          state.myCameraStream = null
         } else if (
-          state.userMediaManager?.startCameraShare(action.payload, state.microphoneON)
+          state.userMediaManager?.startCameraShare(action.payload, state.microphoneON, state.activeMeetingId!)
         ) {
           state.cameraON = action.payload
         } else {
@@ -257,37 +270,6 @@ export const meetingSlice = createSlice({
     },
   },
 })
-
-// Thunk to handle side effects
-export const openMeetingWithDependencies =
-  (meetingId: string, myPlayerId: string, meetingTitle?: string): AppThunk =>
-  (dispatch, getState) => {
-    const state = getState()
-    // const userId = selectUserId(state);
-    // const roomId = selectRoomId(state);
-
-    const meeting = Game.getInstance()?.meetingMap.get(meetingId)
-    dispatch(
-      openMeetingDialog({
-        meeting: meeting!,
-        myPlayerId: myPlayerId,
-        microphoneON: state.user.microphoneON,
-        cameraON: state.user.cameraON,
-      })
-    )
-
-    // Perform side effects after dispatching the action
-    Network.getInstance()?.connectToMeeting(
-      state.user.userId,
-      state.room.roomId,
-      meetingId,
-      meetingTitle ? meetingTitle : meeting?.title!
-    )
-    // setTimeout(() => {
-    //   console.log("MeetingStore::openMeetingWithDependencies Network.getInstance()?.connectToMeeting")
-
-    // }, 0);
-  }
 
 export const {
   closeMeetingDialog,

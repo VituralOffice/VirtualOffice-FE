@@ -270,11 +270,11 @@ export default class Game extends Phaser.Scene {
   }
 
   private handleMyPlayerReady(ready: boolean) {
-    this.myPlayer.readyToConnect = ready
+    this.myPlayer.readyToConnect = ready ? true : false;
   }
 
   private handleMyMediaConnected(connected: boolean) {
-    this.myPlayer.mediaConnected = connected
+    this.myPlayer.mediaConnected = connected ? true : false;
   }
 
   // function to update target position upon receiving player updates

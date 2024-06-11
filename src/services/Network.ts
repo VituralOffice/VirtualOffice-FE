@@ -27,11 +27,12 @@ import { Message } from '../types/Messages'
 import { ACCESS_TOKEN_KEY } from '../utils/util'
 import { API_URL } from '../constant'
 import Cookies from 'js-cookie'
-import { disconnectMeeting } from '../stores/MeetingStore'
+import { disconnectMeeting, openMeetingDialog } from '../stores/MeetingStore'
 import { GetMsgByChatId, GetOneChat } from '../apis/ChatApis'
 import { isApiSuccess } from '../apis/util'
 import { setWhiteboardUrls } from '../stores/WhiteboardStore'
 import { toast } from 'react-toastify'
+import Game from '../scenes/Game'
 
 export default class Network {
   private static instance: Network | null = null // Biến static instance
@@ -288,6 +289,11 @@ export default class Network {
         console.log(
           `Network::onMessage CONNECT_TO_MEETING: meetingId: ${message.meetingId}, chatId: ${message.chatId}, title: ${message.title}`
         )
+
+        const microphoneON = store.getState().user.microphoneON
+        const cameraON = store.getState().user.cameraON
+        store.dispatch(openMeetingDialog({ meetingId: message.meetingId, myPlayerId: this.mySessionId, microphoneON, cameraON }))
+
         const chatResponse = await GetOneChat({
           roomId: store.getState().room.roomId,
           chatId: message.chatId,
@@ -437,15 +443,15 @@ export default class Network {
   }
 
   // method to send ready-to-connect signal to Colyseus server
-  readyToConnect() {
-    this.room?.send(Message.READY_TO_CONNECT)
-    phaserEvents.emit(GameEvent.MY_PLAYER_READY, true)
+  readyToConnect(ready: boolean) {
+    this.room?.send(Message.READY_TO_CONNECT, ready)
+    phaserEvents.emit(GameEvent.MY_PLAYER_READY, ready)
   }
 
   // method to send ready-to-connect signal to Colyseus server
   mediaConnected(connected: boolean) {
-    this.room?.send(Message.VIDEO_CONNECTED, { connected })
-    phaserEvents.emit(GameEvent.MY_PLAYER_VIDEO_CONNECTED, { connected })
+    this.room?.send(Message.VIDEO_CONNECTED, connected)
+    phaserEvents.emit(GameEvent.MY_PLAYER_VIDEO_CONNECTED, connected)
   }
 
   // method to send stream-disconnection signal to Colyseus server

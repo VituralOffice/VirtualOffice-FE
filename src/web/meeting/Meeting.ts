@@ -9,7 +9,6 @@ import {
   setAdminUser,
   setChatId,
   setTitle,
-  openMeetingWithDependencies,
 } from '../../stores/MeetingStore'
 import { setShowCreateMeeting, setCreateMeetingCallback } from '../../stores/UIStore'
 
@@ -81,14 +80,23 @@ export class Meeting {
 
   openDialog(network: Network) {
     if (!this.id) return
-    store.dispatch(openMeetingWithDependencies(this.id, network.mySessionId))
+    network.connectToMeeting(
+      store.getState().user.userId,
+      store.getState().room.roomId,
+      this.id,
+    )
   }
 
   createMeeting(network: Network) {
     if (!this.id) return
 
     const createMeetingCallback = (title: string) => {
-      store.dispatch(openMeetingWithDependencies(this.id, network.mySessionId, title))
+      network.connectToMeeting(
+        store.getState().user.userId,
+        store.getState().room.roomId,
+        this.id,
+        title
+      )
     }
 
     store.dispatch(setCreateMeetingCallback(createMeetingCallback))
