@@ -33,17 +33,17 @@ export default class OtherPlayer extends Player {
   makeCall(myPlayer: MyPlayer, webRTC: WebRTC) {
     this.myPlayer = myPlayer
     if (
-      !this.connected
-      && this.connectionBufferTime >= 750
-      && myPlayer.readyToConnect
-      && this.readyToConnect
-      && myPlayer.mediaConnected
-      && !myPlayer.isPlayerInMeeting()
-      && !this.isInMeeting
-      && myPlayer.getPlayerId()! > this.playerId
+      !this.connected &&
+      this.connectionBufferTime >= 750 &&
+      myPlayer.readyToConnect &&
+      this.readyToConnect &&
+      myPlayer.mediaConnected &&
+      !myPlayer.isPlayerInMeeting() &&
+      !this.isInMeeting &&
+      myPlayer.getPlayerId()! > this.playerId
     ) {
       // console.log(myPlayer.getPlayerId() + " ------- " + this.playerId)
-      console.log(myPlayer.playerNameText.text + " connect " + this.playerNameText.text);
+      console.log(myPlayer.playerNameText.text + ' connect ' + this.playerNameText.text)
       webRTC.connectToNewUser(this.playerId, this.playerNameText.text)
       this.connected = true
       this.connectionBufferTime = 0
@@ -167,14 +167,19 @@ export default class OtherPlayer extends Player {
 
     // while currently connected with myPlayer
     // if myPlayer and the otherPlayer stop overlapping, delete video stream
-    this.connectionBufferTime += dt
+    if (this.connectionBufferTime < 750) this.connectionBufferTime += dt
     if (
       this.connected &&
       !this.body!.embedded &&
       this.body!.touching.none &&
       this.connectionBufferTime >= 750
     ) {
-      if (this.x < 610 && this.y > 515 && this.myPlayer!.x < 610 && this.myPlayer!.y > 515) return
+      // if (this.x < 610 && this.y > 515 && this.myPlayer!.x < 610 && this.myPlayer!.y > 515) return
+      phaserEvents.emit(GameEvent.PLAYER_DISCONNECTED, this.playerId)
+      this.connectionBufferTime = 0
+      this.connected = false
+    }
+    if (this.isInMeeting && this.connected) {
       phaserEvents.emit(GameEvent.PLAYER_DISCONNECTED, this.playerId)
       this.connectionBufferTime = 0
       this.connected = false
