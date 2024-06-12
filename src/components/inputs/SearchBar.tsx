@@ -23,6 +23,11 @@ const SearchInput = styled.input`
   width: 100%;
   height: 100%;
   outline: none;
+
+  ::placeholder {
+    color: white; /* Màu của placeholder */
+    opacity: 0.5
+  }
 `
 
 const SearchBarInner = styled.div`
@@ -95,7 +100,7 @@ export const SearchBar = ({ search, setSearch }: SearchBarProps) => {
         <SearchIcon>
           <SearchRoundedIcon />
         </SearchIcon>
-        <SearchInput value={search} onChange={handleChange} />
+        <SearchInput placeholder='Search' value={search} onChange={handleChange} />
         {search && (
           <ClearSearchButton onClick={handleClear}>
             <span>

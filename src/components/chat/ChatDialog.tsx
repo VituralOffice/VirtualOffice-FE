@@ -71,25 +71,26 @@ const ChatBox = styled(Box)`
   width: 100%;
   overflow-y: auto;
   background: rgb(38, 44, 77);
+  padding: 5px;
   /* Custom scrollbar styles */
-    ::-webkit-scrollbar {
-      width: 6px;
-    }
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
 
-    ::-webkit-scrollbar-track {
-      background: rgb(51, 58, 100);
-      border-radius: 10px;
-    }
+  ::-webkit-scrollbar-track {
+    background: rgb(51, 58, 100);
+    border-radius: 10px;
+  }
 
-    ::-webkit-scrollbar-thumb {
-      background-color: rgb(255, 255, 255, 0.3);
-      border-radius: 10px;
-      cursor: pointer;
-    }
+  ::-webkit-scrollbar-thumb {
+    background-color: rgb(255, 255, 255, 0.3);
+    border-radius: 10px;
+    cursor: pointer;
+  }
 
-    ::-webkit-scrollbar-thumb:hover {
-      background-color: rgb(255, 255, 255, 0.5);
-    }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(255, 255, 255, 0.5);
+  }
 `
 
 const ListChat = styled(Box)`
@@ -258,7 +259,7 @@ export default function ChatDialog() {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [currentChat])
+  }, [currentChat, mapMessages.get(currentChat?._id || '')?.messages.length])
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     setIsDragging(true)
@@ -273,6 +274,8 @@ export default function ChatDialog() {
   }
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (!currentChat) return
+
     const file = event.target.files?.[0]
     if (!file) return
 
@@ -335,6 +338,8 @@ export default function ChatDialog() {
   }
 
   const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
+    if (!currentChat) return
+
     const items = e.clipboardData?.items
     if (items) {
       for (let i = 0; i < items.length; i++) {
@@ -380,6 +385,7 @@ export default function ChatDialog() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    if (!currentChat) return
     if (!readyToSubmit) {
       setReadyToSubmit(true)
       return
@@ -515,15 +521,18 @@ export default function ChatDialog() {
                 }}
               >
                 <h3>{currentChat?.name || ''}</h3>
-                <MenuDropdown
-                  items={[{ icon: <ExitToAppRoundedIcon />, label: 'Leave chat' }]}
-                  handleSelect={() => {}}
-                />
+                {currentChat && (
+                  <MenuDropdown
+                    items={[{ icon: <ExitToAppRoundedIcon />, label: 'Leave chat' }]}
+                    handleSelect={() => {}}
+                  />
+                )}
                 <IconButton
                   aria-label="close dialog"
                   className="close"
                   onClick={() => dispatch(setShowChat(false))}
                   size="small"
+                  style={{ top: '5px', right: '5px' }}
                 >
                   <CloseIcon />
                 </IconButton>
@@ -617,52 +626,54 @@ export default function ChatDialog() {
                       ))}
                     </div>
                   )}
-                  <div style={{ display: 'flex' }}>
-                    <div
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        cursor: 'pointer',
-                      }}
-                      onClick={handleFileClick}
-                    >
-                      <input
-                        type="file"
-                        ref={fileInputRef}
-                        style={{ display: 'none' }}
-                        onChange={handleFileChange}
+                  {currentChat && (
+                    <div style={{ display: 'flex' }}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          cursor: 'pointer',
+                        }}
+                        onClick={handleFileClick}
+                      >
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          style={{ display: 'none' }}
+                          onChange={handleFileChange}
+                        />
+                        <AttachFileIcon style={{ color: 'white' }} />
+                      </div>
+                      <InputTextField
+                        inputRef={inputRef}
+                        autoFocus={focused}
+                        fullWidth
+                        placeholder="Press Enter to chat"
+                        value={inputValue}
+                        onKeyDown={handleKeyDown}
+                        onChange={handleChange}
+                        onPaste={handlePaste}
+                        inputProps={{ accept: 'image/*' }}
+                        onFocus={() => {
+                          if (!focused) {
+                            dispatch(setFocused(true))
+                            setReadyToSubmit(true)
+                          }
+                        }}
+                        onBlur={() => {
+                          dispatch(setFocused(false))
+                          setReadyToSubmit(false)
+                        }}
                       />
-                      <AttachFileIcon style={{ color: 'white' }} />
+                      <IconButton
+                        aria-label="emoji"
+                        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                      >
+                        <InsertEmoticonIcon />
+                      </IconButton>
                     </div>
-                    <InputTextField
-                      inputRef={inputRef}
-                      autoFocus={focused}
-                      fullWidth
-                      placeholder="Press Enter to chat"
-                      value={inputValue}
-                      onKeyDown={handleKeyDown}
-                      onChange={handleChange}
-                      onPaste={handlePaste}
-                      inputProps={{ accept: 'image/*' }}
-                      onFocus={() => {
-                        if (!focused) {
-                          dispatch(setFocused(true))
-                          setReadyToSubmit(true)
-                        }
-                      }}
-                      onBlur={() => {
-                        dispatch(setFocused(false))
-                        setReadyToSubmit(false)
-                      }}
-                    />
-                    <IconButton
-                      aria-label="emoji"
-                      onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                    >
-                      <InsertEmoticonIcon />
-                    </IconButton>
-                  </div>
+                  )}
                 </InputWrapper>
               </div>
             </div>

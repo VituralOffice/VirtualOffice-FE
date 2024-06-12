@@ -17,7 +17,7 @@ const isCustomRoom = (room: RoomInterface) => {
 export const roomSlice = createSlice({
   name: 'room',
   initialState: {
-    lobbyJoined: false,
+    // lobbyJoined: false,
     roomJoined: false,
     roomId: '',
     roomName: '',
@@ -27,9 +27,9 @@ export const roomSlice = createSlice({
     // onlineMemberMap: new Map<string, IRoomMember>(),
   },
   reducers: {
-    setLobbyJoined: (state, action: PayloadAction<boolean>) => {
-      state.lobbyJoined = action.payload
-    },
+    // setLobbyJoined: (state, action: PayloadAction<boolean>) => {
+    //   state.lobbyJoined = action.payload
+    // },
     setRoomJoined: (state, action: PayloadAction<boolean>) => {
       state.roomJoined = action.payload
     },
@@ -102,7 +102,7 @@ export const roomSlice = createSlice({
 export const selectRoomId = (state: RootState) => state.room.roomId;
 
 export const {
-  setLobbyJoined,
+  // setLobbyJoined,
   setRoomJoined,
   setJoinedRoomData,
   setAvailableRooms,

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { IChatMessage } from '../../types/ISpaceState'
-import Tooltip from '@mui/material/Tooltip'
+import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip'
 import styled from 'styled-components'
 import { getColorByString } from '../../utils/util'
 import Zoom from 'react-medium-image-zoom'
@@ -9,6 +9,8 @@ const MessageWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
   padding: 0px 2px;
+  border-radius: 5px;
+  padding: 3px;
 
   p {
     margin: 3px;
@@ -30,7 +32,7 @@ const MessageWrapper = styled.div`
   }
 
   :hover {
-    background: #3a3a3a;
+    background: rgb(255, 255, 255, 0.1);
   }
 `
 
@@ -38,7 +40,18 @@ interface MessageProps {
   chatMessage: IChatMessage
 }
 
-export default function ChatMessage ({ chatMessage }: MessageProps) {
+const CustomTooltip = styled(({ className, ...props }: TooltipProps) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))`
+  & .${tooltipClasses.tooltip} {
+    color: white;
+    font-size: 12px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  }
+`
+
+export default function ChatMessage({ chatMessage }: MessageProps) {
   const [tooltipOpen, setTooltipOpen] = useState(false)
 
   return (
@@ -46,14 +59,14 @@ export default function ChatMessage ({ chatMessage }: MessageProps) {
       onMouseEnter={() => setTooltipOpen(true)}
       onMouseLeave={() => setTooltipOpen(false)}
     >
-      <Tooltip
+      <CustomTooltip
         open={tooltipOpen}
         title={chatMessage?.createdAt?.toString()}
         placement="right"
         arrow
       >
-        <p style={{ color: getColorByString(chatMessage.user?.fullname || '') }}>
-          {chatMessage.user?.fullname}:{' '}
+        <div style={{display: 'flex', justifyContent: 'flex-start', gap: '10px', alignItems: 'flex-end'}}>
+          <span style={{ fontWeight: 'bold', color: getColorByString(chatMessage.user?.fullname || '') }}>{chatMessage.user?.fullname}:{' '}</span>
           {chatMessage.message?.type === 'text' ? (
             <span>{chatMessage.message?.text}</span>
           ) : chatMessage.message?.type === 'image' ? (
@@ -62,7 +75,6 @@ export default function ChatMessage ({ chatMessage }: MessageProps) {
                 width: '100px',
                 height: '60px',
                 margin: '10px',
-                position: 'relative',
               }}
             >
               <Zoom>
@@ -78,7 +90,6 @@ export default function ChatMessage ({ chatMessage }: MessageProps) {
               style={{
                 height: '30px',
                 margin: '10px',
-                position: 'relative',
               }}
             >
               <a href={chatMessage.message.path} style={{ color: 'white' }}>
@@ -88,8 +99,8 @@ export default function ChatMessage ({ chatMessage }: MessageProps) {
           ) : (
             <></>
           )}
-        </p>
-      </Tooltip>
+        </div>
+      </CustomTooltip>
     </MessageWrapper>
   )
 }
