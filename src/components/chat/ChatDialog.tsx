@@ -7,7 +7,7 @@ import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon'
 import CloseIcon from '@mui/icons-material/Close'
 import 'emoji-mart/css/emoji-mart.css'
 import { Picker } from 'emoji-mart'
-import { setFocused, setListChat, setShowChat } from '../../stores/ChatStore'
+import { setChatType, setFocused, setListChat, setShowChat } from '../../stores/ChatStore'
 import { useAppDispatch, useAppSelector } from '../../hook'
 import Game from '../../scenes/Game'
 import { PhaserGameInstance } from '../../PhaserGame'
@@ -22,6 +22,13 @@ import Network from '../../services/Network'
 import ChatMessage from './ChatMessage'
 import { ButtonProps } from '../../interfaces/Interfaces'
 import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded'
+import PersonRoundedIcon from '@mui/icons-material/PersonRounded'
+import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded'
+import LanguageRoundedIcon from '@mui/icons-material/LanguageRounded'
+import MenuIconDropdown from '../dropdowns/MenuIconDropdown'
+import ExitToAppRoundedIcon from '@mui/icons-material/ExitToAppRounded';
+import { CHAT_TYPE } from '../../constants/constant'
+import MenuDropdown from '../dropdowns/MenuDropdown'
 
 const Backdrop = styled.div`
   position: fixed;
@@ -174,9 +181,26 @@ export default function ChatDialog() {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
 
   const listChats = useAppSelector((state) => state.chat.listChats)
+  const chatType = useAppSelector((state) => state.chat.chatType)
   const focused = useAppSelector((state) => state.chat.focused)
   const showChat = useAppSelector((state) => state.chat.showChat)
   const mapMessages = useAppSelector((state) => state.chat.mapMessages)
+
+  const handleSelectedChatType = (index: number) => {
+    switch (index) {
+      case 0:
+        dispatch(setChatType(CHAT_TYPE.PRIVATE))
+        break
+      case 1:
+        dispatch(setChatType(CHAT_TYPE.GROUP))
+        break
+      case 2:
+        dispatch(setChatType(CHAT_TYPE.PUBLIC))
+        break
+      default:
+        break
+    }
+  }
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -211,7 +235,7 @@ export default function ChatDialog() {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [mapMessages.get(currentChat?._id || '')?.messages, showChat])
+  }, [showChat])
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     setIsDragging(true)
@@ -366,11 +390,15 @@ export default function ChatDialog() {
         `/rooms/${roomId}/chats?sort=desc&sortBy=lastModifiedAt`
       )
       dispatch(setListChat(res.result || []))
-      setCurrentChat(res.result[0])
+      setCurrentChat(listChats[0])
     } catch (error) {
       console.error(error)
     }
   }
+
+  useEffect(() => {
+    setCurrentChat(listChats[0])
+  }, [listChats])
 
   return (
     <Backdrop ref={draggableRef} onMouseDown={handleMouseDown}>
@@ -396,6 +424,14 @@ export default function ChatDialog() {
                 }}
               >
                 <h3>Chats</h3>
+                <MenuIconDropdown
+                  items={[
+                    { icon: <PersonRoundedIcon />, label: 'Private' },
+                    { icon: <GroupsRoundedIcon />, label: 'Group' },
+                    { icon: <LanguageRoundedIcon />, label: 'Public' },
+                  ]}
+                  handleSelect={handleSelectedChatType}
+                />
               </ChatHeader>
               <ListChat style={{ height: '91%', borderRadius: '0 0 0 10px', paddingRight: 5 }}>
                 <div
@@ -438,6 +474,12 @@ export default function ChatDialog() {
                 }}
               >
                 <h3>{currentChat?.name || ''}</h3>
+                <MenuDropdown
+                  items={[
+                    { icon: <ExitToAppRoundedIcon />, label: 'Leave chat' },
+                  ]}
+                  handleSelect={() => {}}
+                />
                 <IconButton
                   aria-label="close dialog"
                   className="close"
