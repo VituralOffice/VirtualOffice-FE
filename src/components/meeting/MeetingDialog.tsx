@@ -199,7 +199,7 @@ export default function MeetingDialog() {
         </IconButton> */}
 
           <MeetingHeader>
-            <MeetingTitle>Meeting title</MeetingTitle>
+            <MeetingTitle>{meeting.title || 'No Title'}</MeetingTitle>
 
             <ToolbarContainer>
               {shareScreenAvailable && (

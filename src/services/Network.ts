@@ -291,6 +291,7 @@ export default class Network {
         console.log(
           `Network::onMessage CONNECT_TO_MEETING: meetingId: ${message.meetingId}, chatId: ${message.chatId}, title: ${message.title}`
         )
+        this.webRTC?.disconnect()
 
         const microphoneON = store.getState().user.microphoneON
         const cameraON = store.getState().user.cameraON
@@ -484,7 +485,6 @@ export default class Network {
       meetingId,
       title,
     })
-    this.webRTC?.disconnect()
   }
   lockMeeting(id: string) {
     this.room?.send(Message.MEETING_LOCK, { meetingId: id })
