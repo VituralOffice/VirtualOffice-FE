@@ -106,7 +106,7 @@ export const ParticipantItem = ({ user, isOnline, isKing }: Props) => {
         <div>
           <div className="background">
             {/* <img src={'/' + getAvatarById(user.character_id).img} /> */}
-            <img src={user.character.avatar} />
+            <img src={user.characterAvatar} />
           </div>
           <div className="status-dot">
             <FiberManualRecordRoundedIcon />

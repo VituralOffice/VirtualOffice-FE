@@ -1,123 +1,120 @@
 body {
-    margin: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
-        'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  box-sizing: border-box;
 }
 
 *,
 *:before,
 *:after {
-    box-sizing: inherit;
+  box-sizing: inherit;
 }
 
 #phaser-container {
-    canvas {
-        display: block;
-    }
+  canvas {
+    display: block;
+  }
 
-    // height: 92%;
+  // height: 92%;
 }
 
 .my-video-grid {
-    display: flex;
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    max-height: calc(100% - 100px);
-    overflow-y: auto;
+  display: flex;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  max-height: calc(100% - 100px);
+  overflow-y: auto;
 
-    &>video {
-        width: 160px;
-        height: 160px;
-        object-fit: cover;
-        border-radius: 5px;
-        border: 1px groove rgb(229, 251, 255);
-        background-color: #141414;
-    }
+  & > video {
+    width: 160px;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 5px;
+    border: 1px groove rgb(229, 251, 255);
+    background-color: #141414;
+  }
 }
 
 .others-video-grid {
-    display: flex;
-    position: absolute;
-    gap: 10px;
-    top: 10px;
-    right: 10px;
-    max-height: calc(100% - 100px);
-    overflow-y: visible;
+  display: flex;
+  position: absolute;
+  gap: 10px;
+  top: 10px;
+  right: 10px;
+  max-height: calc(100% - 100px);
+  overflow-y: visible;
 
-    &>div {
-        width: 160px;
-        height: 160px;
-        position: relative;
+  & > div {
+    width: 160px;
+    height: 160px;
+    position: relative;
 
-        &>video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 5px;
-            border: 1px groove rgb(229, 251, 255);
-        }
-
-        &>p {
-            position: absolute;
-            margin: 0;
-            bottom: -20px;
-            left: 0;
-            right: 0;
-            text-align: center;
-            font-size: 14px;
-            font-weight: 500;
-            color: white;
-            text-shadow: 
-                -1px -1px 0 #000,  
-                 1px -1px 0 #000,
-                -1px  1px 0 #000,
-                 1px  1px 0 #000;
-        }
+    & > video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 5px;
+      border: 1px groove rgb(229, 251, 255);
+      background-color: #141414;
     }
+
+    & > p {
+      position: absolute;
+      margin: 0;
+      bottom: -20px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      color: white;
+      text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    }
+  }
 }
 
 .button-grid {
-    width: 160px;
-    display: flex;
-    justify-content: space-evenly;
-    position: absolute;
-    top: 5px;
-    right: 10px;
+  width: 160px;
+  display: flex;
+  justify-content: space-evenly;
+  position: absolute;
+  top: 5px;
+  right: 10px;
 }
 
 * {
-    &:hover {
-        &::-webkit-scrollbar-thumb {
-            background: #eee;
-        }
-    }
-
-    &::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-    }
-
-    &::-webkit-scrollbar-track {
-        background: rgba(#333, 0.2);
-        border-radius: 3px;
-    }
-
-    &::-webkit-scrollbar-corner {
-        background: rgba(#333, 0.2);
-    }
-
+  &:hover {
     &::-webkit-scrollbar-thumb {
-        transition: background 0.1s;
-        background: rgba(#eee, 0.8);
-        border-radius: 3px;
+      background: #eee;
     }
+  }
+
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(#333, 0.2);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-corner {
+    background: rgba(#333, 0.2);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    transition: background 0.1s;
+    background: rgba(#eee, 0.8);
+    border-radius: 3px;
+  }
 }
 
 .bg-color {
-    background-color: rgb(32, 37, 64);
+  background-color: rgb(32, 37, 64);
 }

@@ -290,10 +290,16 @@ export default function MeetingDialog() {
                 </div>
               </ToolbarButton>
               <SeparateLine />
-              <ToolbarExitButton onClick={() => {
-                if (meeting.adminUser == Network.getInstance()?.mySessionId)
-                  setShowLeavePopup(true)
-              }}>
+              <ToolbarExitButton
+                onClick={() => {
+                  if (meeting.adminUser == Network.getInstance()?.mySessionId)
+                    setShowLeavePopup(true)
+                  else {
+                    dispatch(closeMeetingDialog())
+                    Network.getInstance()?.disconnectFromMeeting(meeting.activeMeetingId!)
+                  }
+                }}
+              >
                 <div>
                   <span>
                     <MeetingRoomIcon />
@@ -328,7 +334,7 @@ export default function MeetingDialog() {
       {showLeavePopup && (
         <YesNoPopup
           onSubmit={() => {
-            dispatch(closeMeetingDialog());
+            dispatch(closeMeetingDialog())
             Network.getInstance()?.disconnectFromMeeting(meeting.activeMeetingId!)
           }}
           onClosePopup={() => setShowLeavePopup(false)}
