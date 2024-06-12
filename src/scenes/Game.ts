@@ -19,7 +19,6 @@ import { IPlayer } from '../types/ISpaceState'
 import { ItemType } from '../types/Items'
 import { Meeting } from '../web/meeting/Meeting'
 import Whiteboard from '../items/WhiteBoard'
-import { closeMeetingDialog, openMeetingDialog } from '../stores/MeetingStore'
 
 export default class Game extends Phaser.Scene {
   private static instance: Game | null = null // Biến static instance

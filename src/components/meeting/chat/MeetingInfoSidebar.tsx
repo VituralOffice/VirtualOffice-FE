@@ -68,6 +68,7 @@ export const MeetingInfoSidebar = () => {
     let hehe = meeting.connectedUser.map((sessionId) => {
       return { online: true, user: players?.get(sessionId)!, role: meeting.adminUser == sessionId ? 'admin' : 'user' }
     })
+    // console.log(hehe)
     setConnectedUser(hehe)
   }, [meeting.connectedUser])
 

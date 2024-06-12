@@ -1,14 +1,13 @@
 import Network from '../../services/Network'
 import store from '../../stores'
 import {
-  openMeetingDialog,
   addMeetingUser,
   removeMeetingUser,
-  closeMeetingDialog,
   setMeetingIsLocked,
   setAdminUser,
   setChatId,
   setTitle,
+  closeMeetingDialog,
 } from '../../stores/MeetingStore'
 import { setShowCreateMeeting, setCreateMeetingCallback } from '../../stores/UIStore'
 
@@ -19,7 +18,7 @@ export class Meeting {
   title: string
   chatId: string
   isLocked: boolean
-  adminUser?: string
+  adminUser: string
 
   constructor(meetingId: string) {
     this.id = meetingId
@@ -27,6 +26,8 @@ export class Meeting {
     this.title = ''
     this.chatId = ''
     this.isLocked = false
+    this.adminUser = ''
+    this.currentUsers = []
   }
 
   addCurrentUser(userId: string) {
@@ -40,22 +41,41 @@ export class Meeting {
     console.log(`Meeting::addCurrentUser add user ${userId}`)
     if (meetingState.activeMeetingId === this.id) {
       store.dispatch(addMeetingUser({ meetingId: this.id, user: userId }))
+      const userMediaManager = store.getState().meeting.userMediaManager
+      const shareScreenManager = store.getState().meeting.shareScreenManager
+      userMediaManager?.onUserJoined(userId)
+      shareScreenManager?.onUserJoined(userId)
     }
   }
 
   removeCurrentUser(userId: string) {
     if (!this.currentUsers || !this.currentUsers.includes(userId)) return
+    console.log(`Meeting::removeCurrentUser remove user with id: ${userId}`)
     this.currentUsers = this.currentUsers.filter((u) => u !== userId)
-    // give authority to random user when admin left
-    if (this.adminUser === userId) this.adminUser = this.currentUsers[this.currentUsers.keys[0]]
     const meetingState = store.getState().meeting
     if (meetingState.activeMeetingId === this.id) {
       store.dispatch(removeMeetingUser({ meetingId: this.id, user: userId }))
+      const userMediaManager = store.getState().meeting.userMediaManager
+      const shareScreenManager = store.getState().meeting.shareScreenManager
+      userMediaManager?.onUserLeft(userId)
+      shareScreenManager?.onUserLeft(userId)
     }
   }
 
   setIsOpen(isOpen: boolean) {
+    let wasOpen = this.isOpen
     this.isOpen = isOpen
+    if (wasOpen && !isOpen) {
+      const meetingState = store.getState().meeting
+      if (meetingState.activeMeetingId == this.id) {
+        store.dispatch(closeMeetingDialog())
+      }
+      this.title = ''
+      this.chatId = ''
+      this.isLocked = false
+      this.adminUser = ''
+      this.currentUsers = []
+    }
   }
 
   setTitle(title: string) {
@@ -80,11 +100,7 @@ export class Meeting {
 
   openDialog(network: Network) {
     if (!this.id) return
-    network.connectToMeeting(
-      store.getState().user.userId,
-      store.getState().room.roomId,
-      this.id,
-    )
+    network.connectToMeeting(store.getState().user.userId, store.getState().room.roomId, this.id)
   }
 
   createMeeting(network: Network) {

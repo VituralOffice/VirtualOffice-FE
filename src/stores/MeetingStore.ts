@@ -103,14 +103,13 @@ export const meetingSlice = createSlice({
 
       setTimeout(() => {
         userMediaManager.startCameraShare(cameraON, microphoneON, meetingId);
-      }, 500);
+      }, 1000);
       console.log(
         `MeetingStore::openMeetingDialog set activeMeetingId : ${action.payload.meetingId}`
       )
     },
     closeMeetingDialog: (state) => {
       // Tell server the meeting dialog is closed.
-      Network.getInstance()?.disconnectFromMeeting(state.activeMeetingId!)
       Game.getInstance()?.enableKeys()
       Game.getInstance()?.myPlayer.setPlayerIsInMeeting(false)
       Game.getInstance()?.myPlayer.setLeaveCurrentChair(true)
@@ -199,15 +198,15 @@ export const meetingSlice = createSlice({
           ...state.connectedUser.filter((u) => u != action.payload.user),
           action.payload.user,
         ]
-        state.shareScreenManager?.onUserJoined(action.payload.user)
-        state.userMediaManager?.onUserJoined(action.payload.user)
+        // state.shareScreenManager?.onUserJoined(action.payload.user)
+        // state.userMediaManager?.onUserJoined(action.payload.user)
       }
     },
     removeMeetingUser: (state, action: PayloadAction<{ meetingId: string; user: string }>) => {
       if (state.activeMeetingId === action.payload.meetingId) {
         state.connectedUser = state.connectedUser.filter((u) => u != action.payload.user)
-        state.shareScreenManager?.onUserLeft(action.payload.user)
-        state.userMediaManager?.onUserLeft(action.payload.user)
+        // state.shareScreenManager?.onUserLeft(action.payload.user)
+        // state.userMediaManager?.onUserLeft(action.payload.user)
       }
     },
     setMeetingIsLocked: (

@@ -87,6 +87,8 @@ export default class Network {
   public disconnectMeeting() {
     console.log('Network::disconnectMeeting Disconnecting meeting')
     store.dispatch(disconnectMeeting())
+    let activeMeetingId = store.getState().meeting.activeMeetingId
+    this.disconnectFromMeeting(activeMeetingId || '')
   }
 
   /**
@@ -292,7 +294,14 @@ export default class Network {
 
         const microphoneON = store.getState().user.microphoneON
         const cameraON = store.getState().user.cameraON
-        store.dispatch(openMeetingDialog({ meetingId: message.meetingId, myPlayerId: this.mySessionId, microphoneON, cameraON }))
+        store.dispatch(
+          openMeetingDialog({
+            meetingId: message.meetingId,
+            myPlayerId: this.mySessionId,
+            microphoneON,
+            cameraON,
+          })
+        )
 
         const chatResponse = await GetOneChat({
           roomId: store.getState().room.roomId,
