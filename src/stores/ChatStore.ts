@@ -2,6 +2,7 @@ import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import Game from '../scenes/Game'
 import { IChatMessage, IMapMessage } from '../types/ISpaceState'
 import { IChat } from '../interfaces/chat'
+import { CHAT_TYPE } from '../constants/constant'
 
 export enum MessageType {
   PLAYER_JOINED,
@@ -13,6 +14,10 @@ interface ChatState {
   focused: boolean
   showChat: boolean
   listChats: IChat[]
+  privateChats: IChat[]
+  publicChats: IChat[]
+  groupChats: IChat[]
+  chatType: CHAT_TYPE
   mapMessages: Map<string, IMapMessage>
 }
 
@@ -20,6 +25,10 @@ const initialState: ChatState = {
   focused: false,
   showChat: false,
   listChats: [] as IChat[],
+  privateChats: [] as IChat[],
+  publicChats: [] as IChat[],
+  groupChats: [] as IChat[],
+  chatType: CHAT_TYPE.PRIVATE,
   mapMessages: new Map<string, IMapMessage>(),
 }
 
@@ -73,8 +82,54 @@ export const chatSlice = createSlice({
     setShowChat: (state, action: PayloadAction<boolean>) => {
       state.showChat = action.payload
     },
+    setChatType: (state, action: PayloadAction<CHAT_TYPE>) => {
+      state.chatType = action.payload
+      switch (action.payload) {
+        case CHAT_TYPE.PRIVATE:
+          state.listChats = state.privateChats
+          break
+        case CHAT_TYPE.GROUP:
+          state.listChats = state.groupChats
+          break
+        case CHAT_TYPE.PUBLIC:
+          state.listChats = state.publicChats
+          break
+        default:
+          break
+      }
+    },
     setListChat: (state, action: PayloadAction<IChat[]>) => {
-      state.listChats = action.payload
+      state.privateChats = []
+      state.publicChats = []
+      state.groupChats = []
+      action.payload.forEach((c) => {
+        switch (c.type) {
+          case CHAT_TYPE.PRIVATE:
+            state.privateChats.push(c)
+            break
+          case CHAT_TYPE.GROUP:
+            state.groupChats.push(c)
+            break
+          case CHAT_TYPE.PUBLIC:
+            state.publicChats.push(c)
+            break
+          default:
+            break
+        }
+      })
+      switch (state.chatType) {
+        case CHAT_TYPE.PRIVATE:
+          state.listChats = state.privateChats
+          break
+        case CHAT_TYPE.GROUP:
+          state.listChats = state.groupChats
+          break
+        case CHAT_TYPE.PUBLIC:
+          state.listChats = state.publicChats
+          break
+        default:
+          break
+      }
     },
     setMessageMaps: (state, action: PayloadAction<IMapMessage[]>) => {
       action.payload.forEach((m) => {
@@ -132,6 +187,7 @@ export const {
   updateChat,
   addChatAndSetActive,
   setMessageMaps,
+  setChatType,
 } = chatSlice.actions
 
 export default chatSlice.reducer

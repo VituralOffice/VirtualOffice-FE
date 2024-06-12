@@ -7,7 +7,7 @@ import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon'
 import CloseIcon from '@mui/icons-material/Close'
 import 'emoji-mart/css/emoji-mart.css'
 import { Picker } from 'emoji-mart'
-import { setFocused, setListChat, setShowChat } from '../../stores/ChatStore'
+import { setChatType, setFocused, setListChat, setShowChat } from '../../stores/ChatStore'
 import { useAppDispatch, useAppSelector } from '../../hook'
 import Game from '../../scenes/Game'
 import { PhaserGameInstance } from '../../PhaserGame'
@@ -22,6 +22,14 @@ import Network from '../../services/Network'
 import ChatMessage from './ChatMessage'
 import { ButtonProps } from '../../interfaces/Interfaces'
 import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded'
+import PersonRoundedIcon from '@mui/icons-material/PersonRounded'
+import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded'
+import LanguageRoundedIcon from '@mui/icons-material/LanguageRounded'
+import MenuIconDropdown from '../dropdowns/MenuIconDropdown'
+import ExitToAppRoundedIcon from '@mui/icons-material/ExitToAppRounded'
+import { CHAT_TYPE } from '../../constants/constant'
+import MenuDropdown from '../dropdowns/MenuDropdown'
+import { toast } from 'react-toastify'
 
 const Backdrop = styled.div`
   position: fixed;
@@ -61,8 +69,28 @@ const ChatHeader = styled.div`
 const ChatBox = styled(Box)`
   height: 100%;
   width: 100%;
-  overflow: auto;
+  overflow-y: auto;
   background: rgb(38, 44, 77);
+  padding: 5px;
+  /* Custom scrollbar styles */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: rgb(51, 58, 100);
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: rgb(255, 255, 255, 0.3);
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(255, 255, 255, 0.5);
+  }
 `
 
 const ListChat = styled(Box)`
@@ -133,6 +161,7 @@ const EmojiPickerWrapper = styled.div`
   position: absolute;
   bottom: 54px;
   right: 16px;
+  z-index: 10;
 `
 
 const AddChatButton = styled.span<ButtonProps>`
@@ -168,15 +197,34 @@ export default function ChatDialog() {
   const [inputType, setInputType] = useState<'text' | 'image'>('text')
   const [images, setImages] = useState<PasteItem[]>([])
   const [files, setFiles] = useState<File[]>([])
+  const MAX_FILES = 5
+  const MAX_SIZE_MB = 10
   const [error, setError] = useState<string | null>(null)
   const [searchChatTxt, setSearchChatTxt] = useState('')
   const [isDragging, setIsDragging] = useState(false)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
 
   const listChats = useAppSelector((state) => state.chat.listChats)
+  const chatType = useAppSelector((state) => state.chat.chatType)
   const focused = useAppSelector((state) => state.chat.focused)
   const showChat = useAppSelector((state) => state.chat.showChat)
   const mapMessages = useAppSelector((state) => state.chat.mapMessages)
+
+  const handleSelectedChatType = (index: number) => {
+    switch (index) {
+      case 0:
+        dispatch(setChatType(CHAT_TYPE.PRIVATE))
+        break
+      case 1:
+        dispatch(setChatType(CHAT_TYPE.GROUP))
+        break
+      case 2:
+        dispatch(setChatType(CHAT_TYPE.PUBLIC))
+        break
+      default:
+        break
+    }
+  }
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -211,7 +259,7 @@ export default function ChatDialog() {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [mapMessages.get(currentChat?._id || '')?.messages, showChat])
+  }, [currentChat, mapMessages.get(currentChat?._id || '')?.messages.length])
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     setIsDragging(true)
@@ -226,13 +274,33 @@ export default function ChatDialog() {
   }
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (!currentChat) return
+
     const file = event.target.files?.[0]
-    if (file) {
-      if (file.type.includes('image')) {
-        setImages([...images, { preview: URL.createObjectURL(file), file }])
-      } else {
-        setFiles([...files, file])
+    if (!file) return
+
+    const totalSizeMB = [...files, ...images.map((image) => image.file), file].reduce(
+      (acc, curr) => acc + curr.size / 1024 / 1024,
+      0
+    )
+
+    if (totalSizeMB > MAX_SIZE_MB) {
+      toast('Total file size exceeds 10MB')
+      return
+    }
+
+    if (file.type.includes('image')) {
+      if (images.length >= MAX_FILES) {
+        toast('You can only select up to 5 images')
+        return
       }
+      setImages([...images, { preview: URL.createObjectURL(file), file }])
+    } else {
+      if (files.length >= MAX_FILES) {
+        toast('You can only select up to 5 files')
+        return
+      }
+      setFiles([...files, file])
     }
   }
 
@@ -270,6 +338,8 @@ export default function ChatDialog() {
   }
 
   const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
+    if (!currentChat) return
+
     const items = e.clipboardData?.items
     if (items) {
       for (let i = 0; i < items.length; i++) {
@@ -315,6 +385,7 @@ export default function ChatDialog() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    if (!currentChat) return
     if (!readyToSubmit) {
       setReadyToSubmit(true)
       return
@@ -366,11 +437,15 @@ export default function ChatDialog() {
         `/rooms/${roomId}/chats?sort=desc&sortBy=lastModifiedAt`
       )
       dispatch(setListChat(res.result || []))
-      setCurrentChat(res.result[0])
+      setCurrentChat(listChats[0])
     } catch (error) {
       console.error(error)
     }
   }
+
+  useEffect(() => {
+    setCurrentChat(listChats[0])
+  }, [listChats])
 
   return (
     <Backdrop ref={draggableRef} onMouseDown={handleMouseDown}>
@@ -396,6 +471,14 @@ export default function ChatDialog() {
                 }}
               >
                 <h3>Chats</h3>
+                <MenuIconDropdown
+                  items={[
+                    { icon: <PersonRoundedIcon />, label: 'Private' },
+                    { icon: <GroupsRoundedIcon />, label: 'Group' },
+                    { icon: <LanguageRoundedIcon />, label: 'Public' },
+                  ]}
+                  handleSelect={handleSelectedChatType}
+                />
               </ChatHeader>
               <ListChat style={{ height: '91%', borderRadius: '0 0 0 10px', paddingRight: 5 }}>
                 <div
@@ -438,11 +521,18 @@ export default function ChatDialog() {
                 }}
               >
                 <h3>{currentChat?.name || ''}</h3>
+                {currentChat && (
+                  <MenuDropdown
+                    items={[{ icon: <ExitToAppRoundedIcon />, label: 'Leave chat' }]}
+                    handleSelect={() => {}}
+                  />
+                )}
                 <IconButton
                   aria-label="close dialog"
                   className="close"
                   onClick={() => dispatch(setShowChat(false))}
                   size="small"
+                  style={{ top: '5px', right: '5px' }}
                 >
                   <CloseIcon />
                 </IconButton>
@@ -479,6 +569,11 @@ export default function ChatDialog() {
                             width: '100px',
                             height: '100px',
                             margin: '10px',
+                            background: 'rgb(255, 255, 255, 0.2)',
+                            borderRadius: '5px',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
                             position: 'relative',
                           }}
                         >
@@ -492,7 +587,7 @@ export default function ChatDialog() {
                             className="close"
                             onClick={() => setImages(images.filter((_, i) => i !== idx))}
                             size="small"
-                            style={{ position: 'absolute', right: '0' }}
+                            style={{ position: 'absolute', right: '0', top: '0' }}
                           >
                             <CloseIcon />
                           </IconButton>
@@ -506,10 +601,15 @@ export default function ChatDialog() {
                         <div
                           key={idx}
                           style={{
+                            width: '100px',
+                            height: '100px',
                             margin: '10px',
                             position: 'relative',
+                            background: 'rgb(255, 255, 255, 0.2)',
+                            borderRadius: '5px',
                             display: 'flex',
-                            flexDirection: 'column',
+                            justifyContent: 'center',
+                            alignItems: 'center',
                           }}
                         >
                           <p style={{ color: 'white' }}>{file.name}</p>
@@ -518,7 +618,7 @@ export default function ChatDialog() {
                             className="close"
                             onClick={() => setFiles(files.filter((_, i) => i !== idx))}
                             size="small"
-                            style={{ position: 'absolute', right: '0' }}
+                            style={{ position: 'absolute', right: '0', top: '0' }}
                           >
                             <CloseIcon />
                           </IconButton>
@@ -526,52 +626,54 @@ export default function ChatDialog() {
                       ))}
                     </div>
                   )}
-                  <div style={{ display: 'flex' }}>
-                    <div
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        cursor: 'pointer',
-                      }}
-                      onClick={handleFileClick}
-                    >
-                      <input
-                        type="file"
-                        ref={fileInputRef}
-                        style={{ display: 'none' }}
-                        onChange={handleFileChange}
+                  {currentChat && (
+                    <div style={{ display: 'flex' }}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          cursor: 'pointer',
+                        }}
+                        onClick={handleFileClick}
+                      >
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          style={{ display: 'none' }}
+                          onChange={handleFileChange}
+                        />
+                        <AttachFileIcon style={{ color: 'white' }} />
+                      </div>
+                      <InputTextField
+                        inputRef={inputRef}
+                        autoFocus={focused}
+                        fullWidth
+                        placeholder="Press Enter to chat"
+                        value={inputValue}
+                        onKeyDown={handleKeyDown}
+                        onChange={handleChange}
+                        onPaste={handlePaste}
+                        inputProps={{ accept: 'image/*' }}
+                        onFocus={() => {
+                          if (!focused) {
+                            dispatch(setFocused(true))
+                            setReadyToSubmit(true)
+                          }
+                        }}
+                        onBlur={() => {
+                          dispatch(setFocused(false))
+                          setReadyToSubmit(false)
+                        }}
                       />
-                      <AttachFileIcon style={{ color: 'white' }} />
+                      <IconButton
+                        aria-label="emoji"
+                        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                      >
+                        <InsertEmoticonIcon />
+                      </IconButton>
                     </div>
-                    <InputTextField
-                      inputRef={inputRef}
-                      autoFocus={focused}
-                      fullWidth
-                      placeholder="Press Enter to chat"
-                      value={inputValue}
-                      onKeyDown={handleKeyDown}
-                      onChange={handleChange}
-                      onPaste={handlePaste}
-                      inputProps={{ accept: 'image/*' }}
-                      onFocus={() => {
-                        if (!focused) {
-                          dispatch(setFocused(true))
-                          setReadyToSubmit(true)
-                        }
-                      }}
-                      onBlur={() => {
-                        dispatch(setFocused(false))
-                        setReadyToSubmit(false)
-                      }}
-                    />
-                    <IconButton
-                      aria-label="emoji"
-                      onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                    >
-                      <InsertEmoticonIcon />
-                    </IconButton>
-                  </div>
+                  )}
                 </InputWrapper>
               </div>
             </div>

@@ -13,16 +13,12 @@ import { CreateMeetingPopup } from '../components/popups/CreateMeetingPopup'
 import { useDispatch } from 'react-redux'
 import { setShowCreateMeeting } from '../stores/UIStore'
 import { setRoomId } from '../stores/RoomStore'
-import { GetAllChats, GetAllChatsWithMessage } from '../apis/ChatApis'
+import { GetAllChatsWithMessage } from '../apis/ChatApis'
 import { setListChat, setMessageMaps } from '../stores/ChatStore'
 import WhiteboardDialog from '../components/whiteboards/WhiteboardDialog'
-import { setMediaConnected } from '../stores/UserStore'
-import Network from '../services/Network'
-import WebRTC from '../web/WebRTC'
 
 export const OfficeSpace = () => {
   let { roomId } = useParams()
-  const lobbyJoined = useAppSelector((state) => state.room.lobbyJoined)
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
@@ -31,7 +27,6 @@ export const OfficeSpace = () => {
   const roomStore = useAppSelector((state) => state.room)
   const whiteboardDialogOpen = useAppSelector((state) => state.whiteboard.whiteboardDialogOpen)
   const meeting = useAppSelector((state) => state.meeting)
-  const user = useAppSelector((state) => state.user)
 
   const handleJoinRoom = async () => {
     try {

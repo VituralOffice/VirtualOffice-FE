@@ -2,6 +2,7 @@ import styled from 'styled-components'
 import { IRoomData } from '../../types/Rooms'
 import { writeToClipboard } from '../../utils/helpers'
 import { toast } from 'react-toastify'
+import { useAppSelector } from '../../hook'
 
 const Container = styled.div`
   display: flex;
@@ -53,6 +54,7 @@ const DropdownItem = styled.div`
 `
 
 export default function SpaceOptionPopup({ room }: { room: IRoomData }) {
+  const userId = useAppSelector((state) => state.user.userId)
   const handleCopyUrl = async () => {
     const url = `${window.location.host}/room/${room._id}`
     await writeToClipboard(url)
@@ -61,12 +63,14 @@ export default function SpaceOptionPopup({ room }: { room: IRoomData }) {
   return (
     <Container>
       <DropdownList>
-        <DropdownItem>
-          <span>Manage Space</span>
-        </DropdownItem>
-        <DropdownItem>
+        {userId == room.creator && (
+          <DropdownItem>
+            <span>Manage Space</span>
+          </DropdownItem>
+        )}
+        {/* <DropdownItem>
           <span>Edit Map</span>
-        </DropdownItem>
+        </DropdownItem> */}
         <DropdownItem onClick={handleCopyUrl}>
           <span>Copy URL</span>
         </DropdownItem>

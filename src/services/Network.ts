@@ -6,16 +6,13 @@ import {
   removePlayerNameMap,
   setPlayerAvatarMap,
   removePlayerAvatarMap,
-  selectUserId,
 } from '../stores/UserStore'
 import {
-  setLobbyJoined,
   setJoinedRoomData,
   setAvailableRooms,
   addAvailableRooms,
   removeAvailableRooms,
   updateMember,
-  selectRoomId,
 } from '../stores/RoomStore'
 import { IChair, IMeeting, IOfficeState, IPlayer, IWhiteboard } from '../types/ISpaceState'
 import WebRTC from '../web/WebRTC'
@@ -39,7 +36,7 @@ export default class Network {
 
   private client: Client
   room?: Room<IOfficeState>
-  private lobby!: Room
+  // private lobby!: Room
   webRTC?: WebRTC
 
   mySessionId!: string
@@ -95,18 +92,18 @@ export default class Network {
    * method to join Colyseus' built-in LobbyRoom, which automatically notifies
    * connected clients whenever rooms with "realtime listing" have updates
    */
-  async joinLobbyRoom() {
-    this.lobby = await this.client.joinOrCreate(RoomType.LOBBY)
-    this.lobby.onMessage('rooms', (rooms) => {
-      store.dispatch(setAvailableRooms(rooms))
-    })
-    this.lobby.onMessage('+', ([roomId, room]) => {
-      store.dispatch(addAvailableRooms({ roomId, room }))
-    })
-    this.lobby.onMessage('-', (roomId) => {
-      store.dispatch(removeAvailableRooms(roomId))
-    })
-  }
+  // async joinLobbyRoom() {
+  //   this.lobby = await this.client.joinOrCreate(RoomType.LOBBY)
+  //   this.lobby.onMessage('rooms', (rooms) => {
+  //     store.dispatch(setAvailableRooms(rooms))
+  //   })
+  //   this.lobby.onMessage('+', ([roomId, room]) => {
+  //     store.dispatch(addAvailableRooms({ roomId, room }))
+  //   })
+  //   this.lobby.onMessage('-', (roomId) => {
+  //     store.dispatch(removeAvailableRooms(roomId))
+  //   })
+  // }
 
   // method to join the public lobby
   async joinOrCreatePublic() {
@@ -139,7 +136,7 @@ export default class Network {
 
     console.log('Network::initialize Initilize Network')
 
-    this.lobby?.leave()
+    // this.lobby?.leave()
     this.mySessionId = this.room.sessionId
     store.dispatch(setSessionId(this.room.sessionId))
     this.webRTC = new WebRTC(this.mySessionId, this)

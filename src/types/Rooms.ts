@@ -1,7 +1,7 @@
 import { IUser } from '../interfaces/user'
 
 export enum RoomType {
-  LOBBY = 'lobby',
+  // LOBBY = 'lobby',
   PUBLIC = 'skyoffice',
   CUSTOM = 'custom',
 }
@@ -10,7 +10,9 @@ export interface IRoomData {
   _id: string
   name: string
   private: boolean
+  active: boolean
   autoDispose: boolean
+  creator: string
   map: string
   members: IRoomMember[]
 }
