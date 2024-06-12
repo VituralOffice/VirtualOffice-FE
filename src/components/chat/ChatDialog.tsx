@@ -26,9 +26,10 @@ import PersonRoundedIcon from '@mui/icons-material/PersonRounded'
 import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded'
 import LanguageRoundedIcon from '@mui/icons-material/LanguageRounded'
 import MenuIconDropdown from '../dropdowns/MenuIconDropdown'
-import ExitToAppRoundedIcon from '@mui/icons-material/ExitToAppRounded';
+import ExitToAppRoundedIcon from '@mui/icons-material/ExitToAppRounded'
 import { CHAT_TYPE } from '../../constants/constant'
 import MenuDropdown from '../dropdowns/MenuDropdown'
+import { toast } from 'react-toastify'
 
 const Backdrop = styled.div`
   position: fixed;
@@ -68,8 +69,27 @@ const ChatHeader = styled.div`
 const ChatBox = styled(Box)`
   height: 100%;
   width: 100%;
-  overflow: auto;
+  overflow-y: auto;
   background: rgb(38, 44, 77);
+  /* Custom scrollbar styles */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgb(51, 58, 100);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background-color: rgb(255, 255, 255, 0.3);
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background-color: rgb(255, 255, 255, 0.5);
+    }
 `
 
 const ListChat = styled(Box)`
@@ -140,6 +160,7 @@ const EmojiPickerWrapper = styled.div`
   position: absolute;
   bottom: 54px;
   right: 16px;
+  z-index: 10;
 `
 
 const AddChatButton = styled.span<ButtonProps>`
@@ -175,6 +196,8 @@ export default function ChatDialog() {
   const [inputType, setInputType] = useState<'text' | 'image'>('text')
   const [images, setImages] = useState<PasteItem[]>([])
   const [files, setFiles] = useState<File[]>([])
+  const MAX_FILES = 5
+  const MAX_SIZE_MB = 10
   const [error, setError] = useState<string | null>(null)
   const [searchChatTxt, setSearchChatTxt] = useState('')
   const [isDragging, setIsDragging] = useState(false)
@@ -235,7 +258,7 @@ export default function ChatDialog() {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [showChat])
+  }, [currentChat])
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     setIsDragging(true)
@@ -251,12 +274,30 @@ export default function ChatDialog() {
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
-    if (file) {
-      if (file.type.includes('image')) {
-        setImages([...images, { preview: URL.createObjectURL(file), file }])
-      } else {
-        setFiles([...files, file])
+    if (!file) return
+
+    const totalSizeMB = [...files, ...images.map((image) => image.file), file].reduce(
+      (acc, curr) => acc + curr.size / 1024 / 1024,
+      0
+    )
+
+    if (totalSizeMB > MAX_SIZE_MB) {
+      toast('Total file size exceeds 10MB')
+      return
+    }
+
+    if (file.type.includes('image')) {
+      if (images.length >= MAX_FILES) {
+        toast('You can only select up to 5 images')
+        return
       }
+      setImages([...images, { preview: URL.createObjectURL(file), file }])
+    } else {
+      if (files.length >= MAX_FILES) {
+        toast('You can only select up to 5 files')
+        return
+      }
+      setFiles([...files, file])
     }
   }
 
@@ -475,9 +516,7 @@ export default function ChatDialog() {
               >
                 <h3>{currentChat?.name || ''}</h3>
                 <MenuDropdown
-                  items={[
-                    { icon: <ExitToAppRoundedIcon />, label: 'Leave chat' },
-                  ]}
+                  items={[{ icon: <ExitToAppRoundedIcon />, label: 'Leave chat' }]}
                   handleSelect={() => {}}
                 />
                 <IconButton
@@ -521,6 +560,11 @@ export default function ChatDialog() {
                             width: '100px',
                             height: '100px',
                             margin: '10px',
+                            background: 'rgb(255, 255, 255, 0.2)',
+                            borderRadius: '5px',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
                             position: 'relative',
                           }}
                         >
@@ -534,7 +578,7 @@ export default function ChatDialog() {
                             className="close"
                             onClick={() => setImages(images.filter((_, i) => i !== idx))}
                             size="small"
-                            style={{ position: 'absolute', right: '0' }}
+                            style={{ position: 'absolute', right: '0', top: '0' }}
                           >
                             <CloseIcon />
                           </IconButton>
@@ -548,10 +592,15 @@ export default function ChatDialog() {
                         <div
                           key={idx}
                           style={{
+                            width: '100px',
+                            height: '100px',
                             margin: '10px',
                             position: 'relative',
+                            background: 'rgb(255, 255, 255, 0.2)',
+                            borderRadius: '5px',
                             display: 'flex',
-                            flexDirection: 'column',
+                            justifyContent: 'center',
+                            alignItems: 'center',
                           }}
                         >
                           <p style={{ color: 'white' }}>{file.name}</p>
@@ -560,7 +609,7 @@ export default function ChatDialog() {
                             className="close"
                             onClick={() => setFiles(files.filter((_, i) => i !== idx))}
                             size="small"
-                            style={{ position: 'absolute', right: '0' }}
+                            style={{ position: 'absolute', right: '0', top: '0' }}
                           >
                             <CloseIcon />
                           </IconButton>
