@@ -62,13 +62,13 @@ const DropdownItem = styled.div`
 `
 
 export interface DropdownParams {
+  isOpen: boolean
+  setIsOpen: any
   handleSelect: any
   items: Array<MenuItem>
 }
 
-export default function MenuDropdown({ items, handleSelect }: DropdownParams) {
-  const [isOpen, setIsOpen] = useState(false)
-
+export default function MenuDropdown({ isOpen, setIsOpen, items, handleSelect }: DropdownParams) {
   const handleToggleDropdown = () => {
     setIsOpen(!isOpen)
   }

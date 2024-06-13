@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { useState } from 'react'
-import PlansAndBilling from '../components/spacedashboard/PlansAndBilling'
+import PlansAndBilling from '../components/usersettings/PlansAndBilling'
 import UserSetttingSidebar from '../components/sidebars/UserSettingSidebar'
 
 const PageContainer = styled.div`

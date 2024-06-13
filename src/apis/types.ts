@@ -7,6 +7,17 @@ export type CreateRoomParams = {
   plan: string
 }
 
+export type ChangeRoomSettingParams = {
+  map?: string
+  name?: string
+  private?: boolean
+  active?: boolean
+}
+
+export type RemoveRoomMemberParams = {
+  user: string
+}
+
 export type GetRoomParams = {
   _id: string
 }
