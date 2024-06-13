@@ -4,6 +4,10 @@ import { writeToClipboard } from '../../utils/helpers'
 import { toast } from 'react-toastify'
 import { useAppSelector } from '../../hook'
 import { useNavigate } from 'react-router-dom'
+import { LeaveRoom } from '../../apis/RoomApis'
+import { isApiSuccess } from '../../apis/util'
+import { AxiosError } from 'axios'
+import { UNKNOWN_ERROR } from '../../constant'
 
 const Container = styled.div`
   display: flex;
@@ -54,28 +58,51 @@ const DropdownItem = styled.div`
   }
 `
 
-export default function SpaceOptionPopup({ room }: { room: IRoomData }) {
+export default function SpaceOptionPopup({
+  room,
+  refreshRoom,
+}: {
+  room: IRoomData
+  refreshRoom: any
+}) {
   const userId = useAppSelector((state) => state.user.userId)
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   const handleCopyUrl = async () => {
     const url = `${window.location.host}/room/${room._id}`
     await writeToClipboard(url)
     toast(`Copy url`)
   }
+  const handleLeaveRoom = async () => {
+    if (!room) return
+    try {
+      if (room?._id) {
+        const response = await LeaveRoom(room._id)
+        if (isApiSuccess(response)) {
+          toast('Leave room success!')
+        }
+      }
+    } catch (error) {
+      if (error instanceof AxiosError) toast(error.response?.data?.message)
+      else toast(UNKNOWN_ERROR)
+    }
+    refreshRoom()
+  }
   return (
     <Container>
       <DropdownList>
+        <DropdownItem onClick={handleCopyUrl}>
+          <span>Copy URL</span>
+        </DropdownItem>
         {userId == room.creator && (
           <DropdownItem onClick={() => navigate(`/dashboard/room/${room._id}`)}>
             <span>Manage Space</span>
           </DropdownItem>
         )}
-        {/* <DropdownItem>
-          <span>Edit Map</span>
-        </DropdownItem> */}
-        <DropdownItem onClick={handleCopyUrl}>
-          <span>Copy URL</span>
-        </DropdownItem>
+        {userId != room.creator && (
+          <DropdownItem onClick={handleLeaveRoom}>
+            <span>Leave Space</span>
+          </DropdownItem>
+        )}
       </DropdownList>
     </Container>
   )
