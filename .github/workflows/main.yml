@@ -1,0 +1,23 @@
+name: Deploy to vps
+
+on:
+  push:
+    branches: [ "develop" ]
+  pull_request:
+    branches: [ "develop" ]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    - name: multiple command
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.KEY }}
+        port: ${{ secrets.PORT }}
+        script: |
+          export PATH=$PATH:/root/.nvm/versions/node/v18.20.2/bin
+          cd /root/projects/VirtualOffice-FE
+          ./build.sh
