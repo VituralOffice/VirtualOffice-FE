@@ -6,9 +6,7 @@ import ApiService from '../../apis/ApiService'
 import { BILLING_CYCLE, IPlan, ISubscription } from '../../interfaces/plan'
 import { AxiosError } from 'axios'
 import { toast } from 'react-toastify'
-import { ContentBody, ContentHeader } from '.'
-
-
+import { ContentBody, ContentHeader } from '../spacedashboard'
 
 const LinkButton = styled.div`
   display: flex;
@@ -40,8 +38,6 @@ const LinkButton = styled.div`
     background-color: rgb(118, 125, 165);
   }
 `
-
-
 
 const SubcriptionOrder = styled.div`
   display: flex;
@@ -276,143 +272,141 @@ export default function PlansAndBilling() {
       </ContentHeader>
 
       <ContentBody>
-        <div style={{ display: 'flex' }}>
-          {subscriptions.map((subscription) => (
-            <SubcriptionOrder key={subscription._id}>
-              <div className="subcription-header">
-                <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '8px' }}>
-                  <div
+        {subscriptions.map((subscription) => (
+          <SubcriptionOrder key={subscription._id}>
+            <div className="subcription-header">
+              <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '8px' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <span
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
+                      color: 'rgb(17, 17, 17)',
+                      fontWeight: '700',
+                      fontSize: '20px',
+                      lineHeight: '26px',
                     }}
                   >
-                    <span
-                      style={{
-                        color: 'rgb(17, 17, 17)',
-                        fontWeight: '700',
-                        fontSize: '20px',
-                        lineHeight: '26px',
-                      }}
-                    >
-                      {subscription.plan.name}
-                    </span>
-                    {/* <AutoRenew>AUTO RENEWS</AutoRenew> */}
-                  </div>
+                    {subscription.plan.name}
+                  </span>
+                  {/* <AutoRenew>AUTO RENEWS</AutoRenew> */}
                 </div>
-                <span className="description">Best for remote teams collaborating day-to-day</span>
               </div>
-              <div className="subcription-body">
-                <DetailsBlock>
-                  <p>Status: {subscription.status}</p>
-                  <p>Payment status: {subscription.paymentStatus}</p>
-                  {subscription.status == 'active' ? (
-                    <>
-                      <p>
-                        Your next bill is ${subscription.total} due on{' '}
-                        {new Date(subscription.endDate).toDateString()}
-                      </p>
-                      <p>
-                        Manage on{' '}
-                        <a href={portalLink} target="_blank">
-                          Stripe
-                        </a>
-                      </p>
-                    </>
-                  ) : (
-                    <></>
-                  )}
-                </DetailsBlock>
-                {subscription.status === `active` ? (
-                  <ButtonSelect
-                    style={{ color: 'yellow' }}
-                    onClick={() => handleCancel(subscription)}
-                  >
-                    Cancel
-                  </ButtonSelect>
-                ) : subscription.paymentStatus !== `paid` ? (
-                  <ButtonSelect
-                    style={{ color: 'yellow' }}
-                    onClick={() => handleRetryCheckout(subscription)}
-                  >
-                    Pay
-                  </ButtonSelect>
+              <span className="description">Best for remote teams collaborating day-to-day</span>
+            </div>
+            <div className="subcription-body">
+              <DetailsBlock>
+                <p>Status: {subscription.status}</p>
+                <p>Payment status: {subscription.paymentStatus}</p>
+                {subscription.status == 'active' ? (
+                  <>
+                    <p>
+                      Your next bill is ${subscription.total} due on{' '}
+                      {new Date(subscription.endDate).toDateString()}
+                    </p>
+                    <p>
+                      Manage on{' '}
+                      <a href={portalLink} target="_blank">
+                        Stripe
+                      </a>
+                    </p>
+                  </>
                 ) : (
                   <></>
                 )}
-              </div>
-            </SubcriptionOrder>
-          ))}
-          {subscriptions.length === 0 &&
-            plans
-              .filter((p) => !p.free)
-              .map((p, i) => (
-                <SubcriptionOrder key={i}>
-                  <div className="subcription-header">
-                    <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '8px' }}>
-                      <div
+              </DetailsBlock>
+              {subscription.status === `active` ? (
+                <ButtonSelect
+                  style={{ color: 'yellow' }}
+                  onClick={() => handleCancel(subscription)}
+                >
+                  Cancel
+                </ButtonSelect>
+              ) : subscription.paymentStatus !== `paid` ? (
+                <ButtonSelect
+                  style={{ color: 'yellow' }}
+                  onClick={() => handleRetryCheckout(subscription)}
+                >
+                  Pay
+                </ButtonSelect>
+              ) : (
+                <></>
+              )}
+            </div>
+          </SubcriptionOrder>
+        ))}
+        {subscriptions.length === 0 &&
+          plans
+            .filter((p) => !p.free)
+            .map((p, i) => (
+              <SubcriptionOrder key={i}>
+                <div className="subcription-header">
+                  <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '8px' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <span
                         style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
+                          color: 'rgb(17, 17, 17)',
+                          fontWeight: '700',
+                          fontSize: '20px',
+                          lineHeight: '26px',
                         }}
                       >
-                        <span
-                          style={{
-                            color: 'rgb(17, 17, 17)',
-                            fontWeight: '700',
-                            fontSize: '20px',
-                            lineHeight: '26px',
-                          }}
-                        >
-                          {p.name}
-                        </span>
-                        {/* <AutoRenew>AUTO RENEWS</AutoRenew> */}
-                      </div>
+                        {p.name}
+                      </span>
+                      {/* <AutoRenew>AUTO RENEWS</AutoRenew> */}
                     </div>
-                    <span className="description">
-                      Best for remote teams collaborating day-to-day
-                    </span>
                   </div>
-                  <div className="subcription-body">
-                    <PriceBlock>
-                      <div className="price-text">
-                        {isAnnually ? `$${p.annuallyPrice} USD` : `$${p.monthlyPrice} USD`}
-                      </div>
-                      <span className="desc">{isAnnually ? '/year' : '/month'}</span>
-                    </PriceBlock>
-                    <BillOptionsBlock>
-                      <div className="title" style={{ opacity: isAnnually ? '1' : '0.6' }}>
-                        <span>Billed annually</span>
-                      </div>
-                      <div className="discount-text">
-                        {`-${(((p.monthlyPrice * 12) / p.annuallyPrice - 1) * 100).toFixed(0)}%`}
-                      </div>
-                      {/* <AntSwitch defaultChecked inputProps={{ 'aria-label': 'ant design' }} /> */}
-                      <IOSSwitch
-                        checked={isAnnually}
-                        onClick={() => setIsAnnually(!isAnnually)}
-                        sx={{ m: 1 }}
-                      />
-                      <div className="desc" style={{ opacity: !isAnnually ? '1' : '0.6' }}>
-                        Monthly
-                      </div>
-                    </BillOptionsBlock>
-                    <div>
-                      <p className="price-text">Max room: {p.maxRoom}</p>
-                      <p className="price-text">Max people in room: {p.maxRoomCapacity}</p>
+                  <span className="description">
+                    Best for remote teams collaborating day-to-day
+                  </span>
+                </div>
+                <div className="subcription-body">
+                  <PriceBlock>
+                    <div className="price-text">
+                      {isAnnually ? `$${p.annuallyPrice} USD` : `$${p.monthlyPrice} USD`}
                     </div>
-                    <DetailsBlock>
-                      {p.features.map((f, i) => (
-                        <p key={i}>{f}</p>
-                      ))}
-                    </DetailsBlock>
-                    <ButtonSelect onClick={() => handleCheckout(p)}>Purchase</ButtonSelect>
+                    <span className="desc">{isAnnually ? '/year' : '/month'}</span>
+                  </PriceBlock>
+                  <BillOptionsBlock>
+                    <div className="title" style={{ opacity: isAnnually ? '1' : '0.6' }}>
+                      <span>Billed annually</span>
+                    </div>
+                    <div className="discount-text">
+                      {`-${(((p.monthlyPrice * 12) / p.annuallyPrice - 1) * 100).toFixed(0)}%`}
+                    </div>
+                    {/* <AntSwitch defaultChecked inputProps={{ 'aria-label': 'ant design' }} /> */}
+                    <IOSSwitch
+                      checked={isAnnually}
+                      onClick={() => setIsAnnually(!isAnnually)}
+                      sx={{ m: 1 }}
+                    />
+                    <div className="desc" style={{ opacity: !isAnnually ? '1' : '0.6' }}>
+                      Monthly
+                    </div>
+                  </BillOptionsBlock>
+                  <div>
+                    <p className="price-text">Max room: {p.maxRoom}</p>
+                    <p className="price-text">Max people in room: {p.maxRoomCapacity}</p>
                   </div>
-                </SubcriptionOrder>
-              ))}
-        </div>
+                  <DetailsBlock>
+                    {p.features.map((f, i) => (
+                      <p key={i}>{f}</p>
+                    ))}
+                  </DetailsBlock>
+                  <ButtonSelect onClick={() => handleCheckout(p)}>Purchase</ButtonSelect>
+                </div>
+              </SubcriptionOrder>
+            ))}
       </ContentBody>
     </>
   )

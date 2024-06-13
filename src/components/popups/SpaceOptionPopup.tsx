@@ -3,6 +3,7 @@ import { IRoomData } from '../../types/Rooms'
 import { writeToClipboard } from '../../utils/helpers'
 import { toast } from 'react-toastify'
 import { useAppSelector } from '../../hook'
+import { useNavigate } from 'react-router-dom'
 
 const Container = styled.div`
   display: flex;
@@ -55,6 +56,7 @@ const DropdownItem = styled.div`
 
 export default function SpaceOptionPopup({ room }: { room: IRoomData }) {
   const userId = useAppSelector((state) => state.user.userId)
+  const navigate = useNavigate();
   const handleCopyUrl = async () => {
     const url = `${window.location.host}/room/${room._id}`
     await writeToClipboard(url)
@@ -64,7 +66,7 @@ export default function SpaceOptionPopup({ room }: { room: IRoomData }) {
     <Container>
       <DropdownList>
         {userId == room.creator && (
-          <DropdownItem>
+          <DropdownItem onClick={() => navigate(`/dashboard/room/${room._id}`)}>
             <span>Manage Space</span>
           </DropdownItem>
         )}

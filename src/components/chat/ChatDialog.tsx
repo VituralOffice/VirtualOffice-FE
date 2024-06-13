@@ -10,7 +10,6 @@ import { Picker } from 'emoji-mart'
 import { setChatType, setFocused, setListChat, setShowChat } from '../../stores/ChatStore'
 import { useAppDispatch, useAppSelector } from '../../hook'
 import Game from '../../scenes/Game'
-import { PhaserGameInstance } from '../../PhaserGame'
 import { useParams } from 'react-router-dom'
 import ApiService from '../../apis/ApiService'
 import { IChat } from '../../interfaces/chat'
@@ -26,9 +25,7 @@ import PersonRoundedIcon from '@mui/icons-material/PersonRounded'
 import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded'
 import LanguageRoundedIcon from '@mui/icons-material/LanguageRounded'
 import MenuIconDropdown from '../dropdowns/MenuIconDropdown'
-import ExitToAppRoundedIcon from '@mui/icons-material/ExitToAppRounded'
 import { CHAT_TYPE } from '../../constants/constant'
-import MenuDropdown from '../dropdowns/MenuDropdown'
 import { toast } from 'react-toastify'
 
 const Backdrop = styled.div`
@@ -521,12 +518,12 @@ export default function ChatDialog() {
                 }}
               >
                 <h3>{currentChat?.name || ''}</h3>
-                {currentChat && (
+                {/* {currentChat && (
                   <MenuDropdown
                     items={[{ icon: <ExitToAppRoundedIcon />, label: 'Leave chat' }]}
                     handleSelect={() => {}}
                   />
-                )}
+                )} */}
                 <IconButton
                   aria-label="close dialog"
                   className="close"

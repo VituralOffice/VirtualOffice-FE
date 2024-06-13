@@ -68,7 +68,7 @@ export default function DashboardUserMenuPopup() {
     <MenuPopupContainer>
       <MenuPopupItem>Home</MenuPopupItem>
 
-      <MenuPopupItem>Terms of Service</MenuPopupItem>
+      {/* <MenuPopupItem>Terms of Service</MenuPopupItem> */}
 
       <MenuPopupItem>Sign Out</MenuPopupItem>
     </MenuPopupContainer>

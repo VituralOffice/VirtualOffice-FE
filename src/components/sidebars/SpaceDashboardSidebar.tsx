@@ -159,48 +159,27 @@ const DropdownIcon = styled.div<ButtonProps>`
 
 export default function SpaceDashboardSidebar({ menuId, setMenuId }) {
   const [isUserMenuShow, setUserMenuShow] = useState(false)
-  const user = useAppSelector((state) => state.user);
+  const user = useAppSelector((state) => state.user)
+
+  const navItems = [
+    { icon: <SettingsRoundedIcon />, title: 'Space Preferences' },
+    { icon: <TextSnippetRoundedIcon />, title: 'Space Access' },
+    { icon: <PeopleAltRoundedIcon />, title: 'User Roles' },
+    { icon: <DeleteRoundedIcon />, title: 'Shut Down or Delete' },
+  ]
 
   return (
     <Container>
       <Dashboard>
         <DashboardTitle>Space dashboard</DashboardTitle>
-        <NavMenuItem isEnabled={menuId == 0} onClick={() => setMenuId(0)}>
-          <span className="icon">
-            <CalendarMonthRoundedIcon />
-          </span>
-          <div className="title">Plans & Billing</div>
-        </NavMenuItem>
-        <NavMenuItem isEnabled={menuId == 1} onClick={() => setMenuId(1)}>
-          <span className="icon">
-            <SettingsRoundedIcon />
-          </span>
-          <div className="title">Space Preferences</div>
-        </NavMenuItem>
-        <NavMenuItem isEnabled={menuId == 2} onClick={() => setMenuId(2)}>
-          <span className="icon">
-            <TextSnippetRoundedIcon />
-          </span>
-          <div className="title">Space Access</div>
-        </NavMenuItem>
-        <NavMenuItem isEnabled={menuId == 3} onClick={() => setMenuId(3)}>
-          <span className="icon">
-            <PeopleAltRoundedIcon />
-          </span>
-          <div className="title">User Roles</div>
-        </NavMenuItem>
-        <NavMenuItem isEnabled={menuId == 4} onClick={() => setMenuId(4)}>
-          <span className="icon">
-            <NotInterestedRoundedIcon />
-          </span>
-          <div className="title">Banned Users</div>
-        </NavMenuItem>
-        <NavMenuItem isEnabled={menuId == 5} onClick={() => setMenuId(5)}>
-          <span className="icon">
-            <DeleteRoundedIcon />
-          </span>
-          <div className="title">Shut Down or Delete</div>
-        </NavMenuItem>
+        {navItems.map((item, idx) => {
+          return (
+            <NavMenuItem key={idx} isEnabled={menuId == idx} onClick={() => setMenuId(idx)}>
+              <span className="icon">{item.icon}</span>
+              <div className="title">{item.title}</div>
+            </NavMenuItem>
+          )
+        })}
       </Dashboard>
       <div style={{ position: 'relative' }}>
         <UserBottomInfo>
