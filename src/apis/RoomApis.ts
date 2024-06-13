@@ -49,12 +49,18 @@ export const ChangeRoomSetting = async (roomId: string, data: ChangeRoomSettingP
 
 export const DeleteRoom = async (roomId: string) => {
   // Gọi API đăng nhập
-  const response = await ApiService.getInstance().delete(`/rooms/${roomId}`)
+  const response = await ApiService.getInstance().delete(`/rooms/${roomId}/delete`)
   return response
 }
 
 export const RemoveMember = async (roomId: string, data: RemoveRoomMemberParams) => {
   // Gọi API đăng nhập
   const response = await ApiService.getInstance().post(`/rooms/${roomId}/remove`, data)
+  return response
+}
+
+export const LeaveRoom = async (roomId: string) => {
+  // Gọi API đăng nhập
+  const response = await ApiService.getInstance().get(`/rooms/${roomId}/leave`)
   return response
 }

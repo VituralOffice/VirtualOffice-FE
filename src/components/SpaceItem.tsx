@@ -190,12 +190,14 @@ interface SpaceItemProps {
   room: IRoomData // Declare room as type IRoomData
   isOptionPopupShow: boolean
   setOptionPopupShow: React.Dispatch<React.SetStateAction<string>>
+  refreshRoom: any
 }
 
 export const SpaceItem: React.FC<SpaceItemProps> = ({
   room,
   isOptionPopupShow,
   setOptionPopupShow,
+  refreshRoom
 }) => {
   const [isEnterSpaceVisible, setEnterSpaceVisible] = useState(false)
   const navigate = useNavigate()
@@ -263,7 +265,7 @@ export const SpaceItem: React.FC<SpaceItemProps> = ({
             </DetailsOptionButton>
           </div>
         </div>
-        {isOptionPopupShow && <SpaceOptionPopup room={room} />}
+        {isOptionPopupShow && <SpaceOptionPopup room={room} refreshRoom={refreshRoom} />}
       </DetailsDisplay>
     </Container>
   )

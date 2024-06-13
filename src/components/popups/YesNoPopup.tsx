@@ -1,15 +1,9 @@
 import { FormPopup } from './FormPopup'
 import { YesNoForm } from '../forms/YesNoForm'
 
-export const YesNoPopup = ({ onClosePopup, onSubmit }) => {
-  const titles = ['Warning']
-  const forms = [
-    <YesNoForm
-      question={
-        'You are the admin meeting. If you leave the meeting will end. Do you want to continue?'
-      }
-    />,
-  ]
+export const YesNoPopup = ({ title, text, submitText, onClosePopup, onSubmit }) => {
+  const titles = [title]
+  const forms = [<YesNoForm question={text} />]
 
   return (
     <FormPopup
@@ -19,7 +13,7 @@ export const YesNoPopup = ({ onClosePopup, onSubmit }) => {
       totalSteps={1}
       formCanBeSubmit={true}
       onSubmit={onSubmit}
-      submitText="Leave"
+      submitText={submitText}
     />
   )
 }

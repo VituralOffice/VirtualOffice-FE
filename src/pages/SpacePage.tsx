@@ -1,15 +1,9 @@
 import styled from 'styled-components'
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
-import { MutableRefObject, SetStateAction, useCallback, useEffect, useRef, useState } from 'react'
+import { SetStateAction, useCallback, useEffect, useState } from 'react'
 import { ButtonProps } from '../interfaces/Interfaces'
 import Header from '../components/Header'
-import { useDispatch } from 'react-redux'
-import ApiService from '../apis/ApiService'
-import { setLocalStorage } from '../apis/util'
-import { setLoggedIn, setUserInfo } from '../stores/UserStore'
-import { useNavigate } from 'react-router-dom'
-import { GetRoomsByUserId, InviteUserToRoom, JoinRoom } from '../apis/RoomApis'
-import { useAppSelector } from '../hook'
+import { GetRoomsByUserId } from '../apis/RoomApis'
 import { isApiSuccess } from '../apis/util'
 import { SpaceItem } from '../components/SpaceItem'
 import { RoomQueryParam } from '../types/Rooms'
@@ -234,6 +228,7 @@ export default function SpacePage() {
             <SpaceItem
               key={space._id}
               room={space}
+              refreshRoom={GetRoomsData}
               isOptionPopupShow={activeSpaceItemId === space._id}
               setOptionPopupShow={handleOptionPopupShow}
             />

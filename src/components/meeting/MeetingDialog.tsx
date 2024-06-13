@@ -333,6 +333,9 @@ export default function MeetingDialog() {
       </Backdrop>
       {showLeavePopup && (
         <YesNoPopup
+          title="Warning"
+          text="You are the admin meeting. If you leave the meeting will end. Do you want to continue?"
+          submitText="Leave"
           onSubmit={() => {
             dispatch(closeMeetingDialog())
             Network.getInstance()?.disconnectFromMeeting(meeting.activeMeetingId!)
