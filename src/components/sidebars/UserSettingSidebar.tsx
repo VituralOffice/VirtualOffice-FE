@@ -182,7 +182,7 @@ export default function UserSetttingSidebar({ menuId, setMenuId }) {
             </div>
           </UserAvatar>
           <Username>
-            <div>{user.username}</div>
+            <div>{user.fullname}</div>
           </Username>
           <DropdownIcon isEnabled={isUserMenuShow} onClick={() => setUserMenuShow(!isUserMenuShow)}>
             <span>

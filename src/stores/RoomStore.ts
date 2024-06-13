@@ -1,7 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RoomAvailable } from 'colyseus.js'
-import { IRoomMember, RoomType } from '../types/Rooms'
+import { IRoomData, IRoomMember, RoomType } from '../types/Rooms'
 import { RootState } from '.'
+import { IMapData } from '../types/Rooms'
 
 interface RoomInterface extends RoomAvailable {
   name?: string
@@ -14,6 +15,33 @@ const isCustomRoom = (room: RoomInterface) => {
   return room.name === RoomType.CUSTOM
 }
 
+const defaultMapData: IMapData = {
+  _id: '',
+  active: false,
+  capacity: 0,
+  createdAt: '',
+  default: false,
+  icon: '',
+  id: '',
+  json: '',
+  name: '',
+  style: '',
+  totalChair: 0,
+  totalMeeting: 0,
+  totalWhiteboard: 0,
+};
+
+const defaultRoomState: IRoomData = {
+  _id: '',
+  name: '',
+  private: false,
+  active: false,
+  autoDispose: false,
+  creator: '',
+  map: defaultMapData,
+  members: []
+};
+
 export const roomSlice = createSlice({
   name: 'room',
   initialState: {
@@ -24,6 +52,7 @@ export const roomSlice = createSlice({
     roomDescription: '',
     availableRooms: new Array<RoomAvailable>(),
     members: new Array<IRoomMember>(),
+    roomData: defaultRoomState
     // onlineMemberMap: new Map<string, IRoomMember>(),
   },
   reducers: {
@@ -35,6 +64,9 @@ export const roomSlice = createSlice({
     },
     setRoomId: (state, action: PayloadAction<string>) => {
       state.roomId = action.payload
+    },
+    setRoomData: (state, action: PayloadAction<IRoomData>) => {
+      state.roomData = action.payload
     },
     setJoinedRoomData: (
       state,
@@ -102,17 +134,14 @@ export const roomSlice = createSlice({
 export const selectRoomId = (state: RootState) => state.room.roomId;
 
 export const {
-  // setLobbyJoined,
   setRoomJoined,
   setJoinedRoomData,
   setAvailableRooms,
   addAvailableRooms,
   removeAvailableRooms,
-  // setMembers,
-  // addMember,
-  // removeMember,
   updateMember,
   setRoomId,
+  setRoomData,
 } = roomSlice.actions
 
 export default roomSlice.reducer

@@ -266,7 +266,7 @@ const EditUserCharacterPopup: React.FC<PopupProps> = ({ onClosePopup }) => {
             <UserShadow />
           </UpperContentContainer>
           <UsernameTopDisplay>
-            <span>{user.username}</span>
+            <span>{user.fullname}</span>
           </UsernameTopDisplay>
           <LowerContentContainer>
             <SelectSkinContainer>

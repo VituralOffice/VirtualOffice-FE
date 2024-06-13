@@ -170,7 +170,7 @@ export const OfficeParticipantSidebar = ({ onClose }: SidebarProps) => {
         <ContentLayout>
           <SidebarHeader>
             <div>
-              <span>{user.username}</span>
+              <span>{user.fullname}</span>
             </div>
           </SidebarHeader>
           <div

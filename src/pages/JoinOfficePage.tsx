@@ -325,7 +325,7 @@ export function JoinOfficePage({
 }) {
   const [isEditUserCharacterPopupShow, setEditUserCharacterPopupShow] = useState(false)
   const user = useAppSelector((state) => state.user)
-  const [playerName, setPlayerName] = useState(user.username)
+  const [playerName, setPlayerName] = useState(user.fullname)
   // const [passwordRequired, setPasswordRequired] = useState(false);
   // const [password, setPassword] = useState('')
   const [menuShow, setMenuShow] = useState(false)

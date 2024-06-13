@@ -64,3 +64,8 @@ export const LeaveRoom = async (roomId: string) => {
   const response = await ApiService.getInstance().get(`/rooms/${roomId}/leave`)
   return response
 }
+
+export const GetMap = async (mapId: string) => {
+  const response = await ApiService.getInstance().get(`/maps/${mapId}`)
+  return response
+}

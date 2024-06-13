@@ -13,8 +13,23 @@ export interface IRoomData {
   active: boolean
   autoDispose: boolean
   creator: string
-  map: string
+  map: IMapData
   members: IRoomMember[]
+}
+export interface IMapData {
+  _id: string;
+  active: boolean;
+  capacity: number;
+  createdAt: string;
+  default: boolean;
+  icon: string;
+  id: string;
+  json: string;
+  name: string;
+  style: string;
+  totalChair: number;
+  totalMeeting: number;
+  totalWhiteboard: number;
 }
 export interface RoomQueryParam {
   active?: boolean

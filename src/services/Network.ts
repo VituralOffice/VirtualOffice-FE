@@ -9,9 +9,6 @@ import {
 } from '../stores/UserStore'
 import {
   setJoinedRoomData,
-  setAvailableRooms,
-  addAvailableRooms,
-  removeAvailableRooms,
   updateMember,
 } from '../stores/RoomStore'
 import { IChair, IMeeting, IOfficeState, IPlayer, IWhiteboard } from '../types/ISpaceState'
@@ -29,7 +26,6 @@ import { GetMsgByChatId, GetOneChat } from '../apis/ChatApis'
 import { isApiSuccess } from '../apis/util'
 import { setWhiteboardUrls } from '../stores/WhiteboardStore'
 import { toast } from 'react-toastify'
-import Game from '../scenes/Game'
 
 export default class Network {
   private static instance: Network | null = null // Biến static instance
@@ -48,12 +44,6 @@ export default class Network {
     const endpoint = API_URL.replace(`http`, `ws`)
     this.client = new Client(endpoint)
     this.client.auth.token = Cookies.get(ACCESS_TOKEN_KEY) as string
-    // this.joinLobbyRoom()
-    //   .then(() => {
-    //     console.log('Network:: Lobby joined')
-    //     store.dispatch(setLobbyJoined(true))
-    //   })
-    //   .catch((err) => console.log(eNetwork:: rr))
 
     phaserEvents.on(GameEvent.MY_PLAYER_NAME_CHANGE, this.updatePlayerName, this)
     phaserEvents.on(GameEvent.MY_PLAYER_MEETING_STATUS_CHANGE, this.updatePlayerMeetingStatus, this)
@@ -65,11 +55,6 @@ export default class Network {
   static getInstance(): Network | null {
     return Network.instance
   }
-
-  // public disconnectPlayer() {
-  //   console.log('Network:: Disconnecting my player')
-  //   Game.getInstance()?.myPlayer.disconnectPlayer(this)
-  // }
 
   public disconnectNetwork() {
     console.log('Network::disconnectNetwork Disconnecting network')
@@ -88,34 +73,11 @@ export default class Network {
     this.disconnectFromMeeting(activeMeetingId || '')
   }
 
-  /**
-   * method to join Colyseus' built-in LobbyRoom, which automatically notifies
-   * connected clients whenever rooms with "realtime listing" have updates
-   */
-  // async joinLobbyRoom() {
-  //   this.lobby = await this.client.joinOrCreate(RoomType.LOBBY)
-  //   this.lobby.onMessage('rooms', (rooms) => {
-  //     store.dispatch(setAvailableRooms(rooms))
-  //   })
-  //   this.lobby.onMessage('+', ([roomId, room]) => {
-  //     store.dispatch(addAvailableRooms({ roomId, room }))
-  //   })
-  //   this.lobby.onMessage('-', (roomId) => {
-  //     store.dispatch(removeAvailableRooms(roomId))
-  //   })
-  // }
-
   // method to join the public lobby
   async joinOrCreatePublic() {
     this.room = await this.client.joinOrCreate(RoomType.PUBLIC)
     this.initialize()
   }
-
-  // // method to join a custom room
-  // async joinCustomById(roomId: string, password: string | null) {
-  //   this.room = await this.client.joinById(roomId, { password })
-  //   this.initialize()
-  // }
 
   // method to join a custom room
   async joinCustomById(roomId: string) {
@@ -339,6 +301,8 @@ export default class Network {
     // )
   }
 
+  // #region on events
+
   // method to register event listener and call back function when a item user added
   onChatMessageAdded(callback: (playerId: string, content: string) => void, context?: any) {
     phaserEvents.on(GameEvent.UPDATE_DIALOG_BUBBLE, callback, context)
@@ -429,7 +393,9 @@ export default class Network {
   ) {
     phaserEvents.on(GameEvent.PLAYER_UPDATED, callback, context)
   }
+  // #endregion on events
 
+  // #region send events
   // method to send player updates to Colyseus server
   updatePlayer(currentX: number, currentY: number, currentAnim: string) {
     this.room?.send(Message.UPDATE_PLAYER, { x: currentX, y: currentY, anim: currentAnim })
@@ -517,7 +483,5 @@ export default class Network {
     console.log('Network::addChatMessage send messgae', payload)
     this.room?.send(Message.ADD_CHAT_MESSAGE, payload)
   }
-  // loadChat() {
-  //   this.room?.send(Message.LOAD_CHAT)
-  // }
+  // #endregion send events
 }

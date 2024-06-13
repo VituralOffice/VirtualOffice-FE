@@ -25,7 +25,7 @@ export const userSlice = createSlice({
     showJoystick: window.innerWidth < 650,
     //user info
     userId: '',
-    username: 'Anonymous',
+    fullname: 'Anonymous',
     email: '',
     role: 'user',
     characterId: '',
@@ -74,7 +74,7 @@ export const userSlice = createSlice({
       state.userId = action.payload
     },
     setUsername: (state, action: PayloadAction<string>) => {
-      state.username = action.payload
+      state.fullname = action.payload
     },
     setEmail: (state, action: PayloadAction<string>) => {
       state.email = action.payload
@@ -100,9 +100,9 @@ export const userSlice = createSlice({
     setUserInfo: (state, action: PayloadAction<UserData>) => {
       state.userId = action.payload._id
       state.email = action.payload.email
-      if (!action.payload.fullname) state.username = action.payload.email.split('@')[0]
-      else state.username = action.payload.fullname
-      state.playerName = state.username
+      if (!action.payload.fullname) state.fullname = action.payload.email.split('@')[0]
+      else state.fullname = action.payload.fullname
+      state.playerName = state.fullname
       state.role = action.payload.role ? action.payload.role : 'user'
       state.characterId = action.payload.character._id
       state.character = action.payload.character
@@ -119,13 +119,13 @@ export const userSlice = createSlice({
       state.showJoystick = window.innerWidth < 650
 
       state.userId = ''
-      state.username = 'Anonymous'
+      state.fullname = 'Anonymous'
       state.email = ''
       state.role = 'user'
       state.character_id = 0
       state.isVerified = false
 
-      state.playerName = state.username
+      state.playerName = state.fullname
       state.microphoneON = false
       state.cameraON = false
     },
