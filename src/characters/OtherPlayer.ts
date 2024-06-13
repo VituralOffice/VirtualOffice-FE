@@ -38,6 +38,7 @@ export default class OtherPlayer extends Player {
       myPlayer.readyToConnect &&
       this.readyToConnect &&
       myPlayer.mediaConnected &&
+      this.mediaConnected &&
       !myPlayer.isPlayerInMeeting() &&
       !this.isInMeeting &&
       myPlayer.getPlayerId()! > this.playerId
@@ -84,6 +85,9 @@ export default class OtherPlayer extends Player {
 
       case 'mediaConnected':
         if (typeof value === 'boolean') {
+          console.log(
+            `OtherPlayer::updateOtherPlayer user ${this.playerId} change mediaConnected to ${value}`
+          )
           this.mediaConnected = value
         }
         break
@@ -168,21 +172,21 @@ export default class OtherPlayer extends Player {
     // while currently connected with myPlayer
     // if myPlayer and the otherPlayer stop overlapping, delete video stream
     if (this.connectionBufferTime < 750) this.connectionBufferTime += dt
-    if (
-      this.connected &&
-      !this.body!.embedded &&
-      this.body!.touching.none &&
-      this.connectionBufferTime >= 750
-    ) {
-      // if (this.x < 610 && this.y > 515 && this.myPlayer!.x < 610 && this.myPlayer!.y > 515) return
-      phaserEvents.emit(GameEvent.PLAYER_DISCONNECTED, this.playerId)
-      this.connectionBufferTime = 0
-      this.connected = false
-    }
-    if (this.isInMeeting && this.connected) {
-      phaserEvents.emit(GameEvent.PLAYER_DISCONNECTED, this.playerId)
-      this.connectionBufferTime = 0
-      this.connected = false
+    if (this.connected) {
+      if (!this.body!.embedded && this.body!.touching.none && this.connectionBufferTime >= 750) {
+        // if (this.x < 610 && this.y > 515 && this.myPlayer!.x < 610 && this.myPlayer!.y > 515) return
+        phaserEvents.emit(GameEvent.PLAYER_DISCONNECTED, this.playerId)
+        this.connectionBufferTime = 0
+        this.connected = false
+      } else if (!this.mediaConnected && this.connectionBufferTime >= 750) {
+        phaserEvents.emit(GameEvent.PLAYER_DISCONNECTED, this.playerId)
+        this.connectionBufferTime = 0
+        this.connected = false
+      } else if (this.isInMeeting) {
+        phaserEvents.emit(GameEvent.PLAYER_DISCONNECTED, this.playerId)
+        this.connectionBufferTime = 0
+        this.connected = false
+      }
     }
   }
 }

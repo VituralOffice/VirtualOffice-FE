@@ -23,6 +23,7 @@ export default class WebRTC {
   private myVideo
   private myStream?: MediaStream
   private network: Network
+  private isActive: boolean
 
   constructor(userId: string, network: Network) {
     console.log('WebRTC::constructor Construct WebRTC')
@@ -39,6 +40,7 @@ export default class WebRTC {
 
     // config peerJS
     this.initialize()
+    this.isActive = true
   }
 
   static getInstance(): WebRTC | null {
@@ -53,6 +55,7 @@ export default class WebRTC {
 
   initialize() {
     this.myPeer.on('call', (call) => {
+      if (!this.isActive) return
       if (!this.onCalledPeers.has(call.peer)) {
         console.log('WebRTC::initialize answer call from ', call.metadata?.username)
         call.answer(this.myStream)
@@ -95,10 +98,12 @@ export default class WebRTC {
     this.onCalledPeers.clear()
 
     if (this.myVideo) this.myVideo.remove()
+    this.isActive = false
   }
 
   // check if permission has been granted before
   checkPreviousPermission() {
+    this.isActive = true
     // const permissionName = 'microphone' as PermissionName
     // navigator.permissions?.query({ name: permissionName }).then((result) => {
     //   if (result.state === 'granted') this.getUserMedia(false)
@@ -117,18 +122,22 @@ export default class WebRTC {
         // const hasCam = stream.getVideoTracks().length > 0
         // const hasMic = stream.getAudioTracks().length > 0
         // console.log(`has cam: ${hasCam}, has mic: ${hasMic}`)
-        console.log(`WebRTC:: success get user media, video: ${video} ${stream.getVideoTracks().length}, audio: ${audio}`)
+        console.log(
+          `WebRTC:: success get user media, video: ${video} ${
+            stream.getVideoTracks().length
+          }, audio: ${audio}`
+        )
         store.dispatch(setMicrophoneON(audio))
         store.dispatch(setCameraON(video))
         store.dispatch(setMediaConnected(true))
         this.network.mediaConnected(true)
-        this.cleanupStream();
+        this.cleanupStream()
         this.myStream = stream
 
         // mute your own video stream (you don't want to hear yourself)
         if (this.myVideo) {
-          this.myVideo.remove();
-          this.myVideo = undefined;
+          this.myVideo.remove()
+          this.myVideo = undefined
         }
         this.myVideo = document.createElement('video')
         this.myVideo.muted = true
@@ -136,10 +145,10 @@ export default class WebRTC {
       })
       .catch((error) => {
         console.log(`WebRTC:: failed get user media, video: ${video}, audio: ${audio}`)
-        this.cleanupStream();
+        this.cleanupStream()
         if (this.myVideo) {
-          this.myVideo.remove();
-          this.myVideo = undefined;
+          this.myVideo.remove()
+          this.myVideo = undefined
         }
         store.dispatch(setMediaConnected(false))
         this.network.mediaConnected(false)
@@ -158,15 +167,15 @@ export default class WebRTC {
   }
 
   removeUserVideo() {
-    console.log("WebRTC::removeUserVideo remove user video")
-    this.myVideo?.remove();
-    this.myVideo = undefined;
-    this.myStream = undefined;
+    console.log('WebRTC::removeUserVideo remove user video')
+    this.myVideo?.remove()
+    this.myVideo = undefined
+    this.myStream = undefined
   }
   cleanupStream() {
     if (this.myStream) {
-      console.log("WebRTC::cleanupStream")
-      this.myStream.getTracks().forEach(track => track.stop())
+      console.log('WebRTC::cleanupStream')
+      this.myStream.getTracks().forEach((track) => track.stop())
     }
   }
 
