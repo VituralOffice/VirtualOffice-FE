@@ -13,10 +13,11 @@ import { GetAllChatsWithMessage } from '../apis/ChatApis'
 import { setListChat, setMessageMaps } from '../stores/ChatStore'
 import WhiteboardDialog from '../components/whiteboards/WhiteboardDialog'
 import Network from '../services/Network'
-import { GetRoomById, JoinRoom } from '../apis/RoomApis'
+import { JoinRoom } from '../apis/RoomApis'
 import { setRoomData } from '../stores/RoomStore'
 import { isApiSuccess } from '../apis/util'
 import { toast } from 'react-toastify'
+import { startLoadingAndWait, stopLoading } from '../stores/LoadingStore'
 
 export const OfficeSpace = () => {
   let { roomId } = useParams()
@@ -31,6 +32,7 @@ export const OfficeSpace = () => {
   const [gameInittialized, setGameInitialized] = useState(false)
 
   const handleJoinRoom = async () => {
+    dispatch(startLoadingAndWait())
     try {
       await Network.getInstance()?.joinCustomById(roomStore.roomData!._id)
       setJoinPageShow(false)
@@ -45,11 +47,13 @@ export const OfficeSpace = () => {
           setJoinPageShow(false)
         } catch (createError) {
           console.log('Error creating room:', createError)
+          dispatch(stopLoading())
           navigate('/')
         }
         return
       }
       console.log(e)
+      dispatch(stopLoading())
       navigate('/')
       return
     }
@@ -78,6 +82,7 @@ export const OfficeSpace = () => {
       navigate('/app')
       return
     }
+    dispatch(startLoadingAndWait())
     loadRoom()
     return () => {
       Bootstrap.getInstance()?.network?.disconnectFromMeeting(meeting.activeMeetingId!)
@@ -101,6 +106,18 @@ export const OfficeSpace = () => {
       setGameInitialized(true)
     }
   }, [roomStore.roomData])
+
+  useEffect(() => {
+    if (roomStore.gameCreated && roomStore.networkConstructed) {
+      dispatch(stopLoading())
+    }
+  }, [roomStore.gameCreated, roomStore.networkConstructed])
+
+  useEffect(() => {
+    if (roomStore.gameCreated && roomStore.networkConstructed && roomStore.networkInitialized) {
+      dispatch(stopLoading())
+    }
+  }, [roomStore.networkInitialized])
 
   return (
     <>

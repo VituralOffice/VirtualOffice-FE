@@ -7,6 +7,7 @@ import roomReducer from './RoomStore'
 import whiteboardReducer from './WhiteboardStore'
 import uiReducer from './UIStore'
 import mapReducer from './MapStore'
+import loadingReducer from './LoadingStore'
 
 enableMapSet()
 
@@ -19,6 +20,7 @@ const store = configureStore({
     room: roomReducer,
     ui: uiReducer,
     map: mapReducer,
+    loading: loadingReducer,
   },
   // Temporary disable serialize check for redux as we store MediaStream in MeetingStore.
   // https://stackoverflow.com/a/63244831

@@ -48,6 +48,9 @@ export const roomSlice = createSlice({
   initialState: {
     // lobbyJoined: false,
     roomJoined: false,
+    networkConstructed: false,
+    networkInitialized: false,
+    gameCreated: false,
     // gameLoaded: false,
     // roomId: '',
     // roomName: '',
@@ -73,6 +76,15 @@ export const roomSlice = createSlice({
       //   Bootstrap.getInstance()?.loadTileMap()
       //   Bootstrap.getInstance()?.launchGame()
       // }
+    },
+    setNetworkConstructed: (state, action: PayloadAction<boolean>) => {
+      state.networkConstructed = action.payload
+    },
+    setNetworkInitialized: (state, action: PayloadAction<boolean>) => {
+      state.networkInitialized = action.payload
+    },
+    setGameCreated: (state, action: PayloadAction<boolean>) => {
+      state.gameCreated = action.payload
     },
     // setJoinedRoomData: (state, action: PayloadAction<IRoomData>) => {
     //   console.log(`RoomStore::setRoomData roomData: `, action.payload)
@@ -136,6 +148,9 @@ export const {
   // setAvailableRooms,
   // addAvailableRooms,
   // removeAvailableRooms,
+  setNetworkConstructed,
+  setNetworkInitialized,
+  setGameCreated,
   updateMember,
   // setRoomId,
   setRoomData,

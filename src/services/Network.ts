@@ -7,9 +7,7 @@ import {
   setPlayerAvatarMap,
   removePlayerAvatarMap,
 } from '../stores/UserStore'
-import {
-  updateMember,
-} from '../stores/RoomStore'
+import { setNetworkConstructed, setNetworkInitialized, updateMember } from '../stores/RoomStore'
 import { IChair, IMeeting, IOfficeState, IPlayer, IWhiteboard } from '../types/ISpaceState'
 import WebRTC from '../web/WebRTC'
 import { GameEvent, phaserEvents } from '../events/EventCenter'
@@ -49,6 +47,8 @@ export default class Network {
     phaserEvents.on(GameEvent.MY_PLAYER_TEXTURE_CHANGE, this.updatePlayer, this)
     phaserEvents.on(GameEvent.MY_PLAYER_CHARACTER_ID_CHANGE, this.updatePlayerCharacterId, this)
     phaserEvents.on(GameEvent.PLAYER_DISCONNECTED, this.playerStreamDisconnect, this)
+
+    store.dispatch(setNetworkConstructed(true))
   }
 
   static getInstance(): Network | null {
@@ -298,6 +298,8 @@ export default class Network {
     //     store.dispatch(setMeetingState({ connectedUser, adminUser, isLocked }))
     //   }
     // )
+
+    store.dispatch(setNetworkInitialized(true))
   }
 
   // #region on events
