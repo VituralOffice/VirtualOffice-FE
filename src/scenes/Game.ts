@@ -19,6 +19,7 @@ import { IPlayer } from '../types/ISpaceState'
 import { ItemType } from '../types/Items'
 import { Meeting } from '../web/meeting/Meeting'
 import Whiteboard from '../items/WhiteBoard'
+import { setGameCreated } from '../stores/RoomStore'
 
 export default class Game extends Phaser.Scene {
   private static instance: Game | null = null // Biến static instance
@@ -105,10 +106,10 @@ export default class Game extends Phaser.Scene {
     const chairLayer = this.map.getObjectLayer('Chair')
     chairLayer!.objects.forEach((chairObj, index) => {
       const item = this.addObjectFromTiled(chairs, chairObj, 'chairs', 'chair') as Chair
-      item.itemDirection = chairObj.properties[0].value
+      item.itemDirection = chairObj.properties[0].value.toString()
       item.chairId = index.toString()
       if (chairObj.properties[1]) {
-        const chairGroupID = chairObj.properties[1].value
+        const chairGroupID = chairObj.properties[1].value.toString()
         item.groupId = chairGroupID
         if (!this.chairGroups.has(chairGroupID)) {
           this.chairGroups.set(chairGroupID, [])
@@ -193,6 +194,9 @@ export default class Game extends Phaser.Scene {
     // this.myPlayer.setPlayerName(store.getState().user.playerName);
     // this.myPlayer.setPlayerTexture(avatars[store.getState().user.character_id].name);
     // this.network.readyToConnect();
+
+    store.dispatch(setGameCreated(true))
+    console.log("Game::create Game created")
   }
 
   private handleItemSelectorOverlap(playerSelector, selectionItem) {
