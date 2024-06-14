@@ -11,7 +11,7 @@ export const JoinRoomByLink = () => {
   const handleJoinRoom = async () => {
     try {
       if (!token || !roomId || !user) return navigate('/')
-      await ApiService.getInstance().post(`/rooms/${roomId}/join`, { token })
+      await ApiService.getInstance().post(`/rooms/${roomId}/join-by-token`, { token })
       return navigate(`/room/${roomId}`)
     } catch (error) {
       console.log({ error })

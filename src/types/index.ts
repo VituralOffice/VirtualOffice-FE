@@ -33,7 +33,7 @@ export type User = {
   showJoystick: boolean
 
   userId: string
-  username: string
+  fullname: string
   email: string
   role: string
   character_id: number

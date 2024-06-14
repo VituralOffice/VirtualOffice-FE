@@ -4602,7 +4602,7 @@
                         {
                          "name":"direction",
                          "type":"string",
-                         "value":"left"
+                         "value":"right"
                         }, 
                         {
                          "name":"groupId",
@@ -4625,7 +4625,7 @@
                         {
                          "name":"direction",
                          "type":"string",
-                         "value":"left"
+                         "value":"right"
                         }, 
                         {
                          "name":"groupId",

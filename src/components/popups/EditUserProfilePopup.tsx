@@ -228,13 +228,13 @@ const ButtonFinish = styled.div`
 
 const EditUserProfilePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
   const user = useAppSelector((state) => state.user)
-  const [username, setUserName] = useState(user.username)
+  const [fullname, setUserName] = useState(user.fullname)
   const dispatch = useDispatch()
 
   const handleFinish = async () => {
     try {
-      await ApiService.getInstance().patch('/users/profile', { fullname: username })
-      dispatch(setUsername(username))
+      await ApiService.getInstance().patch('/users/profile', { fullname: fullname })
+      dispatch(setUsername(fullname))
       onClosePopup()
     } catch (error) {
       toast(`Update error`)
@@ -255,7 +255,7 @@ const EditUserProfilePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
             <UserShadow />
           </UpperContentContainer>
           <UsernameTopDisplay>
-            <span>{user.username}</span>
+            <span>{user.fullname}</span>
           </UsernameTopDisplay>
           <LowerContentContainer>
             <div
@@ -308,7 +308,7 @@ const EditUserProfilePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
                     maxLength={50}
                     placeholder="Enter your name"
                     onChange={(event) => setUserName(event.target.value)}
-                    value={username}
+                    value={fullname}
                   ></input>
                 </div>
               </UserInputBar>

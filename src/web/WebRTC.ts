@@ -57,17 +57,17 @@ export default class WebRTC {
     this.myPeer.on('call', (call) => {
       if (!this.isActive) return
       if (!this.onCalledPeers.has(call.peer)) {
-        console.log('WebRTC::initialize answer call from ', call.metadata?.username)
+        console.log('WebRTC::initialize answer call from ', call.metadata?.fullname)
         call.answer(this.myStream)
 
-        // Access username from call metadata
-        const username = call.metadata?.username || 'Unknown User'
+        // Access fullname from call metadata
+        const fullname = call.metadata?.fullname || 'Unknown User'
 
         // Create elements
         const uiBlock = document.createElement('div')
         const video = document.createElement('video')
         const p = document.createElement('p')
-        p.textContent = username
+        p.textContent = fullname
         uiBlock.appendChild(video)
         uiBlock.appendChild(p)
         this.onCalledPeers.set(call.peer, { call, uiBlock, video })
@@ -180,19 +180,19 @@ export default class WebRTC {
   }
 
   // method to call a peer
-  connectToNewUser(userId: string, username: string) {
+  connectToNewUser(userId: string, fullname: string) {
     if (this.myStream) {
       const sanitizedId = this.replaceInvalidId(userId)
       if (!this.peers.has(sanitizedId)) {
-        console.log('WebRTC::connectToNewUser calling', username)
+        console.log('WebRTC::connectToNewUser calling', fullname)
         const call = this.myPeer.call(sanitizedId, this.myStream, {
-          metadata: { username: store.getState().user.playerName },
+          metadata: { fullname: store.getState().user.playerName },
         })
         // Create elements
         const uiBlock = document.createElement('div')
         const video = document.createElement('video')
         const p = document.createElement('p')
-        p.textContent = username
+        p.textContent = fullname
         uiBlock.appendChild(video)
         uiBlock.appendChild(p)
         this.peers.set(sanitizedId, { call, uiBlock, video })

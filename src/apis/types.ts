@@ -27,9 +27,13 @@ export type InviteUserParams = {
   email: string
 }
 
-export type JoinRoomParams = {
+export type JoinRoomByTokenParams = {
   roomId: string
   token: string
+}
+
+export type JoinRoomParams = {
+  roomId: string
 }
 
 export type CreateGroupChatParams = {

@@ -100,7 +100,7 @@ export class Meeting {
 
   openDialog(network: Network) {
     if (!this.id) return
-    network.connectToMeeting(store.getState().user.userId, store.getState().room.roomId, this.id)
+    network.connectToMeeting(store.getState().user.userId, store.getState().room.roomData._id, this.id)
   }
 
   createMeeting(network: Network) {
@@ -109,7 +109,7 @@ export class Meeting {
     const createMeetingCallback = (title: string) => {
       network.connectToMeeting(
         store.getState().user.userId,
-        store.getState().room.roomId,
+        store.getState().room.roomData._id,
         this.id,
         title
       )

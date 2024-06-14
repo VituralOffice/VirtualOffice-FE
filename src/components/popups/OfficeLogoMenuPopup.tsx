@@ -52,7 +52,7 @@ export default function OfficeLogoMenuPopup() {
                         <AvatarImg src={"/" + getAvatarById(user.character_id).img} />
                     </AvatarBackground>
                 </AvatarContainer>
-                <UsernameText>{user.username}</UsernameText>
+                <UsernameText>{user.fullname}</UsernameText>
             </div>
             <hr
                 style={{

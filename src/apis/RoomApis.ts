@@ -5,6 +5,7 @@ import {
   CreateRoomParams,
   GetRoomParams,
   InviteUserParams,
+  JoinRoomByTokenParams,
   JoinRoomParams,
   RemoveRoomMemberParams,
 } from './types'
@@ -34,10 +35,15 @@ export const InviteUserToRoom = async (data: InviteUserParams) => {
   return response
 }
 
-export const JoinRoom = async (data: JoinRoomParams) => {
-  const response = await ApiService.getInstance().post(`/rooms/${data.roomId}/join`, {
+export const JoinRoomByToken = async (data: JoinRoomByTokenParams) => {
+  const response = await ApiService.getInstance().post(`/rooms/${data.roomId}/join-by-token`, {
     token: data.token,
   })
+  return response
+}
+
+export const JoinRoom = async (data: JoinRoomParams) => {
+  const response = await ApiService.getInstance().get(`/rooms/${data.roomId}/join`)
   return response
 }
 
@@ -62,5 +68,10 @@ export const RemoveMember = async (roomId: string, data: RemoveRoomMemberParams)
 export const LeaveRoom = async (roomId: string) => {
   // Gọi API đăng nhập
   const response = await ApiService.getInstance().get(`/rooms/${roomId}/leave`)
+  return response
+}
+
+export const GetMap = async (mapId: string) => {
+  const response = await ApiService.getInstance().get(`/maps/${mapId}`)
   return response
 }

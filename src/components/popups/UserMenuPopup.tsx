@@ -125,7 +125,7 @@ export default function UserMenuPopup() {
                   justifyContent: 'space-between',
                 }}
               >
-                <UserNameText>{user.username}</UserNameText>
+                <UserNameText>{user.fullname}</UserNameText>
                 <div
                   style={{
                     display: 'flex',

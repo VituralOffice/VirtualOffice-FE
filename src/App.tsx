@@ -41,7 +41,7 @@ function App() {
               <Route path="/user/settings" element={<UserSettingPage />} />
               <Route path="/dashboard/room/:roomId" element={<SpaceDashboardPage />} />
               <Route path="/room/:roomId" element={<OfficeSpace />} />
-              <Route path="/rooms/:roomId/join" element={<JoinRoomByLink />} />
+              <Route path="/rooms/:roomId/join-by-token" element={<JoinRoomByLink />} />
             </>
           )}
         </Routes>

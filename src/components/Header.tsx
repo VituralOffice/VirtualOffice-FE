@@ -255,7 +255,7 @@ export default function Header() {
                   <AvatarImg src={user.character?.avatar} />
                 </AvatarBackground>
               </AvatarContainer>
-              <Text>{user.username}</Text>
+              <Text>{user.fullname}</Text>
             </ButtonItem>
             {isUserMenuShow && <UserMenuPopup />}
           </div>

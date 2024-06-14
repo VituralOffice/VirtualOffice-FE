@@ -1,5 +1,6 @@
 import Phaser from 'phaser'
 import Bootstrap from './scenes/Bootstrap'
+import { IMapData } from './types/Rooms'
 
 const loadBootstrapScene = async () => {
   const BootstrapModule = await import('./scenes/Bootstrap')
@@ -17,7 +18,7 @@ const loadBackgroundScene = async () => {
 let PhaserGame: Phaser.Game | null = null
 let bootstrapCreatedResolver: (() => void) | null = null
 
-export const InitGame = async () => {
+export const InitPhaserGame = async () => {
   console.log('PhaserGame::InitGame Init Phaser Game')
 
   const Bootstrap = await loadBootstrapScene()
@@ -77,10 +78,4 @@ export const DestroyGame = () => {
   } catch (error) {
     console.log(`PhaserGame::DestroyGame Destroy game error:`, error)
   }
-}
-export const PhaserGameInstance = async () => {
-  if (PhaserGame === null) {
-    InitGame()
-  }
-  return PhaserGame
 }

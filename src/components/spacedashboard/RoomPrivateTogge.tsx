@@ -48,5 +48,5 @@ export default function RoomPrivateToggle({ room, refreshRoom }: SpaceDashboardC
     setIsRoomPrivate(room ? room.private : true)
   }, [room?.private])
 
-  return <IOSSwitch checked={isRoomPrivate} onClick={toggleRoomPrivacy} />
+  return <IOSSwitch checked={!isRoomPrivate} onClick={toggleRoomPrivacy} />
 }

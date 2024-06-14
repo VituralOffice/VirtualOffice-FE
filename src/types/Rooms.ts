@@ -6,6 +6,19 @@ export enum RoomType {
   CUSTOM = 'custom',
 }
 
+export interface ICreateCustomRoomParams {
+  name: string
+  map: IMapData
+  _id: string
+  private?: boolean
+  active?: boolean
+  description?: string
+  password?: string
+  autoDispose?: boolean
+  creator?: string
+  members?: IRoomMember[]
+}
+
 export interface IRoomData {
   _id: string
   name: string
@@ -13,8 +26,23 @@ export interface IRoomData {
   active: boolean
   autoDispose: boolean
   creator: string
-  map: string
+  map: IMapData
   members: IRoomMember[]
+}
+export interface IMapData {
+  _id: string;
+  active: boolean;
+  capacity: number;
+  createdAt: string;
+  default: boolean;
+  icon: string;
+  id: string;
+  json: string;
+  name: string;
+  style: string;
+  totalChair: number;
+  totalMeeting: number;
+  totalWhiteboard: number;
 }
 export interface RoomQueryParam {
   active?: boolean
