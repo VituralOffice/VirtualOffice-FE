@@ -47,7 +47,7 @@ const SpaceMapInside = styled.div`
   aspect-ratio: 16 / 9;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 12px 12px;
   background-color: rgb(0, 0, 0);
-  background-image: url(https://cdn.gather.town/storage.googleapis.com/gather-town.appspot.com/uploads/SBpyJwUS7MorgvE4/9vAI8FK7tgsEpO134jorPf);
+  background-image: url(/assets/background/room_bg.png);
 `
 
 const SpaceMapTopDetails = styled.div`
@@ -199,7 +199,7 @@ export const SpaceItem: React.FC<SpaceItemProps> = ({
   room,
   isOptionPopupShow,
   setOptionPopupShow,
-  refreshRoom
+  refreshRoom,
 }) => {
   const [isEnterSpaceVisible, setEnterSpaceVisible] = useState(false)
   const navigate = useNavigate()
