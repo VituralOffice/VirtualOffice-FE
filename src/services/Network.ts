@@ -8,13 +8,12 @@ import {
   removePlayerAvatarMap,
 } from '../stores/UserStore'
 import {
-  setJoinedRoomData,
   updateMember,
 } from '../stores/RoomStore'
 import { IChair, IMeeting, IOfficeState, IPlayer, IWhiteboard } from '../types/ISpaceState'
 import WebRTC from '../web/WebRTC'
 import { GameEvent, phaserEvents } from '../events/EventCenter'
-import { IRoomData, RoomType, IMessagePayload } from '../types/Rooms'
+import { IRoomData, RoomType, IMessagePayload, ICreateCustomRoomParams } from '../types/Rooms'
 import { addChatAndSetActive, loadMapChatMessage, pushChatMessage } from '../stores/ChatStore'
 import { ItemType } from '../types/Items'
 import { Message } from '../types/Messages'
@@ -86,8 +85,8 @@ export default class Network {
   }
 
   // method to create a custom room
-  async createCustom(roomData: IRoomData) {
-    this.room = await this.client.create(RoomType.CUSTOM, roomData)
+  async createCustom(params: ICreateCustomRoomParams) {
+    this.room = await this.client.create(RoomType.CUSTOM, params)
     console.log('Network::createCustom Room created')
     this.initialize()
   }
@@ -205,10 +204,10 @@ export default class Network {
     }
 
     // when the server sends room data
-    this.room.onMessage(Message.SEND_ROOM_DATA, (content) => {
-      console.log(`Network::onMessage SEND_ROOM_DATA`, { content })
-      store.dispatch(setJoinedRoomData(content))
-    })
+    // this.room.onMessage(Message.SEND_ROOM_DATA, (content) => {
+    //   console.log(`Network::onMessage SEND_ROOM_DATA`, { content })
+    //   store.dispatch(setJoinedRoomData(content))
+    // })
     // when the server sends room data
     // this.room.onMessage(Message.LOAD_CHAT, ({ mapChatMessages }) => {
     //   ///store.dispatch(setJoinedRoomData(content))
@@ -264,11 +263,11 @@ export default class Network {
         )
 
         const chatResponse = await GetOneChat({
-          roomId: store.getState().room.roomId,
+          roomId: store.getState().room.roomData._id,
           chatId: message.chatId,
         })
         const msgResponse = await GetMsgByChatId({
-          roomId: store.getState().room.roomId,
+          roomId: store.getState().room.roomData._id,
           chatId: message.chatId,
         })
         if (isApiSuccess(chatResponse) && isApiSuccess(msgResponse)) {

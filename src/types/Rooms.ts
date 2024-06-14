@@ -6,6 +6,19 @@ export enum RoomType {
   CUSTOM = 'custom',
 }
 
+export interface ICreateCustomRoomParams {
+  name: string
+  map: IMapData
+  _id: string
+  private?: boolean
+  active?: boolean
+  description?: string
+  password?: string
+  autoDispose?: boolean
+  creator?: string
+  members?: IRoomMember[]
+}
+
 export interface IRoomData {
   _id: string
   name: string

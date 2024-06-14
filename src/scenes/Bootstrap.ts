@@ -94,6 +94,10 @@ export default class Bootstrap extends Phaser.Scene {
         })
     }
 
+    // loadTileMap() {
+    //     this.load.tilemapTiledJSON('tilemap', '/assets/map/DefaultMap_10.json')
+    // }
+
     init() {
         console.log("Bootstrap::init Init bootstrap")
         this.network = new Network()

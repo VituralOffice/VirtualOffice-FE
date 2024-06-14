@@ -5,6 +5,7 @@ import {
   CreateRoomParams,
   GetRoomParams,
   InviteUserParams,
+  JoinRoomByTokenParams,
   JoinRoomParams,
   RemoveRoomMemberParams,
 } from './types'
@@ -34,10 +35,15 @@ export const InviteUserToRoom = async (data: InviteUserParams) => {
   return response
 }
 
-export const JoinRoom = async (data: JoinRoomParams) => {
-  const response = await ApiService.getInstance().post(`/rooms/${data.roomId}/join`, {
+export const JoinRoomByToken = async (data: JoinRoomByTokenParams) => {
+  const response = await ApiService.getInstance().post(`/rooms/${data.roomId}/join-by-token`, {
     token: data.token,
   })
+  return response
+}
+
+export const JoinRoom = async (data: JoinRoomParams) => {
+  const response = await ApiService.getInstance().get(`/rooms/${data.roomId}/join`)
   return response
 }
 

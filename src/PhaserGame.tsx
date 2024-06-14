@@ -18,7 +18,7 @@ const loadBackgroundScene = async () => {
 let PhaserGame: Phaser.Game | null = null
 let bootstrapCreatedResolver: (() => void) | null = null
 
-export const InitGame = async () => {
+export const InitPhaserGame = async () => {
   console.log('PhaserGame::InitGame Init Phaser Game')
 
   const Bootstrap = await loadBootstrapScene()

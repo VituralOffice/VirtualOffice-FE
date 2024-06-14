@@ -135,7 +135,7 @@ export default class Game extends Phaser.Scene {
     })
 
     // init meeting manager
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < store.getState().room.roomData.map.totalMeeting; i++) {
       this.meetingMap.set(String(i), new Meeting(String(i)))
     }
 

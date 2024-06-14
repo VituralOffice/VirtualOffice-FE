@@ -154,7 +154,7 @@ export const OfficeParticipantSidebar = ({ onClose }: SidebarProps) => {
   const [searchUserTxt, setSearchUserTxt] = useState<string>('')
   const [showAddPeoplePopup, setShowAddPeoplePopup] = useState(false)
   const user = useAppSelector((state) => state.user)
-  const members = useAppSelector((state) => state.room.members)
+  const members = useAppSelector((state) => state.room.roomData.members)
 
   useEffect(() => {
     console.log(members)

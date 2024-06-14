@@ -7,6 +7,8 @@ import { ButtonProps } from '../interfaces/Interfaces'
 import SpaceOptionPopup from './popups/SpaceOptionPopup'
 import { IRoomData } from '../types/Rooms'
 import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { setRoomData } from '../stores/RoomStore'
 
 const Container = styled.div`
   display: flex;
@@ -212,7 +214,9 @@ export const SpaceItem: React.FC<SpaceItemProps> = ({
       <MapDisplay
         onMouseEnter={() => setEnterSpaceVisible(true)}
         onMouseLeave={() => setEnterSpaceVisible(false)}
-        onClick={() => navigate(`/room/${room._id}`)}
+        onClick={() => {
+          navigate(`/room/${room._id}`)
+        }}
       >
         <SpaceLink>
           <SpaceMapInside />
