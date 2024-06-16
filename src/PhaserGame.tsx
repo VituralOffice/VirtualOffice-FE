@@ -1,6 +1,9 @@
 import Phaser from 'phaser'
 import Bootstrap from './scenes/Bootstrap'
-import { IMapData } from './types/Rooms'
+import store from './stores'
+import { setGameCreated, setNetworkConstructed, setNetworkInitialized } from './stores/RoomStore'
+import Game from './scenes/Game'
+import Network from './services/Network'
 
 const loadBootstrapScene = async () => {
   const BootstrapModule = await import('./scenes/Bootstrap')
@@ -56,7 +59,7 @@ export const InitPhaserGame = async () => {
   }
 
   PhaserGame = new Phaser.Game(config)
-  ;(window as any).game = PhaserGame
+    ; (window as any).game = PhaserGame
 
   // Wait for Bootstrap scene to be created before continuing
   return bootstrapCreatedPromise
@@ -70,9 +73,12 @@ export const InitPhaserGame = async () => {
 export const DestroyGame = () => {
   try {
     // Bootstrap.getInstance()?.network.disconnectPlayer()
-    Bootstrap.getInstance()?.network.disconnectMeeting()
-    Bootstrap.getInstance()?.network.disconnectWebRTC()
-    Bootstrap.getInstance()?.network.disconnectNetwork()
+    Network.getInstance()?.disconnectMeeting()
+    Network.getInstance()?.disconnectWebRTC()
+    Network.getInstance()?.disconnectNetwork()
+    store.dispatch(setNetworkInitialized(false))
+    store.dispatch(setNetworkConstructed(false))
+    store.dispatch(setGameCreated(false))
     if (PhaserGame) PhaserGame.destroy(true)
     console.log('PhaserGame::DestroyGame Destroy Phaser Game')
   } catch (error) {
