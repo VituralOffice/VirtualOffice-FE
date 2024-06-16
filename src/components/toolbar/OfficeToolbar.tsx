@@ -18,6 +18,7 @@ import { setShowChat } from '../../stores/ChatStore'
 import ChatDialog from '../chat/ChatDialog'
 import { ToolbarButton, ToolbarExitButton } from '../buttons'
 import WebRTC from '../../web/WebRTC'
+import { useNavigate } from 'react-router-dom'
 
 const LayoutContainer = styled.div<{ isExpanded: boolean }>`
   position: absolute;
@@ -103,6 +104,7 @@ const OfficeToolbar = () => {
   const [showParticipantSidebar, setShowParticipantSidebar] = useState(false)
   const [isToolbarExpanded, setIsToolbarExpanded] = useState(true);
   const showChat = useAppSelector((state) => state.chat.showChat)
+  const navigate = useNavigate()
 
   const toggetMic = () => {
     const nextState = !user.microphoneON;
@@ -153,7 +155,7 @@ const OfficeToolbar = () => {
                 </div>
               </ToolbarButton>
               <SeparateLine />
-              <ToolbarExitButton>
+              <ToolbarExitButton onClick={() => navigate("/app")}>
                 <div>
                   <span>
                     <MeetingRoomIcon />

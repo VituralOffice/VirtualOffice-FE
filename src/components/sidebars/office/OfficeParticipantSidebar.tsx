@@ -154,8 +154,8 @@ export const OfficeParticipantSidebar = ({ onClose }: SidebarProps) => {
   const [searchUserTxt, setSearchUserTxt] = useState<string>('')
   const [showAddPeoplePopup, setShowAddPeoplePopup] = useState(false)
   const user = useAppSelector((state) => state.user)
+  const room = useAppSelector((state) => state.room.roomData)
   const members = useAppSelector((state) => state.room.roomData.members)
-
   useEffect(() => {
     console.log(members)
   }, [])
@@ -183,13 +183,15 @@ export const OfficeParticipantSidebar = ({ onClose }: SidebarProps) => {
             }}
           >
             <SearchBar search={searchUserTxt} setSearch={setSearchUserTxt} />
-            <ToolbarButton onClick={() => setShowAddPeoplePopup(true)}>
-              <div>
-                <span>
-                  <PersonAddAlt1Icon />
-                </span>
-              </div>
-            </ToolbarButton>
+            {user.userId === room.creator && (
+              <ToolbarButton onClick={() => setShowAddPeoplePopup(true)}>
+                <div>
+                  <span>
+                    <PersonAddAlt1Icon />
+                  </span>
+                </div>
+              </ToolbarButton>
+            )}
           </div>
           <ParticipantContentLayout>
             <ParticipantDropdown

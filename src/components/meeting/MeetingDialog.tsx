@@ -235,12 +235,14 @@ export default function MeetingDialog() {
                 </ToolbarButton>
               )}
               <ToolbarButton
-                onClick={() => {
+                onClick={async () => {
                   if (shareScreenManager?.myStream) {
-                    shareScreenManager?.stopScreenShare()
+                    shareScreenManager?.stopScreenShare();
+                    setActiveMeetingView(0);
                   } else {
-                    shareScreenManager?.startScreenShare()
-                    setActiveMeetingView(1)
+                    let success = await shareScreenManager?.startScreenShare()
+                    console.log(success)
+                    if (success) setActiveMeetingView(1);
                   }
                 }}
               >
