@@ -50,12 +50,10 @@ class ApiService {
               return this.axiosInstance.request(originalRequest)
             } catch (error) {
               // call refresh token error
-              if (error instanceof AxiosError) {
-                Cookies.remove(REFRESH_TOKEN_KEY)
-                Cookies.remove(ACCESS_TOKEN_KEY)
-                // navigate to /signin
-                window.location.href = '/signin'
-              }
+              Cookies.remove(REFRESH_TOKEN_KEY)
+              Cookies.remove(ACCESS_TOKEN_KEY)
+              // navigate to /signin
+              window.location.href = '/signin'
             }
           } else {
             return new Promise((resolve) => {

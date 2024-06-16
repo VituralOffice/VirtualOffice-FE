@@ -1,4 +1,6 @@
+import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
+import { useSignOut } from '../../apis/AuthApis'
 
 export const MenuPopupContainer = styled.div`
   display: flex;
@@ -64,13 +66,15 @@ export const MenuPopupItem = styled.button`
 `
 
 export default function DashboardUserMenuPopup() {
+  const navigate = useNavigate()
+  const handleSignOut = useSignOut()
   return (
     <MenuPopupContainer>
-      <MenuPopupItem>Home</MenuPopupItem>
+      <MenuPopupItem onClick={() => navigate("/app")}>Home</MenuPopupItem>
 
       {/* <MenuPopupItem>Terms of Service</MenuPopupItem> */}
 
-      <MenuPopupItem>Sign Out</MenuPopupItem>
+      <MenuPopupItem onClick={() => handleSignOut()}>Sign Out</MenuPopupItem>
     </MenuPopupContainer>
   )
 }

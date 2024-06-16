@@ -68,12 +68,6 @@ export const CreateSpacePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
         plan: '663277c9401c17854a17ec7a', //todo:
       })
       console.log('Room created: ', response)
-      await Bootstrap.getInstance()?.network.createCustom({
-        name: response.result.name,
-        id: response.result._id,
-        map: response.result.map,
-        autoDispose: false,
-      } as any)
       navigate(`/room/${response.result._id}`)
     } catch (error) {
       if (error instanceof AxiosError) toast(error.response?.data?.message)

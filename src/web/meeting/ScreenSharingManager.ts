@@ -47,9 +47,9 @@ export default class ShareScreenManager {
     return `${id.replace(/[^0-9a-z]/gi, 'G')}-ss`
   }
 
-  startScreenShare() {
+  async startScreenShare() {
     // @ts-ignore
-    navigator.mediaDevices
+    let success = await navigator.mediaDevices
       ?.getDisplayMedia({
         video: true,
         audio: true,
@@ -74,7 +74,11 @@ export default class ShareScreenManager {
             this.onUserJoined(userId)
           }
         }
-      })
+        return true
+      }).catch((error) => {
+        return false
+      });
+    return success
   }
 
   // TODO(daxchen): Fix this trash hack, if we call store.dispatch here when calling

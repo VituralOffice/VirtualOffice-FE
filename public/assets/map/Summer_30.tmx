@@ -14357,21 +14357,25 @@
   </object>
   <object id="3541" gid="2563" x="768" y="1408" width="32" height="64">
    <properties>
+    <property name="direction" value="left"/>
     <property name="groupId" value="7"/>
    </properties>
   </object>
   <object id="3542" gid="2563" x="768" y="1760" width="32" height="64">
    <properties>
+    <property name="direction" value="left"/>
     <property name="groupId" value="6"/>
    </properties>
   </object>
   <object id="3543" gid="2564" x="448" y="1760" width="32" height="64">
    <properties>
+    <property name="direction" value="right"/>
     <property name="groupId" value="6"/>
    </properties>
   </object>
   <object id="3544" gid="2564" x="448" y="1408" width="32" height="64">
    <properties>
+    <property name="direction" value="right"/>
     <property name="groupId" value="7"/>
    </properties>
   </object>
@@ -14389,11 +14393,13 @@
   </object>
   <object id="3547" gid="2563" x="768" y="1056" width="32" height="64">
    <properties>
+    <property name="direction" value="left"/>
     <property name="groupId" value="8"/>
    </properties>
   </object>
   <object id="3548" gid="2564" x="448" y="1056" width="32" height="64">
    <properties>
+    <property name="direction" value="right"/>
     <property name="groupId" value="8"/>
    </properties>
   </object>
