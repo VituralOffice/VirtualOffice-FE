@@ -1,20 +1,7 @@
 import styled from "styled-components"
-import { FieldInput } from "./utils"
+import { FieldInput, SecurityOptionsContainer } from "./utils"
 import { OptionBox } from "./OptionBox"
 import { useState } from "react"
-
-const SecurityOptionsContainer = styled.div`
-display: flex;
-flex-direction: column;
-gap: 4px;
-.label {
-    color: rgb(255, 255, 255);
-    font-family: "DM Sans", sans-serif;
-    font-weight: 500;
-    font-size: 13px;
-    line-height: 17px;
-}
-`
 
 const PasswordInput = styled.div`
 display: flex;
@@ -118,7 +105,7 @@ const InviteInput = ({ onAdd }) => {
     );
 };
 
-export const CreateRoomPanel = ({ spaceName, setSpaceName, setSecuritySelectedOption, spaceOptions }) => {
+export const CreateRoomForm = ({ spaceName, setSpaceName, setSecuritySelectedOption, spaceOptions }) => {
     // const [invitedUsers, setInvitedUsers] = useState<string[]>([]);
 
     // const addInvitedUser = (email) => {

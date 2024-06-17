@@ -11,8 +11,23 @@ export function getInitialBackgroundMode() {
   return currentHour > 6 && currentHour <= 18 ? BackgroundMode.DAY : BackgroundMode.NIGHT
 }
 interface UserState {
-  [key: string | number]: any
+  backgroundMode: BackgroundMode
+  sessionId: string
+  mediaConnected: boolean
+  playerNameMap: Map<string, string>
+  playerAvatarMap: Map<string, number>
+  showJoystick: boolean
+  userId: string
+  fullname: string
+  email: string
+  role: string
+  characterId: string
   character: ICharacter | null
+  isVerified: boolean
+  loggedIn: boolean
+  playerName: string
+  microphoneON: boolean
+  cameraON: boolean
 }
 export const userSlice = createSlice({
   name: 'user',
@@ -122,7 +137,7 @@ export const userSlice = createSlice({
       state.fullname = 'Anonymous'
       state.email = ''
       state.role = 'user'
-      state.character_id = 0
+      state.characterId = ''
       state.isVerified = false
 
       state.playerName = state.fullname
@@ -132,7 +147,7 @@ export const userSlice = createSlice({
   },
 })
 
-export const selectUserId = (state: RootState) => state.user.userId;
+export const selectUserId = (state: RootState) => state.user.userId
 
 export const {
   toggleBackgroundMode,

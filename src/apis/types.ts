@@ -40,7 +40,7 @@ export type CreateGroupChatParams = {
   roomId: string
   name?: string
   type: CHAT_TYPE
-  member: string[]
+  members: string[]
 }
 
 export type GetAllChatParams = {

@@ -27,6 +27,7 @@ import LanguageRoundedIcon from '@mui/icons-material/LanguageRounded'
 import MenuIconDropdown from '../dropdowns/MenuIconDropdown'
 import { CHAT_TYPE } from '../../constants/constant'
 import { toast } from 'react-toastify'
+import { CreateGroupChatPopup } from '../popups/CreateGroupChatPopup'
 
 const Backdrop = styled.div`
   position: fixed;
@@ -141,7 +142,6 @@ const ChatContainer = styled.div<ButtonProps>`
 `
 
 const InputWrapper = styled.form`
-  border-radius: 0px 0px 10px 0;
   display: flex;
   flex-direction: column;
   background: linear-gradient(rgb(26 29 45), rgb(34 38 57));
@@ -200,6 +200,7 @@ export default function ChatDialog() {
   const [searchChatTxt, setSearchChatTxt] = useState('')
   const [isDragging, setIsDragging] = useState(false)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+  const [showAddChatPopup, setShowAddChatPopup] = useState(false)
 
   const listChats = useAppSelector((state) => state.chat.listChats)
   const chatType = useAppSelector((state) => state.chat.chatType)
@@ -223,26 +224,45 @@ export default function ChatDialog() {
     }
   }
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (isDragging && draggableRef.current) {
-        draggableRef.current.style.left = `${e.clientX - dragOffset.x}px`
-        draggableRef.current.style.top = `${e.clientY - dragOffset.y}px`
-      }
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    setIsDragging(true)
+    const rect = draggableRef.current?.getBoundingClientRect()
+    if (rect) {
+      setDragOffset({ x: e.clientX - rect.left, y: e.clientY - rect.top })
     }
+  }
 
-    const handleMouseUp = () => {
-      setIsDragging(false)
+  const handleMouseMove = (e) => {
+    if (isDragging && draggableRef.current) {
+      draggableRef.current.style.left = `${e.clientX - dragOffset.x}px`
+      draggableRef.current.style.top = `${e.clientY - dragOffset.y}px`
     }
+  }
 
-    document.addEventListener('mousemove', handleMouseMove)
-    document.addEventListener('mouseup', handleMouseUp)
+  const handleMouseUp = () => {
+    setIsDragging(false)
+  }
 
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove)
-      document.removeEventListener('mouseup', handleMouseUp)
-    }
-  }, [isDragging, dragOffset])
+  // useEffect(() => {
+  //   const handleMouseMove = (e: MouseEvent) => {
+  //     if (isDragging && draggableRef.current) {
+  //       draggableRef.current.style.left = `${e.clientX - dragOffset.x}px`
+  //       draggableRef.current.style.top = `${e.clientY - dragOffset.y}px`
+  //     }
+  //   }
+
+  //   const handleMouseUp = () => {
+  //     setIsDragging(false)
+  //   }
+
+  //   document.addEventListener('mousemove', handleMouseMove)
+  //   document.addEventListener('mouseup', handleMouseUp)
+
+  //   return () => {
+  //     document.removeEventListener('mousemove', handleMouseMove)
+  //     document.removeEventListener('mouseup', handleMouseUp)
+  //   }
+  // }, [isDragging, dragOffset])
 
   useEffect(() => {
     getListChats()
@@ -257,14 +277,6 @@ export default function ChatDialog() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [currentChat, mapMessages.get(currentChat?._id || '')?.messages.length])
-
-  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    setIsDragging(true)
-    const rect = draggableRef.current?.getBoundingClientRect()
-    if (rect) {
-      setDragOffset({ x: e.clientX - rect.left, y: e.clientY - rect.top })
-    }
-  }
 
   const handleFileClick = () => {
     fileInputRef.current?.click()
@@ -445,7 +457,12 @@ export default function ChatDialog() {
   }, [listChats])
 
   return (
-    <Backdrop ref={draggableRef} onMouseDown={handleMouseDown}>
+    <Backdrop
+      ref={draggableRef}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+    >
       <Wrapper>
         {showChat && (
           <div style={{ height: '100%', display: 'flex' }}>
@@ -474,6 +491,9 @@ export default function ChatDialog() {
                     { icon: <GroupsRoundedIcon />, label: 'Group' },
                     { icon: <LanguageRoundedIcon />, label: 'Public' },
                   ]}
+                  defaultValue={
+                    chatType == CHAT_TYPE.PRIVATE ? 0 : chatType == CHAT_TYPE.GROUP ? 1 : 2
+                  }
                   handleSelect={handleSelectedChatType}
                 />
               </ChatHeader>
@@ -489,7 +509,7 @@ export default function ChatDialog() {
                   }}
                 >
                   <SearchBar search={searchChatTxt} setSearch={setSearchChatTxt} />
-                  <AddChatButton>
+                  <AddChatButton onClick={() => setShowAddChatPopup(true)}>
                     <AddCircleOutlineRoundedIcon />
                   </AddChatButton>
                 </div>
@@ -534,7 +554,15 @@ export default function ChatDialog() {
                   <CloseIcon />
                 </IconButton>
               </ChatHeader>
-              <div style={{ display: 'flex', flexDirection: 'column', height: '91%' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  height: '91%',
+                  borderRadius: '0px 0px 10px 0px',
+                  overflow: 'hidden',
+                }}
+              >
                 <ChatBox>
                   {mapMessages.get(currentChat?._id || '')?.messages?.map((message, index) => (
                     <ChatMessage chatMessage={message} key={index} />
@@ -677,6 +705,7 @@ export default function ChatDialog() {
           </div>
         )}
       </Wrapper>
+      {showAddChatPopup && <CreateGroupChatPopup onClosePopup={() => setShowAddChatPopup(false)} />}
     </Backdrop>
   )
 }

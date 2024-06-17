@@ -6,6 +6,7 @@ export const uiSlice = createSlice({
   name: 'ui',
   initialState: {
     showCreateMeeting: false,
+    openingUIs: 0,
     createMeetingCallback: null as CreateMeetingCallback,
   },
   reducers: {

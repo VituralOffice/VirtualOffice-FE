@@ -241,7 +241,6 @@ export default function MeetingChatSidebar() {
               onSelect={(emoji) => {
                 setInputValue(inputValue + emoji.native)
                 setShowEmojiPicker(!showEmojiPicker)
-                dispatch(setFocused(true))
               }}
               exclude={['recent', 'flags']}
             />
@@ -275,13 +274,9 @@ export default function MeetingChatSidebar() {
           // onKeyDown={handleKeyDown}
           onChange={handleChange}
           onFocus={() => {
-            if (!focused) {
-              dispatch(setFocused(true))
-              setReadyToSubmit(true)
-            }
+            setReadyToSubmit(true)
           }}
           onBlur={() => {
-            dispatch(setFocused(false))
             setReadyToSubmit(false)
           }}
         />
