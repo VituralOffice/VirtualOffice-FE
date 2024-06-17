@@ -3,7 +3,7 @@ import { PopupProps } from '../../interfaces/Interfaces'
 import { useEffect, useState } from 'react'
 import { CreateRoom } from '../../apis/RoomApis'
 import { ChooseMap } from '../forms/ChooseMap'
-import { CreateRoomPanel } from '../forms/CreateRoom'
+import { CreateRoomForm } from '../forms/CreateRoomForm'
 import Bootstrap from '../../scenes/Bootstrap'
 import { useNavigate } from 'react-router-dom'
 import { FormPopup } from './FormPopup'
@@ -77,7 +77,7 @@ export const CreateSpacePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
 
   const PopupContents = [
     <ChooseMap mapSize={mapSize} setMapId={setMapId} setMapSize={setMapSize} />,
-    <CreateRoomPanel
+    <CreateRoomForm
       spaceName={spaceName}
       setSpaceName={setSpaceName}
       setSecuritySelectedOption={setSecuritySelectedOption}

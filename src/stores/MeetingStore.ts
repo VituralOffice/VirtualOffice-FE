@@ -267,6 +267,7 @@ export const meetingSlice = createSlice({
         }
       }
     },
+    resetMeetingStore: () => initialState,
   },
 })
 
@@ -288,6 +289,7 @@ export const {
   setTitle,
   setMicrophoneON,
   setCameraON,
+  resetMeetingStore,
 } = meetingSlice.actions
 
 export default meetingSlice.reducer

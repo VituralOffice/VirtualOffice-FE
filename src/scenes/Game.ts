@@ -10,7 +10,7 @@ import PlayerSelector from '../characters/PlayerSelector'
 import Network from '../services/Network'
 
 import store from '../stores'
-import { setFocused, setShowChat } from '../stores/ChatStore'
+import { setShowChat } from '../stores/ChatStore'
 import { Keyboard, NavKeys } from '../types/KeyboardState'
 import Chair from '../items/Chair'
 import Item from '../items/Item'
@@ -60,7 +60,6 @@ export default class Game extends Phaser.Scene {
     this.input.keyboard!.disableGlobalCapture()
     this.input.keyboard!.on('keydown-ENTER', (event) => {
       store.dispatch(setShowChat(true))
-      store.dispatch(setFocused(true))
     })
     this.input.keyboard!.on('keydown-ESC', (event) => {
       store.dispatch(setShowChat(false))
@@ -189,11 +188,6 @@ export default class Game extends Phaser.Scene {
     this.network.onItemUserRemoved(this.handleItemUserRemoved, this)
     this.network.onChatMessageAdded(this.handleChatMessageAdded, this)
     this.network.onChairConnectedUserChange(this.handleChairUserConnectedChange, this)
-
-    // this.registerKeys();
-    // this.myPlayer.setPlayerName(store.getState().user.playerName);
-    // this.myPlayer.setPlayerTexture(avatars[store.getState().user.character_id].name);
-    // this.network.readyToConnect();
 
     store.dispatch(setGameCreated(true))
     console.log("Game::create Game created")

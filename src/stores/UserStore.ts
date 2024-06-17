@@ -11,8 +11,21 @@ export function getInitialBackgroundMode() {
   return currentHour > 6 && currentHour <= 18 ? BackgroundMode.DAY : BackgroundMode.NIGHT
 }
 interface UserState {
-  [key: string | number]: any
+  backgroundMode: BackgroundMode
+  sessionId: string
+  mediaConnected: boolean
+  showJoystick: boolean
+  userId: string
+  fullname: string
+  email: string
+  role: string
+  characterId: string
   character: ICharacter | null
+  isVerified: boolean
+  loggedIn: boolean
+  playerName: string
+  microphoneON: boolean
+  cameraON: boolean
 }
 export const userSlice = createSlice({
   name: 'user',
@@ -20,8 +33,6 @@ export const userSlice = createSlice({
     backgroundMode: getInitialBackgroundMode(),
     sessionId: '',
     mediaConnected: false,
-    playerNameMap: new Map<string, string>(),
-    playerAvatarMap: new Map<string, number>(),
     showJoystick: window.innerWidth < 650,
     //user info
     userId: '',
@@ -53,18 +64,6 @@ export const userSlice = createSlice({
     },
     setLoggedIn: (state, action: PayloadAction<boolean>) => {
       state.loggedIn = action.payload
-    },
-    setPlayerNameMap: (state, action: PayloadAction<{ id: string; name: string }>) => {
-      state.playerNameMap.set(sanitizeId(action.payload.id), action.payload.name)
-    },
-    removePlayerNameMap: (state, action: PayloadAction<string>) => {
-      state.playerNameMap.delete(sanitizeId(action.payload))
-    },
-    setPlayerAvatarMap: (state, action: PayloadAction<{ id: string; characterId: number }>) => {
-      state.playerAvatarMap.set(sanitizeId(action.payload.id), action.payload.characterId)
-    },
-    removePlayerAvatarMap: (state, action: PayloadAction<string>) => {
-      state.playerAvatarMap.delete(sanitizeId(action.payload))
     },
     setShowJoystick: (state, action: PayloadAction<boolean>) => {
       state.showJoystick = action.payload
@@ -114,15 +113,13 @@ export const userSlice = createSlice({
       state.sessionId = ''
       state.mediaConnected = false
       state.loggedIn = false
-      state.playerNameMap = new Map<string, string>()
-      state.playerAvatarMap = new Map<string, number>()
       state.showJoystick = window.innerWidth < 650
 
       state.userId = ''
       state.fullname = 'Anonymous'
       state.email = ''
       state.role = 'user'
-      state.character_id = 0
+      state.characterId = ''
       state.isVerified = false
 
       state.playerName = state.fullname
@@ -132,17 +129,13 @@ export const userSlice = createSlice({
   },
 })
 
-export const selectUserId = (state: RootState) => state.user.userId;
+export const selectUserId = (state: RootState) => state.user.userId
 
 export const {
   toggleBackgroundMode,
   setSessionId,
   setMediaConnected,
   setLoggedIn,
-  setPlayerNameMap,
-  removePlayerNameMap,
-  setPlayerAvatarMap,
-  removePlayerAvatarMap,
   setShowJoystick,
   setUserId,
   setUsername,

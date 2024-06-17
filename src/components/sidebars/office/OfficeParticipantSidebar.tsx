@@ -7,6 +7,8 @@ import { ParticipantDropdown } from '../../dropdowns/ParticipantDropdown'
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1'
 import { ButtonProps } from '../../../interfaces/Interfaces'
 import { AddPeopleToOfficePopup } from '../../popups/AddPeopleToOfficePopup'
+import { useDispatch } from 'react-redux'
+import { increaseOpeningCount, decreaseOpeningCount } from '../../../stores/UIStore'
 
 const LayoutContainer = styled.div`
   position: absolute;
@@ -156,8 +158,13 @@ export const OfficeParticipantSidebar = ({ onClose }: SidebarProps) => {
   const user = useAppSelector((state) => state.user)
   const room = useAppSelector((state) => state.room.roomData)
   const members = useAppSelector((state) => state.room.roomData.members)
+  const dispatch = useDispatch();
   useEffect(() => {
-    console.log(members)
+    dispatch(increaseOpeningCount())
+
+    return () => {
+      dispatch(decreaseOpeningCount())
+    }
   }, [])
   return (
     <>

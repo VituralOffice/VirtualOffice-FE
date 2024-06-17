@@ -65,10 +65,11 @@ const DropdownItem = styled.div`
 export interface DropdownParams {
   handleSelect: any
   items: Array<MenuItem>
+  defaultValue: number
 }
 
-export default function MenuIconDropdown({ items, handleSelect }: DropdownParams) {
-  const [selectedItemIndex, setSelectedItemIndex] = useState(0)
+export default function MenuIconDropdown({ items, defaultValue, handleSelect }: DropdownParams) {
+  const [selectedItemIndex, setSelectedItemIndex] = useState(defaultValue)
   const [isOpen, setIsOpen] = useState(false)
 
   const handleToggleDropdown = () => {

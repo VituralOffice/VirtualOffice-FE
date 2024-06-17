@@ -19,6 +19,7 @@ import ChatDialog from '../chat/ChatDialog'
 import { ToolbarButton, ToolbarExitButton } from '../buttons'
 import WebRTC from '../../web/WebRTC'
 import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
 
 const LayoutContainer = styled.div<{ isExpanded: boolean }>`
   position: absolute;
@@ -105,6 +106,7 @@ const OfficeToolbar = () => {
   const [isToolbarExpanded, setIsToolbarExpanded] = useState(true);
   const showChat = useAppSelector((state) => state.chat.showChat)
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const toggetMic = () => {
     const nextState = !user.microphoneON;
@@ -174,7 +176,9 @@ const OfficeToolbar = () => {
         </ExpandMenu>
       </LayoutContainer>
       {showParticipantSidebar && (
-        <OfficeParticipantSidebar onClose={() => setShowParticipantSidebar(false)} />
+        <OfficeParticipantSidebar onClose={() => {
+          setShowParticipantSidebar(false)
+        }} />
       )}
       {showChat && (
         <ChatDialog />

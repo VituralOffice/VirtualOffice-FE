@@ -8,5 +8,5 @@ export interface IUser {
   role: string
   online: boolean
   password: string
-  character: string | ICharacter
+  character: ICharacter
 }

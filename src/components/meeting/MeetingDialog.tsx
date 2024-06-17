@@ -23,6 +23,7 @@ import LockIcon from '@mui/icons-material/Lock'
 import LockOpenIcon from '@mui/icons-material/LockOpen'
 import Network from '../../services/Network'
 import { YesNoPopup } from '../popups/YesNoPopup'
+import { decreaseOpeningCount, increaseOpeningCount } from '../../stores/UIStore'
 
 const Backdrop = styled.div`
   position: fixed;
@@ -164,6 +165,14 @@ export default function MeetingDialog() {
       setShareScreenAvailable(true)
     }
   }, [peerDisplayStreams, myPeerDisplayStream])
+
+  useEffect(() => {
+    dispatch(increaseOpeningCount())
+
+    return () => {
+      dispatch(decreaseOpeningCount())
+    }
+  }, [])
 
   // //TODO: optimize this: temp delay first start camera because userMediaManager hasn't been initialized yet
   // const isFirstRun = useRef(true);

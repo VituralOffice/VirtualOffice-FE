@@ -41,10 +41,16 @@ export const whiteboardSlice = createSlice({
         `https://wbo.ophir.dev/boards/sky-office-${action.payload.roomId}`
       )
     },
+    resetWhiteBoardStore: (state) => {
+      state.whiteboardDialogOpen = false
+      state.whiteboardId = null
+      state.whiteboardUrl = null
+      state.urls = new Map()
+    },
   },
 })
 
-export const { openWhiteboardDialog, closeWhiteboardDialog, setWhiteboardUrls } =
+export const { openWhiteboardDialog, closeWhiteboardDialog, setWhiteboardUrls, resetWhiteBoardStore } =
   whiteboardSlice.actions
 
 export default whiteboardSlice.reducer

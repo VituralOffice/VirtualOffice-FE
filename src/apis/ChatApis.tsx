@@ -5,7 +5,7 @@ export const CreateGroupChat = async (data: CreateGroupChatParams) => {
   const response = await ApiService.getInstance().post(`/rooms/${data.roomId}/chats`, {
     name: data.name,
     type: data.type,
-    member: data.member,
+    members: data.members,
   })
   return response
 }
