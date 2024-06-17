@@ -37,7 +37,6 @@ export const chatSlice = createSlice({
   initialState,
   reducers: {
     pushChatMessage: (state, action: PayloadAction<{ chatId: string; message: IChatMessage }>) => {
-      console.log('push new message', action.payload.message)
       if (state.mapMessages.get(action.payload.chatId)) {
         // const mapMessage = {
         //   id: action.payload.chatId,
@@ -147,17 +146,32 @@ export const chatSlice = createSlice({
     //     state.listChats[index] = action.payload
     //   } else state.listChats.unshift(action.payload)
     // },
-    addChatAndSetActive: (
-      state,
-      action: PayloadAction<{ chat: IChat; mapMessage: IMapMessage }>
-    ) => {
+    addChat: (state, action: PayloadAction<{ chat: IChat; mapMessage: IMapMessage }>) => {
       //add chat
       const { _id } = action.payload.chat
-      const exists = state.listChats.find((c) => c._id === _id)
-      if (exists) {
-        const index = state.listChats.findIndex((c) => c._id === _id)
-        state.listChats[index] = action.payload.chat
-      } else state.listChats.unshift(action.payload.chat)
+      let index = -1
+      switch (action.payload.chat.type) {
+        case CHAT_TYPE.PRIVATE:
+          index = state.privateChats.findIndex((c) => c._id === _id)
+          if (index >= 0) {
+            state.privateChats[index] = action.payload.chat
+          } else state.privateChats.unshift(action.payload.chat)
+          break
+        case CHAT_TYPE.GROUP:
+          index = state.groupChats.findIndex((c) => c._id === _id)
+          if (index >= 0) {
+            state.groupChats[index] = action.payload.chat
+          } else state.groupChats.unshift(action.payload.chat)
+          break
+        case CHAT_TYPE.PUBLIC:
+          index = state.publicChats.findIndex((c) => c._id === _id)
+          if (index >= 0) {
+            state.publicChats[index] = action.payload.chat
+          } else state.publicChats.unshift(action.payload.chat)
+          break
+        default:
+          break
+      }
 
       //add map messages
       state.mapMessages.set(action.payload.mapMessage._id, action.payload.mapMessage)
@@ -185,7 +199,7 @@ export const {
   setListChat,
   loadMapChatMessage,
   updateChat,
-  addChatAndSetActive,
+  addChat,
   setMessageMaps,
   setChatType,
 } = chatSlice.actions

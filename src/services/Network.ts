@@ -12,7 +12,7 @@ import { IChair, IMeeting, IOfficeState, IPlayer, IWhiteboard } from '../types/I
 import WebRTC from '../web/WebRTC'
 import { GameEvent, phaserEvents } from '../events/EventCenter'
 import { IRoomData, RoomType, IMessagePayload, ICreateCustomRoomParams } from '../types/Rooms'
-import { addChatAndSetActive, loadMapChatMessage, pushChatMessage } from '../stores/ChatStore'
+import { addChat, loadMapChatMessage, pushChatMessage } from '../stores/ChatStore'
 import { ItemType } from '../types/Items'
 import { Message } from '../types/Messages'
 import { ACCESS_TOKEN_KEY } from '../utils/util'
@@ -23,6 +23,7 @@ import { GetMsgByChatId, GetOneChat } from '../apis/ChatApis'
 import { isApiSuccess } from '../apis/util'
 import { setWhiteboardUrls } from '../stores/WhiteboardStore'
 import { toast } from 'react-toastify'
+import { IChat } from '../interfaces/chat'
 
 export default class Network {
   private static instance: Network | null = null // Biến static instance
@@ -242,12 +243,23 @@ export default class Network {
       meetingState.shareScreenManager?.onUserLeft(clientId)
     })
 
+    this.room.onMessage(Message.ADD_CHAT, async (message: { chat: IChat }) => {
+      console.log(`Network::onMessgae ADD_CHAT ${message.chat._id}`)
+      const msgResponse = await GetMsgByChatId({
+        roomId: store.getState().room.roomData._id,
+        chatId: message.chat._id,
+      })
+      if (isApiSuccess(msgResponse)) {
+        store.dispatch(addChat({ chat: message.chat, mapMessage: msgResponse.result }))
+      }
+    })
+
     // when receive info from server when join a new meeting
     this.room.onMessage(
       Message.CONNECT_TO_MEETING,
-      async (message: { meetingId: string; chatId: string; title: string }) => {
+      async (message: { meetingId: string; title: string }) => {
         console.log(
-          `Network::onMessage CONNECT_TO_MEETING: meetingId: ${message.meetingId}, chatId: ${message.chatId}, title: ${message.title}`
+          `Network::onMessage CONNECT_TO_MEETING: meetingId: ${message.meetingId}, title: ${message.title}`
         )
         this.webRTC?.disconnect()
 
@@ -261,25 +273,6 @@ export default class Network {
             cameraON,
           })
         )
-
-        const chatResponse = await GetOneChat({
-          roomId: store.getState().room.roomData._id,
-          chatId: message.chatId,
-        })
-        const msgResponse = await GetMsgByChatId({
-          roomId: store.getState().room.roomData._id,
-          chatId: message.chatId,
-        })
-        if (isApiSuccess(chatResponse) && isApiSuccess(msgResponse)) {
-          // console.log(`Network:: on event Message.CONNECT_TO_MEETING success`, chatResponse.result)
-          // console.log('Network:: mapMessages of chat: ', msgResponse.result)
-          store.dispatch(
-            addChatAndSetActive({ chat: chatResponse.result, mapMessage: msgResponse.result })
-          )
-          // const meeting = Game.getInstance()?.meetingMap.get(message.meetingId)!
-          // meeting.setTitle(message.title)
-          // meeting.setChatId(message.chatId)
-        }
       }
     )
 

@@ -11,7 +11,7 @@ import { CHAT_TYPE } from '../../constants/constant'
 import { FormSelection } from '../forms/types'
 import { useAppSelector } from '../../hook'
 
-export const CreateGroupChatPopup = ({ onClosePopup }: PopupProps) => {
+export const CreateChatPopup = ({ onClosePopup }: PopupProps) => {
   const room = useAppSelector((state) => state.room)
   const [chatName, setChatName] = useState('')
   const [selectedMembers, setSelectedMembers] = useState<FormSelection[]>([])
@@ -46,10 +46,6 @@ export const CreateGroupChatPopup = ({ onClosePopup }: PopupProps) => {
       else toast(UNKNOWN_ERROR)
     }
   }
-
-  useEffect(() => {
-    console.log(selectedMembers)
-  }, [selectedMembers])
 
   return (
     <FormPopup

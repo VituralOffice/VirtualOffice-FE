@@ -27,7 +27,7 @@ import LanguageRoundedIcon from '@mui/icons-material/LanguageRounded'
 import MenuIconDropdown from '../dropdowns/MenuIconDropdown'
 import { CHAT_TYPE } from '../../constants/constant'
 import { toast } from 'react-toastify'
-import { CreateGroupChatPopup } from '../popups/CreateGroupChatPopup'
+import { CreateChatPopup } from '../popups/CreateChatPopup'
 
 const Backdrop = styled.div`
   position: fixed;
@@ -202,6 +202,7 @@ export default function ChatDialog() {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [showAddChatPopup, setShowAddChatPopup] = useState(false)
 
+  const userId = useAppSelector((state) => state.user.userId)
   const listChats = useAppSelector((state) => state.chat.listChats)
   const chatType = useAppSelector((state) => state.chat.chatType)
   const focused = useAppSelector((state) => state.chat.focused)
@@ -520,7 +521,7 @@ export default function ChatDialog() {
                       key={chat._id}
                       onClick={() => handleChangeChat(chat)}
                     >
-                      <p style={{ margin: 0, color: 'white' }}>{chat.name}</p>
+                      <p style={{ margin: 0, color: 'white' }}>{chat.type == CHAT_TYPE.PRIVATE ? (chat.members[0].user._id == userId ? chat.members[1].user.fullname : chat.members[0].user.fullname) : chat.name}</p>
                     </ChatContainer>
                   ))}
                 </div>
@@ -705,7 +706,7 @@ export default function ChatDialog() {
           </div>
         )}
       </Wrapper>
-      {showAddChatPopup && <CreateGroupChatPopup onClosePopup={() => setShowAddChatPopup(false)} />}
+      {showAddChatPopup && <CreateChatPopup onClosePopup={() => setShowAddChatPopup(false)} />}
     </Backdrop>
   )
 }

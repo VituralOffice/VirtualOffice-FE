@@ -29,12 +29,14 @@ export const CreateChatForm = ({
   }, [])
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-      <FormFieldInput
-        label="Chat name"
-        placeHolder="Chat name"
-        value={chatName}
-        setValue={setChatName}
-      />
+      {selectedChatType != 0 && (
+        <FormFieldInput
+          label="Chat name"
+          placeHolder="Chat name"
+          value={chatName}
+          setValue={setChatName}
+        />
+      )}
       <SecurityOptionsContainer className="form-session">
         <span className="label">Security options</span>
         <OptionBox

@@ -1,7 +1,7 @@
 import styled from "styled-components"
 import { ButtonProps } from "../../interfaces/Interfaces"
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
-import { ReactElement, useState } from "react"
+import { ReactElement, useRef, useState } from "react"
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 
 export const PopupContainer = styled.div`
@@ -191,6 +191,15 @@ interface Props {
 
 export const FormPopup = ({onClose, titles, forms, totalSteps, formCanBeSubmit, onSubmit, submitText}: Props) => {
     const [stepIndex, setStepIndex] = useState(0);
+    const lastSubmitTimeRef = useRef<number>(0);
+
+    const handleSubmit = () => {
+      const now = Date.now();
+      if (now - lastSubmitTimeRef.current >= 1000) { // 1000 milliseconds = 1 second
+        lastSubmitTimeRef.current = now;
+        onSubmit();
+      }
+    };
     return(
         <PopupContainer>
             <div>
@@ -225,7 +234,7 @@ export const FormPopup = ({onClose, titles, forms, totalSteps, formCanBeSubmit, 
                                 }
                                 {
                                     stepIndex == totalSteps - 1 ? (
-                                        <FormSubmitButton isActive={formCanBeSubmit} onClick={onSubmit}>
+                                        <FormSubmitButton isActive={formCanBeSubmit} onClick={handleSubmit}>
                                             <span className='icon'>
                                                 <span><CheckCircleRoundedIcon /></span>
                                             </span>
