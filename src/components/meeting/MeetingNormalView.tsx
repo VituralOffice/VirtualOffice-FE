@@ -145,10 +145,11 @@ function VideoContainer({
 }
 
 export const MeetingNormalView = () => {
+  const members = useAppSelector((state) => state.room.roomData.members)
   const myStream = useAppSelector((state) => state.meeting.myCameraStream)
   const peerStreams = useAppSelector((state) => state.meeting.peerCameraStreams)
   const playerNameMap = useAppSelector((state) => state.user.playerNameMap)
-  // const playerAvatarMap = useAppSelector((state) => state.user.playerAvatarMap)
+  const playerAvatarMap = useAppSelector((state) => state.user.playerAvatarMap)
   const user = useAppSelector((state) => state.user)
 
   const [activeScreenIndex, setActiveScreenIndex] = useState(-1)
@@ -172,12 +173,12 @@ export const MeetingNormalView = () => {
       )}
       {[...peerStreams.entries()].map(([id, { stream }], index) => {
         const playerName = playerNameMap.get(id)
-        // console.log(Game.getInstance()?.otherPlayerMap.get(id)?.playerNameText.text)
+        const playeAvatar = playerAvatarMap.get(id)
         return (
           <VideoContainer
             key={id}
             playerName={playerName!}
-            avatarLink={user.character?.avatar}
+            avatarLink={playeAvatar ? getAvatarById(playeAvatar).img : getAvatarById(0).img}
             stream={stream}
             onClick={() => handleVideoContainerClick(index + 1)}
             canInteract={totalDisplays > 1}
@@ -195,7 +196,7 @@ export const MeetingNormalView = () => {
           <VideoContainer
             stream={myStream}
             playerName="You"
-            avatarLink={getAvatarById(user.character_id).img}
+            avatarLink={user.character?.avatar}
             canInteract={totalDisplays > 1}
             canZoomIn={true}
             onClick={() => setActiveScreenIndex(-1)}
@@ -207,12 +208,13 @@ export const MeetingNormalView = () => {
       if (peerStreamEntry) {
         const [id, { stream }] = peerStreamEntry
         const playerName = playerNameMap.get(id)
+        const playeAvatar = playerAvatarMap.get(id)
         return (
           <VideoGrid>
             <VideoContainer
               key={id}
               playerName={playerName!}
-              avatarLink={user.character?.avatar}
+              avatarLink={playeAvatar ? getAvatarById(playeAvatar).img : getAvatarById(0).img}
               stream={stream}
               canInteract={totalDisplays > 1}
               canZoomIn={true}

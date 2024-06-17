@@ -49,7 +49,7 @@ export default function OfficeLogoMenuPopup() {
             <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: '10px', padding: '0px 16px' }}>
                 <AvatarContainer>
                     <AvatarBackground>
-                        <AvatarImg src={"/" + getAvatarById(user.character_id).img} />
+                        <AvatarImg src={user.character?.avatar} />
                     </AvatarBackground>
                 </AvatarContainer>
                 <UsernameText>{user.fullname}</UsernameText>

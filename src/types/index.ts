@@ -36,7 +36,7 @@ export type User = {
   fullname: string
   email: string
   role: string
-  character_id: number
+  characterId: number
   isVerified: false
   loggedIn: false
 
