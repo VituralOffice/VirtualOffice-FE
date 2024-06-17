@@ -7,7 +7,7 @@ import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon'
 import CloseIcon from '@mui/icons-material/Close'
 import 'emoji-mart/css/emoji-mart.css'
 import { Picker } from 'emoji-mart'
-import { setChatType, setFocused, setListChat, setShowChat } from '../../stores/ChatStore'
+import { setChatType, setListChat, setShowChat } from '../../stores/ChatStore'
 import { useAppDispatch, useAppSelector } from '../../hook'
 import Game from '../../scenes/Game'
 import { useParams } from 'react-router-dom'
@@ -28,6 +28,7 @@ import MenuIconDropdown from '../dropdowns/MenuIconDropdown'
 import { CHAT_TYPE } from '../../constants/constant'
 import { toast } from 'react-toastify'
 import { CreateChatPopup } from '../popups/CreateChatPopup'
+import { decreaseOpeningCount, increaseOpeningCount } from '../../stores/UIStore'
 
 const Backdrop = styled.div`
   position: fixed;
@@ -205,7 +206,6 @@ export default function ChatDialog() {
   const userId = useAppSelector((state) => state.user.userId)
   const listChats = useAppSelector((state) => state.chat.listChats)
   const chatType = useAppSelector((state) => state.chat.chatType)
-  const focused = useAppSelector((state) => state.chat.focused)
   const showChat = useAppSelector((state) => state.chat.showChat)
   const mapMessages = useAppSelector((state) => state.chat.mapMessages)
 
@@ -266,14 +266,13 @@ export default function ChatDialog() {
   // }, [isDragging, dragOffset])
 
   useEffect(() => {
+    dispatch(increaseOpeningCount())
     getListChats()
-  }, [])
 
-  useEffect(() => {
-    if (focused) {
-      inputRef.current?.focus()
+    return () => {
+      dispatch(decreaseOpeningCount())
     }
-  }, [focused])
+  }, [])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -521,7 +520,13 @@ export default function ChatDialog() {
                       key={chat._id}
                       onClick={() => handleChangeChat(chat)}
                     >
-                      <p style={{ margin: 0, color: 'white' }}>{chat.type == CHAT_TYPE.PRIVATE ? (chat.members[0].user._id == userId ? chat.members[1].user.fullname : chat.members[0].user.fullname) : chat.name}</p>
+                      <p style={{ margin: 0, color: 'white' }}>
+                        {chat.type == CHAT_TYPE.PRIVATE
+                          ? chat.members[0].user._id == userId
+                            ? chat.members[1].user.fullname
+                            : chat.members[0].user.fullname
+                          : chat.name}
+                      </p>
                     </ChatContainer>
                   ))}
                 </div>
@@ -578,7 +583,6 @@ export default function ChatDialog() {
                         onSelect={(emoji) => {
                           setInputValue(inputValue + emoji.native)
                           setShowEmojiPicker(!showEmojiPicker)
-                          dispatch(setFocused(true))
                         }}
                         exclude={['recent', 'flags']}
                       />
@@ -673,7 +677,7 @@ export default function ChatDialog() {
                       </div>
                       <InputTextField
                         inputRef={inputRef}
-                        autoFocus={focused}
+                        autoFocus={true}
                         fullWidth
                         placeholder="Press Enter to chat"
                         value={inputValue}
@@ -682,13 +686,9 @@ export default function ChatDialog() {
                         onPaste={handlePaste}
                         inputProps={{ accept: 'image/*' }}
                         onFocus={() => {
-                          if (!focused) {
-                            dispatch(setFocused(true))
-                            setReadyToSubmit(true)
-                          }
+                          setReadyToSubmit(true)
                         }}
                         onBlur={() => {
-                          dispatch(setFocused(false))
                           setReadyToSubmit(false)
                         }}
                       />

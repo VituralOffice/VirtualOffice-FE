@@ -5,9 +5,7 @@ import IconButton from '@mui/material/IconButton'
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon'
 import 'emoji-mart/css/emoji-mart.css'
 import { Picker } from 'emoji-mart'
-import { MessageType, setFocused } from '../../../stores/ChatStore'
-import { useAppDispatch, useAppSelector } from '../../../hook'
-import Game from '../../../scenes/Game'
+import { useAppSelector } from '../../../hook'
 import InputBase from '@mui/material/InputBase'
 import { useDispatch } from 'react-redux'
 import { Message } from './Message'
@@ -104,7 +102,6 @@ export default function MeetingChatSidebar() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const mapMessages = useAppSelector((state) => state.chat.mapMessages)
-  const focused = useAppSelector((state) => state.chat.focused)
   const showChat = useAppSelector((state) => state.chat.showChat)
   // const chat = useAppSelector((state) => state.chat)
   const meeting = useAppSelector((state) => state.meeting)
@@ -156,10 +153,6 @@ export default function MeetingChatSidebar() {
     console.log(meeting.chatId)
     event.preventDefault()
 
-    // this is added because without this, 2 things happen at the same
-    // time when Enter is pressed, (1) the inputRef gets focus (from
-    // useEffect) and (2) the form gets submitted (right after the input
-    // gets focused)
     if (!readyToSubmit) {
       setReadyToSubmit(true)
       return
@@ -213,12 +206,6 @@ export default function MeetingChatSidebar() {
   }
 
   useEffect(() => {
-    if (focused) {
-      inputRef.current?.focus()
-    }
-  }, [focused])
-
-  useEffect(() => {
     scrollToBottom()
   }, [mapMessages, showChat])
 
@@ -267,7 +254,6 @@ export default function MeetingChatSidebar() {
         </div>
         <InputTextField
           inputRef={inputRef}
-          autoFocus={focused}
           fullWidth
           placeholder="Press Enter to chat"
           value={inputValue}

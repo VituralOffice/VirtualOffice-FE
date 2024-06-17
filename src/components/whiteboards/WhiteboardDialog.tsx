@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import styled from 'styled-components'
 import IconButton from '@mui/material/IconButton'
 import CloseIcon from '@mui/icons-material/Close'
 import { useAppDispatch, useAppSelector } from '../../hook'
 import { closeWhiteboardDialog } from '../../stores/WhiteboardStore'
+import { increaseOpeningCount, decreaseOpeningCount } from '../../stores/UIStore'
 
 
 const Backdrop = styled.div`
@@ -53,6 +54,14 @@ const WhiteboardWrapper = styled.div`
 export default function WhiteboardDialog() {
   const whiteboardUrl = useAppSelector((state) => state.whiteboard.whiteboardUrl)
   const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    dispatch(increaseOpeningCount())
+
+    return () => {
+      dispatch(decreaseOpeningCount())
+    }
+  }, [])
 
   return (
     <Backdrop>

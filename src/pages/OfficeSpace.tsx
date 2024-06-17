@@ -18,6 +18,7 @@ import { setRoomData } from '../stores/RoomStore'
 import { isApiSuccess } from '../apis/util'
 import { toast } from 'react-toastify'
 import { startLoadingAndWait, stopLoading } from '../stores/LoadingStore'
+import Game from '../scenes/Game'
 
 export const OfficeSpace = () => {
   let { roomId } = useParams()
@@ -27,6 +28,7 @@ export const OfficeSpace = () => {
   const [joinPageShow, setJoinPageShow] = useState(true)
   // const [room, setRoom] = useState<IRoomData | null>()
   const roomStore = useAppSelector((state) => state.room)
+  const UICount = useAppSelector((state) => state.ui.openingUIs)
   const whiteboardDialogOpen = useAppSelector((state) => state.whiteboard.whiteboardDialogOpen)
   const meeting = useAppSelector((state) => state.meeting)
   const [gameInittialized, setGameInitialized] = useState(false)
@@ -118,6 +120,15 @@ export const OfficeSpace = () => {
       dispatch(stopLoading())
     }
   }, [roomStore.networkInitialized])
+
+  useEffect(() => {
+    if (UICount > 0) {
+      Game.getInstance()?.disableKeys()
+    }
+    if (UICount == 0) {
+      Game.getInstance()?.enableKeys()
+    }
+  }, [UICount])
 
   return (
     <>

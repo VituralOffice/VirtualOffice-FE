@@ -10,7 +10,7 @@ import PlayerSelector from '../characters/PlayerSelector'
 import Network from '../services/Network'
 
 import store from '../stores'
-import { setFocused, setShowChat } from '../stores/ChatStore'
+import { setShowChat } from '../stores/ChatStore'
 import { Keyboard, NavKeys } from '../types/KeyboardState'
 import Chair from '../items/Chair'
 import Item from '../items/Item'
@@ -60,7 +60,6 @@ export default class Game extends Phaser.Scene {
     this.input.keyboard!.disableGlobalCapture()
     this.input.keyboard!.on('keydown-ENTER', (event) => {
       store.dispatch(setShowChat(true))
-      store.dispatch(setFocused(true))
     })
     this.input.keyboard!.on('keydown-ESC', (event) => {
       store.dispatch(setShowChat(false))
