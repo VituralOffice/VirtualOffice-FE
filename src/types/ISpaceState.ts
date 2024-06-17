@@ -2,13 +2,24 @@ import { Schema, ArraySchema, SetSchema, MapSchema } from '@colyseus/schema'
 import { IUser } from '../interfaces/user'
 
 export interface IPlayer extends IUser, Schema {
-  playerName: string
-  x: number
-  y: number
-  anim: string
-  readyToConnect: boolean
-  mediaConnected: boolean
-  isInMeeting: boolean
+  id : string
+  email : string
+  password : string
+  avatar : string
+  role : string
+  online : boolean
+  provider : string
+  isVerified : boolean
+  fullname : string
+  playerName : string
+  x : number
+  y : number
+  anim : string
+  readyToConnect : boolean
+  mediaConnected : boolean
+  isInMeeting : boolean
+  characterId : string
+  characterAvatar : string
 }
 export interface IMessage extends Schema {
   type: string

@@ -28,8 +28,6 @@ export type User = {
   backgroundMode: BackgroundMode
   sessionId: string
   mediaConnected: boolean
-  playerNameMap: Map<string, string>
-  playerAvatarMap: Map<string, number>
   showJoystick: boolean
 
   userId: string

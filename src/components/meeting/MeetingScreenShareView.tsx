@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import { ButtonProps } from "../../interfaces/Interfaces"
 import ZoomOutMapIcon from '@mui/icons-material/ZoomOutMap';
 import ZoomInMapIcon from '@mui/icons-material/ZoomInMap';
+import Network from "../../services/Network"
 
 const VideoGrid = styled.div`
   flex: 1;
@@ -89,7 +90,6 @@ function VideoContainer({ playerName, stream, onClick, canZoomIn, canInteract }:
 export const MeetingScreenShareView = () => {
   const myStream = useAppSelector((state) => state.meeting.myDisplayStream)
   const peerStreams = useAppSelector((state) => state.meeting.peerDisplayStreams)
-  const playerNameMap = useAppSelector((state) => state.user.playerNameMap)
 
   const [activeScreenIndex, setActiveScreenIndex] = useState(-1);
   const [totalDisplays, setTotalDisplays] = useState(0);
@@ -110,11 +110,11 @@ export const MeetingScreenShareView = () => {
         />
       )}
       {[...peerStreams.entries()].map(([id, { stream }], index) => {
-        const playerName = playerNameMap.get(id);
+        const player = Network.getInstance()?.room?.state.players.get(id)
         return (
           <VideoContainer
             key={id}
-            playerName={playerName!}
+            playerName={player?.playerName!}
             stream={stream}
             onClick={() => handleVideoContainerClick(index + 1)}
             canInteract={totalDisplays > 1}
@@ -139,11 +139,11 @@ export const MeetingScreenShareView = () => {
       const peerStreamEntry = [...peerStreams.entries()][activeScreenIndex - 1];
       if (peerStreamEntry) {
         const [id, { stream }] = peerStreamEntry;
-        const playerName = playerNameMap.get(id);
+        const player = Network.getInstance()?.room?.state.players.get(id)
         return <VideoGrid>
           <VideoContainer
             key={id}
-            playerName={playerName!}
+            playerName={player?.playerName!}
             stream={stream}
             canInteract={totalDisplays > 1}
             canZoomIn={true}

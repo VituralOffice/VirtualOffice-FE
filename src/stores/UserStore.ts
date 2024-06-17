@@ -14,8 +14,6 @@ interface UserState {
   backgroundMode: BackgroundMode
   sessionId: string
   mediaConnected: boolean
-  playerNameMap: Map<string, string>
-  playerAvatarMap: Map<string, number>
   showJoystick: boolean
   userId: string
   fullname: string
@@ -35,8 +33,6 @@ export const userSlice = createSlice({
     backgroundMode: getInitialBackgroundMode(),
     sessionId: '',
     mediaConnected: false,
-    playerNameMap: new Map<string, string>(),
-    playerAvatarMap: new Map<string, number>(),
     showJoystick: window.innerWidth < 650,
     //user info
     userId: '',
@@ -68,18 +64,6 @@ export const userSlice = createSlice({
     },
     setLoggedIn: (state, action: PayloadAction<boolean>) => {
       state.loggedIn = action.payload
-    },
-    setPlayerNameMap: (state, action: PayloadAction<{ id: string; name: string }>) => {
-      state.playerNameMap.set(sanitizeId(action.payload.id), action.payload.name)
-    },
-    removePlayerNameMap: (state, action: PayloadAction<string>) => {
-      state.playerNameMap.delete(sanitizeId(action.payload))
-    },
-    setPlayerAvatarMap: (state, action: PayloadAction<{ id: string; characterId: number }>) => {
-      state.playerAvatarMap.set(sanitizeId(action.payload.id), action.payload.characterId)
-    },
-    removePlayerAvatarMap: (state, action: PayloadAction<string>) => {
-      state.playerAvatarMap.delete(sanitizeId(action.payload))
     },
     setShowJoystick: (state, action: PayloadAction<boolean>) => {
       state.showJoystick = action.payload
@@ -129,8 +113,6 @@ export const userSlice = createSlice({
       state.sessionId = ''
       state.mediaConnected = false
       state.loggedIn = false
-      state.playerNameMap = new Map<string, string>()
-      state.playerAvatarMap = new Map<string, number>()
       state.showJoystick = window.innerWidth < 650
 
       state.userId = ''
@@ -154,10 +136,6 @@ export const {
   setSessionId,
   setMediaConnected,
   setLoggedIn,
-  setPlayerNameMap,
-  removePlayerNameMap,
-  setPlayerAvatarMap,
-  removePlayerAvatarMap,
   setShowJoystick,
   setUserId,
   setUsername,

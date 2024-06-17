@@ -2,10 +2,6 @@ import { Client, Room } from 'colyseus.js'
 import store from '../stores'
 import {
   setSessionId,
-  setPlayerNameMap,
-  removePlayerNameMap,
-  setPlayerAvatarMap,
-  removePlayerAvatarMap,
 } from '../stores/UserStore'
 import { setNetworkConstructed, setNetworkInitialized, updateMember } from '../stores/RoomStore'
 import { IChair, IMeeting, IOfficeState, IPlayer, IWhiteboard } from '../types/ISpaceState'
@@ -118,12 +114,7 @@ export default class Network {
           // when a new player finished setting up player name
           if (field === 'playerName' && value !== '') {
             phaserEvents.emit(GameEvent.PLAYER_JOINED, player, key)
-            store.dispatch(setPlayerNameMap({ id: key, name: value }))
             // store.dispatch(pushPlayerJoinedMessage(value))
-          }
-
-          if (field === 'characterId') {
-            store.dispatch(setPlayerAvatarMap({ id: key, characterId: value }))
           }
         })
       }
@@ -135,9 +126,7 @@ export default class Network {
       this.webRTC?.deleteVideoStream(key)
       this.webRTC?.deleteOnCalledVideoStream(key)
       // store.dispatch(pushPlayerLeftMessage(player.playerName))
-      store.dispatch(removePlayerNameMap(key))
       store.dispatch(updateMember({ member: { online: false, role: 'user', user: player } }))
-      store.dispatch(removePlayerAvatarMap(key))
     }
 
     this.room.state.chairs.onAdd = (chair: IChair, key: string) => {
