@@ -5,6 +5,7 @@ import PeopleAltRoundedIcon from '@mui/icons-material/PeopleAltRounded'
 import DiscreteSlider from '../sliders/DiscreteSlider'
 import { StyleMap } from '../popups/CreateSpacePopup'
 import { useAppSelector } from '../../hook'
+import { toast } from 'react-toastify'
 
 const Container = styled.div`
 display: grid;
@@ -68,7 +69,7 @@ const MapTheme = styled.div`
 
 const ThemeOptionButon = styled.div<ButtonProps>`
   background: rgb(84, 92, 143);
-  opacity: 1;
+  opacity: ${(props) => (props.isDisabled ? '0.5' : '1')};
   border: 2px solid ${(props) => (props.isEnabled ? 'rgb(6, 214, 160)' : 'transparent')};
   width: 100%;
   height: 76px;
@@ -76,7 +77,7 @@ const ThemeOptionButon = styled.div<ButtonProps>`
   display: inline-grid;
   grid-template-rows: auto auto;
   gap: 4px;
-  cursor: pointer;
+  cursor: ${(props) => (props.isDisabled ? 'default' : 'pointer')};
 
   .icon {
     width: 24px;
@@ -147,6 +148,7 @@ interface Props {
   setMapSize: (size: number) => void
 }
 export const ChooseMap = ({ setMapId, mapSize }: Props) => {
+  const subscription = useAppSelector((state) => state.user.subscription)
   const styledMap = useAppSelector((state) => state.map.styledMaps)
   const [style, setStyle] = useState(styledMap[0]?.style)
   const [localSize, setLocalSize] = useState(mapSize)
@@ -189,6 +191,8 @@ export const ChooseMap = ({ setMapId, mapSize }: Props) => {
                 shiftStep={30}
                 min={10}
                 max={30}
+                disabled={subscription.plan.free}
+                // disabled={false}
                 onChange={(_, value) => setLocalSize(+value)}
               />
             </MapSize>
@@ -199,7 +203,13 @@ export const ChooseMap = ({ setMapId, mapSize }: Props) => {
                   <ThemeOptionButon
                     key={idx}
                     isEnabled={style === map.style}
-                    onClick={() => setStyle(map.style)}
+                    isDisabled={map.style == 'Classic' ? false : subscription.plan.free}
+                    // isDisabled={false}
+                    onClick={() => {
+                      if (map.style == 'Classic' ? false : subscription.plan.free)
+                        toast('This feature is only accessible with a subscription!')
+                      else setStyle(map.style)
+                    }}
                   >
                     <span className="icon">{map.maps[0]?.icon || '🌳'}</span>
                     <span className="name">{map.style}</span>

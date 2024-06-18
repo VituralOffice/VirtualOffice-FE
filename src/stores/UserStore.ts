@@ -5,6 +5,7 @@ import { sanitizeId } from '../utils/util'
 import { UserData } from '../types'
 import { ICharacter } from '../interfaces/character'
 import { RootState } from '.'
+import { IPlan, ISubscription } from '../interfaces/plan'
 
 export function getInitialBackgroundMode() {
   const currentHour = new Date().getHours()
@@ -26,27 +27,56 @@ interface UserState {
   playerName: string
   microphoneON: boolean
   cameraON: boolean
+
+  subscription: ISubscription
 }
+
+const defaultPlan: IPlan = {
+  id: '',
+  _id: '',
+  name: 'Free Plan',
+  maxRoom: 1,
+  maxRoomCapacity: 5,
+  monthlyPrice: 0,
+  annuallyPrice: 0,
+  features: ['Basic Support'],
+  free: true,
+}
+
+const defaultSubscription: ISubscription = {
+  _id: '',
+  plan: defaultPlan,
+  freePlan: true,
+  total: 0,
+  status: 'active',
+  paymentStatus: 'paid',
+  startDate: new Date().toISOString(),
+  endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(), // One year from now
+}
+
+const initialState: UserState = {
+  backgroundMode: getInitialBackgroundMode(),
+  sessionId: '',
+  mediaConnected: false,
+  showJoystick: window.innerWidth < 650,
+  userId: '',
+  fullname: 'Anonymous',
+  email: '',
+  role: 'user',
+  characterId: '',
+  character: null,
+  isVerified: false,
+  loggedIn: false,
+  playerName: 'Anonymous',
+  microphoneON: false,
+  cameraON: false,
+
+  subscription: defaultSubscription,
+}
+
 export const userSlice = createSlice({
   name: 'user',
-  initialState: {
-    backgroundMode: getInitialBackgroundMode(),
-    sessionId: '',
-    mediaConnected: false,
-    showJoystick: window.innerWidth < 650,
-    //user info
-    userId: '',
-    fullname: 'Anonymous',
-    email: '',
-    role: 'user',
-    characterId: '',
-    character: null,
-    isVerified: false,
-    loggedIn: false,
-    playerName: 'Anonymous',
-    microphoneON: false,
-    cameraON: false,
-  } as UserState,
+  initialState,
   reducers: {
     toggleBackgroundMode: (state) => {
       const newMode =
@@ -108,6 +138,10 @@ export const userSlice = createSlice({
       state.isVerified = action.payload.isVerified
     },
 
+    setSubcription: (state, action: PayloadAction<ISubscription>) => {
+      state.subscription = action.payload
+    },
+
     resetUserState: (state) => {
       state.backgroundMode = getInitialBackgroundMode()
       state.sessionId = ''
@@ -125,6 +159,8 @@ export const userSlice = createSlice({
       state.playerName = state.fullname
       state.microphoneON = false
       state.cameraON = false
+
+      state.subscription = defaultSubscription
     },
   },
 })
@@ -147,6 +183,7 @@ export const {
   setCameraON,
   setUserInfo,
   resetUserState,
+  setSubcription,
 } = userSlice.actions
 
 export default userSlice.reducer
