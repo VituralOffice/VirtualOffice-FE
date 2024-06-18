@@ -76,7 +76,7 @@ interface VideoProps {
 function VideoContainer({ playerName, stream, onClick, canZoomIn, canInteract }: VideoProps) {
   return (
     <VideoContainerComponent onClick={canInteract ? onClick : undefined} isEnabled={canInteract}>
-      <Video srcObject={stream} autoPlay></Video>
+      <Video srcObject={stream} muted autoPlay></Video>
       {playerName && <div className="player-name">{playerName}</div>}
       {
         canInteract && (
@@ -109,7 +109,8 @@ export const MeetingScreenShareView = () => {
           canZoomIn={false}
         />
       )}
-      {[...peerStreams.entries()].map(([id, { stream }], index) => {
+      {[...peerStreams.entries()].map(([id, { call, stream }], index) => {
+        console.log(call)
         const player = Network.getInstance()?.room?.state.players.get(id)
         return (
           <VideoContainer
