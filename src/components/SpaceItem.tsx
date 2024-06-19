@@ -228,7 +228,7 @@ export const SpaceItem: React.FC<SpaceItemProps> = ({
         }}
       >
         <SpaceLink>
-          <SpaceMapInside preview={`https://storage.voffice.space/voffice/${room.map.preview}`} />
+          <SpaceMapInside preview={room.map.preview} />
         </SpaceLink>
         <SpaceMapTopDetails>
           <OnlineUsersDetail>
