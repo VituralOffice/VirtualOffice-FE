@@ -7,7 +7,7 @@ import { GetUserProfile } from '../apis/UserApis'
 import { getLocalStorage, setLocalStorage } from '../apis/util'
 import { setLoggedIn, setSubcription, setUserInfo } from '../stores/UserStore'
 import { useAppSelector } from '../hook'
-import { addStopAllTrackBeforeUnloadEvent } from '../utils/util'
+import { USER_LS_KEY, addStopAllTrackBeforeUnloadEvent } from '../utils/util'
 import { setIsLoading } from '../stores/LoadingStore'
 import { GetAllSubscriptions, GetHighestMonthlyPriceSubcription } from '../apis/SubcriptionApis'
 
@@ -89,7 +89,7 @@ export default function LoadingPage() {
       getUserProfile()
       return
     }
-    const userData = getLocalStorage('userData')
+    const userData = getLocalStorage(USER_LS_KEY)
     if (userData) {
       dispatch(setUserInfo(userData))
       dispatch(setLoggedIn(true))

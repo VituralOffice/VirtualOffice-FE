@@ -31,7 +31,7 @@ export function setTokenToCookie(tokenName: string, tokenValue: any) {
 
 export const REFRESH_TOKEN_KEY = `refreshToken`
 export const ACCESS_TOKEN_KEY = `accessToken`
-
+export const USER_LS_KEY = `userData`
 export function getCookie(name: string): string | undefined {
   return Cookies.get(name)
 }
@@ -63,11 +63,11 @@ export function getColorByString(string: string) {
 }
 
 export function castObject<A extends object, B extends object>(source: A): B {
-  const result = {} as B;
+  const result = {} as B
   Object.keys(source).forEach((key) => {
-    const sourceKey = key as keyof A;
-    const targetKey = key as keyof B;
-    result[targetKey] = source[sourceKey] as unknown as B[keyof B];
-  });
-  return result;
+    const sourceKey = key as keyof A
+    const targetKey = key as keyof B
+    result[targetKey] = source[sourceKey] as unknown as B[keyof B]
+  })
+  return result
 }
