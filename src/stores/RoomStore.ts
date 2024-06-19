@@ -29,6 +29,7 @@ const defaultMapData: IMapData = {
   totalChair: 0,
   totalMeeting: 0,
   totalWhiteboard: 0,
+  preview: '',
 }
 
 const defaultRoomState: IRoomData = {
