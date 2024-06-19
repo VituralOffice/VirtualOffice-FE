@@ -13,9 +13,10 @@ import { useAppSelector } from '../../hook'
 
 export const CreateChatPopup = ({ onClosePopup }: PopupProps) => {
   const room = useAppSelector((state) => state.room)
+  const userId = useAppSelector((state) => state.user.userId)
   const [chatName, setChatName] = useState('')
   const [selectedMembers, setSelectedMembers] = useState<FormSelection[]>([])
-  const chatTypes = [CHAT_TYPE.PRIVATE, CHAT_TYPE.GROUP, CHAT_TYPE.PUBLIC]
+  const chatTypes = userId == room.roomData.creator ? [CHAT_TYPE.PRIVATE, CHAT_TYPE.GROUP, CHAT_TYPE.PUBLIC] : [CHAT_TYPE.PRIVATE, CHAT_TYPE.GROUP]
   const [selectedChatType, setSelectedChatType] = useState(0)
 
   const titles = ['Create Chat']

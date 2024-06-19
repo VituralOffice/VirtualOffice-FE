@@ -5,10 +5,11 @@ import { spinAnimation } from '../anims/CssAnims'
 import { useDispatch } from 'react-redux'
 import { GetUserProfile } from '../apis/UserApis'
 import { getLocalStorage, setLocalStorage } from '../apis/util'
-import { setLoggedIn, setUserInfo } from '../stores/UserStore'
+import { setLoggedIn, setSubcription, setUserInfo } from '../stores/UserStore'
 import { useAppSelector } from '../hook'
 import { addStopAllTrackBeforeUnloadEvent } from '../utils/util'
 import { setIsLoading } from '../stores/LoadingStore'
+import { GetAllSubscriptions, GetHighestMonthlyPriceSubcription } from '../apis/SubcriptionApis'
 
 const Container = styled.div`
   display: flex;
@@ -67,6 +68,12 @@ export default function LoadingPage() {
         setLocalStorage('userData', response.result)
         dispatch(setUserInfo(response.result))
         dispatch(setLoggedIn(true))
+
+        const subres = await GetHighestMonthlyPriceSubcription()
+        console.log(`LoadingPage::GetUserProfile load user's subscriptions`, subres.result)
+        if (subres.message === `Success` && subres.result) {
+          dispatch(setSubcription(subres.result))
+        }
       } else {
         dispatch(setLoggedIn(false))
         navigate('/signin')

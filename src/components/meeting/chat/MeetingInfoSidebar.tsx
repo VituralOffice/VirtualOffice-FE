@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { useAppSelector } from '../../../hook'
 import { SearchBar } from '../../inputs/SearchBar'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ParticipantDropdown } from '../../dropdowns/ParticipantDropdown'
 import Network from '../../../services/Network'
 
@@ -59,18 +59,40 @@ const ParticipantContentLayout = styled.div`
 
 export const MeetingInfoSidebar = () => {
   const [searchUserTxt, setSearchUserTxt] = useState<string>('')
-  // const user = useAppSelector((state) => state.user)
   const meeting = useAppSelector((state) => state.meeting)
-  const [connectedUser, setConnectedUser] = useState<(any)[]>()
+  const [connectedUser, setConnectedUser] = useState<any[]>([])
+  const [filteredUsers, setFilteredUsers] = useState<any[]>([])
+  const debounceTimeout = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
-    const players = Network.getInstance()?.room?.state.players;
-    let hehe = meeting.connectedUser.map((sessionId) => {
-      return { online: true, user: players?.get(sessionId)!, role: meeting.adminUser == sessionId ? 'admin' : 'user' }
+    const players = Network.getInstance()?.room?.state.players
+    let allMem = meeting.connectedUser.map((sessionId) => {
+      return {
+        online: true,
+        user: players?.get(sessionId)!,
+        role: meeting.adminUser === sessionId ? 'admin' : 'user',
+      }
     })
-    // console.log(hehe)
-    setConnectedUser(hehe)
+    allMem = allMem.filter((m) => m?.online || false)
+    setConnectedUser(allMem)
   }, [meeting.connectedUser])
+
+  useEffect(() => {
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current)
+    }
+    debounceTimeout.current = setTimeout(() => {
+      const filtered = connectedUser.filter((mem) => 
+        mem.user.fullname.toLowerCase().includes(searchUserTxt.toLowerCase())
+      )
+      setFilteredUsers(filtered)
+    }, 300)
+    return () => {
+      if (debounceTimeout.current) {
+        clearTimeout(debounceTimeout.current)
+      }
+    }
+  }, [searchUserTxt, connectedUser])
 
   return (
     <Wrapper>
@@ -89,7 +111,7 @@ export const MeetingInfoSidebar = () => {
         <ParticipantDropdown
           key={1}
           title="Members"
-          members={connectedUser?.filter((m) => m?.online || false) || []}
+          members={filteredUsers}
           enabledByDefault={true}
         />
       </ParticipantContentLayout>

@@ -121,7 +121,7 @@ function VideoContainer({
   return (
     <VideoContainerComponent onClick={canInteract ? onClick : undefined} isEnabled={canInteract}>
       {stream.getVideoTracks()[0] ? (
-        <Video srcObject={stream} autoPlay></Video>
+        <Video srcObject={stream} muted autoPlay></Video>
       ) : (
         <div
           style={{
@@ -170,13 +170,14 @@ export const MeetingNormalView = () => {
           canZoomIn={false}
         />
       )}
-      {[...peerStreams.entries()].map(([id, { stream }], index) => {
-        const player = Network.getInstance()?.room?.state.players.get(id)
+      {[...peerStreams.entries()].map(([id, { sessionId, stream }], index) => {
+        const { fullname, characterAvatar } =
+          Network.getInstance()?.room?.state.players.get(sessionId)!
         return (
           <VideoContainer
             key={id}
-            playerName={player?.fullname || ''}
-            avatarLink={player?.characterAvatar || ''}
+            playerName={fullname}
+            avatarLink={characterAvatar}
             stream={stream}
             onClick={() => handleVideoContainerClick(index + 1)}
             canInteract={totalDisplays > 1}
@@ -204,14 +205,14 @@ export const MeetingNormalView = () => {
     } else if (activeScreenIndex > 0) {
       const peerStreamEntry = [...peerStreams.entries()][activeScreenIndex - 1]
       if (peerStreamEntry) {
-        const [id, { stream }] = peerStreamEntry
-        const player = Network.getInstance()?.room?.state.players.get(id)
+        const [id, { sessionId, stream }] = peerStreamEntry
+        const { fullname, characterAvatar } = Network.getInstance()?.room?.state.players.get(sessionId)!
         return (
           <VideoGrid>
             <VideoContainer
               key={id}
-              playerName={player?.fullname || ''}
-              avatarLink={player?.character?.avatar || ''}
+              playerName={fullname}
+              avatarLink={characterAvatar}
               stream={stream}
               canInteract={totalDisplays > 1}
               canZoomIn={true}

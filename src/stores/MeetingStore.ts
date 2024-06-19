@@ -25,6 +25,7 @@ interface MeetingState {
   peerDisplayStreams: Map<
     string,
     {
+      sessionId: string
       stream: MediaStream
       call: MediaConnection
     }
@@ -32,6 +33,7 @@ interface MeetingState {
   peerCameraStreams: Map<
     string,
     {
+      sessionId: string
       stream: MediaStream
       call: MediaConnection
     }
@@ -141,9 +143,10 @@ export const meetingSlice = createSlice({
     },
     addDisplayStream: (
       state,
-      action: PayloadAction<{ id: string; call: MediaConnection; stream: MediaStream }>
+      action: PayloadAction<{ id: string; sessionId: string; call: MediaConnection; stream: MediaStream }>
     ) => {
       state.peerDisplayStreams.set(sanitizeId(action.payload.id), {
+        sessionId: action.payload.sessionId,
         call: action.payload.call,
         stream: action.payload.stream,
       })
@@ -156,9 +159,10 @@ export const meetingSlice = createSlice({
     },
     addCameraStream: (
       state,
-      action: PayloadAction<{ id: string; call: MediaConnection; stream: MediaStream }>
+      action: PayloadAction<{ id: string; sessionId: string; call: MediaConnection; stream: MediaStream }>
     ) => {
       state.peerCameraStreams.set(sanitizeId(action.payload.id), {
+        sessionId: action.payload.sessionId,
         call: action.payload.call,
         stream: action.payload.stream,
       })

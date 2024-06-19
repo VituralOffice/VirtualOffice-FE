@@ -56,7 +56,7 @@ const GroupedButtons = ({ setParam }) => {
         setParam({ active: true })
         break
       case 2:
-        setParam({ owner: true, active: true })
+        setParam({ owned: true, active: true })
         break
       case 3:
         setParam({ active: false })

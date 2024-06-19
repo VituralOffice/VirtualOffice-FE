@@ -5,7 +5,7 @@ function valuetext(value: number) {
   return `${value}`;
 }
 
-export default function DiscreteSlider({width, label, defaultValue, step, shiftStep, min, max, onChange}) {
+export default function DiscreteSlider({width, label, defaultValue, step, shiftStep, min, max, onChange, disabled}) {
   return (
     <Box sx={{ width }}>
       <Slider
@@ -19,6 +19,7 @@ export default function DiscreteSlider({width, label, defaultValue, step, shiftS
         min={min}
         max={max}
         onChange={onChange}
+        disabled={disabled}
       />
     </Box>
   );

@@ -3,6 +3,7 @@ import store from '../../stores'
 import Game from '../../scenes/Game'
 import { setMyCameraStream, addCameraStream, removeCameraStream } from '../../stores/MeetingStore'
 import { PEER_CONNECT_OPTIONS } from '../../constant'
+import Network from '../../services/Network'
 
 export default class UserMediaManager {
   private myPeer: Peer
@@ -23,7 +24,7 @@ export default class UserMediaManager {
         call.answer()
         call.on('stream', (userVideoStream) => {
           console.log(`UserMediaManager::on stream ${call.peer}`)
-          store.dispatch(addCameraStream({ id: call.peer, call, stream: userVideoStream }))
+          store.dispatch(addCameraStream({ id: call.peer, sessionId: Network.getInstance()?.mySessionId!, call, stream: userVideoStream }))
         })
       } else {
         // queue the call until ready
@@ -111,7 +112,7 @@ export default class UserMediaManager {
       call.answer()
       call.on('stream', (userVideoStream) => {
         console.log(`UserMediaManager::on stream ${call.peer}`)
-        store.dispatch(addCameraStream({ id: call.peer, call, stream: userVideoStream }))
+        store.dispatch(addCameraStream({ id: call.peer, sessionId: Network.getInstance()?.mySessionId!, call, stream: userVideoStream }))
       })
     })
     this.queuedCalls = []

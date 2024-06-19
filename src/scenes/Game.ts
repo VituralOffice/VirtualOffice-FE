@@ -105,10 +105,19 @@ export default class Game extends Phaser.Scene {
     const chairLayer = this.map.getObjectLayer('Chair')
     chairLayer!.objects.forEach((chairObj, index) => {
       const item = this.addObjectFromTiled(chairs, chairObj, 'chairs', 'chair') as Chair
-      item.itemDirection = chairObj.properties[0].value.toString()
+
+      // Get properties by key
+      const directionProp = chairObj.properties.find((prop) => prop.name === 'direction')
+      const groupIdProp = chairObj.properties.find((prop) => prop.name === 'groupId')
+
+      if (directionProp) {
+        item.itemDirection = directionProp.value.toString()
+      }
+
       item.chairId = index.toString()
-      if (chairObj.properties[1]) {
-        const chairGroupID = chairObj.properties[1].value.toString()
+
+      if (groupIdProp) {
+        const chairGroupID = groupIdProp.value.toString()
         item.groupId = chairGroupID
         if (!this.chairGroups.has(chairGroupID)) {
           this.chairGroups.set(chairGroupID, [])
@@ -190,7 +199,7 @@ export default class Game extends Phaser.Scene {
     this.network.onChairConnectedUserChange(this.handleChairUserConnectedChange, this)
 
     store.dispatch(setGameCreated(true))
-    console.log("Game::create Game created")
+    console.log('Game::create Game created')
   }
 
   private handleItemSelectorOverlap(playerSelector, selectionItem) {
@@ -267,11 +276,11 @@ export default class Game extends Phaser.Scene {
   }
 
   private handleMyPlayerReady(ready: boolean) {
-    this.myPlayer.readyToConnect = ready ? true : false;
+    this.myPlayer.readyToConnect = ready ? true : false
   }
 
   private handleMyMediaConnected(connected: boolean) {
-    this.myPlayer.mediaConnected = connected ? true : false;
+    this.myPlayer.mediaConnected = connected ? true : false
   }
 
   // function to update target position upon receiving player updates

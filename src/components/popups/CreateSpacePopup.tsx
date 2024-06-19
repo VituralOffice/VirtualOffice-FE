@@ -25,19 +25,20 @@ export const CreateSpacePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
   const totalSteps = 2
   const styledMap = useAppSelector((state) => state.map.styledMaps)
   const titles = ['Choose your office template', 'Create a new office space for your team']
-  const [subscriptions, setSubscriptions] = useState<ISubscription[]>([])
+  // const [subscriptions, setSubscriptions] = useState<ISubscription[]>([])
+  const subscription = useAppSelector((state) => state.user.subscription)
   const [spaceName, setSpaceName] = useState('')
   const [securitySelectedOption, setSecuritySelectedOption] = useState(0)
   const spaceOptions = ['Anyone with the office URL can enter', 'Only invited members can enter']
   const [mapId, setMapId] = useState('')
   const [mapSize, setMapSize] = useState(10)
   const [formComplete, setFormComplete] = useState(false)
-  const fetchSubscription = async () => {
-    try {
-      const res = await ApiService.getInstance().get(`/subscriptions?status=active`)
-      setSubscriptions(res.result)
-    } catch (error) {}
-  }
+  // const fetchSubscription = async () => {
+  //   try {
+  //     const res = await ApiService.getInstance().get(`/subscriptions?status=active`)
+  //     setSubscriptions(res.result)
+  //   } catch (error) {}
+  // }
   const fetchListMap = async () => {
     try {
       const res = await ApiService.getInstance().get(`/maps?groupBy=style`)
@@ -65,13 +66,14 @@ export const CreateSpacePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
         map: mapId,
         name: spaceName,
         private: securitySelectedOption == 1,
-        plan: '663277c9401c17854a17ec7a', //todo:
+        plan: subscription.plan._id,
       })
       console.log('Room created: ', response)
       navigate(`/room/${response.result._id}`)
     } catch (error) {
       if (error instanceof AxiosError) toast(error.response?.data?.message)
       else toast(UNKNOWN_ERROR)
+      onClosePopup()
     }
   }
 
@@ -86,7 +88,7 @@ export const CreateSpacePopup: React.FC<PopupProps> = ({ onClosePopup }) => {
   ]
   useEffect(() => {
     fetchListMap()
-    fetchSubscription()
+    // fetchSubscription()
   }, [])
   useEffect(() => {
     if (checkSpaceName() && checkSecurityOption()) setFormComplete(true)

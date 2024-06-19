@@ -23,7 +23,7 @@ export default class ShareScreenManager {
       call.answer()
       call.on('stream', (userVideoStream) => {
         console.log(`ScreenShareingManager::on stream ${call.peer}`)
-        store.dispatch(addDisplayStream({ id: call.peer, call, stream: userVideoStream }))
+        store.dispatch(addDisplayStream({ id: call.peer, sessionId: Network.getInstance()?.mySessionId!, call, stream: userVideoStream }))
       })
       // we handled on close on our own
     })

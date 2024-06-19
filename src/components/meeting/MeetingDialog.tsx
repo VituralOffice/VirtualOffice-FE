@@ -24,6 +24,7 @@ import LockOpenIcon from '@mui/icons-material/LockOpen'
 import Network from '../../services/Network'
 import { YesNoPopup } from '../popups/YesNoPopup'
 import { decreaseOpeningCount, increaseOpeningCount } from '../../stores/UIStore'
+import MeetingAudioManager from './MeetingAudioManager'
 
 const Backdrop = styled.div`
   position: fixed;
@@ -342,6 +343,7 @@ export default function MeetingDialog() {
           </MeetingBody>
         </Wrapper>
       </Backdrop>
+      <MeetingAudioManager />
       {showLeavePopup && (
         <YesNoPopup
           title="Warning"
