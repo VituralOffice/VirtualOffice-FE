@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import CloseIcon from '@mui/icons-material/Close'
 import { useAppSelector } from '../../../hook'
 import { SearchBar } from '../../inputs/SearchBar'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ParticipantDropdown } from '../../dropdowns/ParticipantDropdown'
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1'
 import { ButtonProps } from '../../../interfaces/Interfaces'
@@ -158,6 +158,8 @@ export const OfficeParticipantSidebar = ({ onClose }: SidebarProps) => {
   const user = useAppSelector((state) => state.user)
   const room = useAppSelector((state) => state.room.roomData)
   const members = useAppSelector((state) => state.room.roomData.members)
+  const [filteredUsers, setFilteredUsers] = useState<any[]>([])
+  const debounceTimeout = useRef<NodeJS.Timeout | null>(null)
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(increaseOpeningCount())
@@ -166,6 +168,22 @@ export const OfficeParticipantSidebar = ({ onClose }: SidebarProps) => {
       dispatch(decreaseOpeningCount())
     }
   }, [])
+  useEffect(() => {
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current)
+    }
+    debounceTimeout.current = setTimeout(() => {
+      const filtered = members.filter((mem) => 
+        mem.user.fullname.toLowerCase().includes(searchUserTxt.toLowerCase())
+      )
+      setFilteredUsers(filtered)
+    }, 200)
+    return () => {
+      if (debounceTimeout.current) {
+        clearTimeout(debounceTimeout.current)
+      }
+    }
+  }, [searchUserTxt, members])
   return (
     <>
       <LayoutContainer>
@@ -204,12 +222,14 @@ export const OfficeParticipantSidebar = ({ onClose }: SidebarProps) => {
             <ParticipantDropdown
               key={1}
               title="online members"
-              members={members.filter((m) => m.online)}
+              members={filteredUsers.filter((m) => m.online)}
+              enabledByDefault={true}
             />
             <ParticipantDropdown
               key={2}
               title="offline members"
-              members={members.filter((m) => !m.online)}
+              members={filteredUsers.filter((m) => !m.online)}
+              enabledByDefault={true}
             />
           </ParticipantContentLayout>
         </ContentLayout>

@@ -20,9 +20,9 @@ const AudioComponent = ({ stream }) => {
 };
 
 const MeetingAudioManager = () => {
-  const myCameraStream = useAppSelector((state) => state.meeting.myCameraStream);
+  // const myCameraStream = useAppSelector((state) => state.meeting.myCameraStream);
   const peerCameraStreams = useAppSelector((state) => state.meeting.peerCameraStreams);
-  const myDisplayStream = useAppSelector((state) => state.meeting.myDisplayStream);
+  // const myDisplayStream = useAppSelector((state) => state.meeting.myDisplayStream);
   const peerDisplayStreams = useAppSelector((state) => state.meeting.peerDisplayStreams);
 
   return (

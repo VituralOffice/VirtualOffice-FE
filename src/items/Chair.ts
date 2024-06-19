@@ -26,11 +26,11 @@ export default class Chair extends Item {
     this.clearDialogBox()
     let meeting = Game.getInstance()?.meetingMap.get(this.groupId!);
     if (meeting?.isOpen && !meeting?.isLocked) {
-      this.setDialogBox('Press E to leave\nPress R to join meeting')
+      this.setDialogBox('Press R to join meeting\nPress E to leave')
     } else if(this.groupId !== '-1' && !meeting?.isLocked) {
-      this.setDialogBox('Press E to leave\nPress R to hold a meeting')
+      this.setDialogBox('Press R to hold a meeting\nPress E to leave')
     } else {
-      this.setDialogBox('Press E to leave')
+      this.setDialogBox('This meeting is being locked!\nPress E to leave')
     }
     network.connectToChair(this.chairId!)
   }
