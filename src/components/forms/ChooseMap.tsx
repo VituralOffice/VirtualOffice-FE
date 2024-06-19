@@ -172,7 +172,7 @@ export const ChooseMap = ({ setMapId, mapSize }: Props) => {
       {styledMap && (
         <Container>
           <RoomPreview>
-            <img src={`https://storage.voffice.space/voffice/${currentMap?.preview}`} />
+            <img src={`currentMap?.preview`} />
           </RoomPreview>
           <LeftContent>
             <MapSize>
