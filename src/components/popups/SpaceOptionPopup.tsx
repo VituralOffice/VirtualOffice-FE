@@ -90,9 +90,11 @@ export default function SpaceOptionPopup({
   return (
     <Container>
       <DropdownList>
-        <DropdownItem onClick={handleCopyUrl}>
-          <span>Copy URL</span>
-        </DropdownItem>
+        {room.active && (
+          <DropdownItem onClick={handleCopyUrl}>
+            <span>Copy URL</span>
+          </DropdownItem>
+        )}
         {userId == room.creator && (
           <DropdownItem onClick={() => navigate(`/dashboard/room/${room._id}`)}>
             <span>Manage Space</span>

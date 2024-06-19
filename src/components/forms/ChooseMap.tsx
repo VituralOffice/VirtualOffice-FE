@@ -3,9 +3,9 @@ import { ButtonProps } from '../../interfaces/Interfaces'
 import { useEffect, useState } from 'react'
 import PeopleAltRoundedIcon from '@mui/icons-material/PeopleAltRounded'
 import DiscreteSlider from '../sliders/DiscreteSlider'
-import { StyleMap } from '../popups/CreateSpacePopup'
 import { useAppSelector } from '../../hook'
 import { toast } from 'react-toastify'
+import { IMap } from '../../interfaces/map'
 
 const Container = styled.div`
 display: grid;
@@ -152,6 +152,7 @@ export const ChooseMap = ({ setMapId, mapSize }: Props) => {
   const styledMap = useAppSelector((state) => state.map.styledMaps)
   const [style, setStyle] = useState(styledMap[0]?.style)
   const [localSize, setLocalSize] = useState(mapSize)
+  const [currentMap, setCurrentMap] = useState<IMap | null>(null)
   useEffect(() => {
     const maps = styledMap.find((m) => m.style === style)?.maps
     if (!maps) return
@@ -159,6 +160,7 @@ export const ChooseMap = ({ setMapId, mapSize }: Props) => {
     if (!map) return
     console.log(map)
     setMapId(map._id)
+    setCurrentMap(map)
   }, [style, localSize])
   useEffect(() => {
     if (!style) {
@@ -170,11 +172,11 @@ export const ChooseMap = ({ setMapId, mapSize }: Props) => {
       {styledMap && (
         <Container>
           <RoomPreview>
-            <img src="https://cdn.gather.town/storage.googleapis.com/gather-town.appspot.com/uploads/SBpyJwUS7MorgvE4/9vAI8FK7tgsEpO134jorPf" />
+            <img src={`https://storage.voffice.space/voffice/${currentMap?.preview}`} />
           </RoomPreview>
           <LeftContent>
             <MapSize>
-              <SizeSelectHeader onClick={() => {}}>
+              <SizeSelectHeader>
                 <span className="title">MAP SIZE</span>
                 <div className="size-display">
                   <span className="icon">

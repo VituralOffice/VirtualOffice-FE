@@ -8,5 +8,6 @@ export interface IMap {
   totalChair: number
   style: string
   icon: string
+  preview: string;
   default: boolean
 }
