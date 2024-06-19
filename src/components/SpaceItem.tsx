@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import FiberManualRecordRoundedIcon from '@mui/icons-material/FiberManualRecordRounded'
 import LoginRoundedIcon from '@mui/icons-material/LoginRounded'
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded'
-import { useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ButtonProps } from '../interfaces/Interfaces'
 import SpaceOptionPopup from './popups/SpaceOptionPopup'
 import { IRoomData } from '../types/Rooms'
@@ -37,7 +37,7 @@ const SpaceLink = styled.a`
   text-decoration: none;
 `
 
-const SpaceMapInside = styled.div`
+const SpaceMapInside = styled.div<{ preview: string }>`
   width: 100%;
   height: 100%;
   background-size: cover;
@@ -47,7 +47,7 @@ const SpaceMapInside = styled.div`
   aspect-ratio: 16 / 9;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 12px 12px;
   background-color: rgb(0, 0, 0);
-  background-image: url(/assets/background/room_bg.png);
+  background-image: url(${(props) => props.preview});
 `
 
 const SpaceMapTopDetails = styled.div`
@@ -82,9 +82,9 @@ const EnterSpaceContainer = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
 `
-const MapDisplay = styled.div`
+const MapDisplay = styled.div<ButtonProps>`
   border: 3px solid transparent;
-  cursor: pointer;
+  cursor: ${(props) => (props.isEnabled ? 'pointer' : 'default')};
   height: 80%;
   margin-bottom: 8px;
   border-radius: 16px;
@@ -93,9 +93,17 @@ const MapDisplay = styled.div`
   -webkit-box-pack: center;
   justify-content: center;
   position: relative;
+  overflow: hidden;
+  ${(props) =>
+    props.isEnabled
+      ? `
   &:hover {
     background: rgb(84, 92, 143);
   }
+  `
+      : `
+  filter: grayscale(100%);
+  `}
 `
 
 const EnterSpaceButton = styled.button`
@@ -212,14 +220,15 @@ export const SpaceItem: React.FC<SpaceItemProps> = ({
   return (
     <Container>
       <MapDisplay
+        isEnabled={room.active}
         onMouseEnter={() => setEnterSpaceVisible(true)}
         onMouseLeave={() => setEnterSpaceVisible(false)}
         onClick={() => {
-          navigate(`/room/${room._id}`)
+          if (room.active) navigate(`/room/${room._id}`)
         }}
       >
         <SpaceLink>
-          <SpaceMapInside />
+          <SpaceMapInside preview={`https://storage.voffice.space/voffice/${room.map.preview}`} />
         </SpaceLink>
         <SpaceMapTopDetails>
           <OnlineUsersDetail>
@@ -239,7 +248,7 @@ export const SpaceItem: React.FC<SpaceItemProps> = ({
             </span>
           </OnlineUsersDetail>
         </SpaceMapTopDetails>
-        <EnterSpaceContainer style={{ opacity: isEnterSpaceVisible ? 1 : 0 }}>
+        <EnterSpaceContainer style={{ opacity: isEnterSpaceVisible && room.active ? 1 : 0 }}>
           <EnterSpaceButton>
             <span>
               <LoginRoundedIcon />

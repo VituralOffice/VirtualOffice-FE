@@ -43,6 +43,7 @@ export interface IMapData {
   totalChair: number;
   totalMeeting: number;
   totalWhiteboard: number;
+  preview: string;
 }
 export interface RoomQueryParam {
   active?: boolean
