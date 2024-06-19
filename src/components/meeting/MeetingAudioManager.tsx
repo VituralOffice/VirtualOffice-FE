@@ -27,11 +27,11 @@ const MeetingAudioManager = () => {
 
   return (
     <AudioContainer>
-      {myCameraStream && <AudioComponent stream={myCameraStream} />}
+      {/* {myCameraStream && <AudioComponent stream={myCameraStream} />} */}
       {[...peerCameraStreams.values()].map(({ stream }, index) => (
         <AudioComponent key={`peer-camera-${index}`} stream={stream} />
       ))}
-      {myDisplayStream && <AudioComponent stream={myDisplayStream} />}
+      {/* {myDisplayStream && <AudioComponent stream={myDisplayStream} />} */}
       {[...peerDisplayStreams.values()].map(({ stream }, index) => (
         <AudioComponent key={`peer-display-${index}`} stream={stream} />
       ))}
