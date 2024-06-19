@@ -85,7 +85,7 @@ export default class Game extends Phaser.Scene {
     // console.log('create character anims')
 
     this.map = this.make.tilemap({ key: 'tilemap' })
-    const FloorAndGround = this.map.addTilesetImage('FloorAndGround', 'tiles_wall')
+    const FloorAndGround = this.map.addTilesetImage('FloorAndGround', 'tiles_wall', 32, 32, 1, 2)
 
     const groundLayer = this.map.createLayer('Ground', FloorAndGround!)
     groundLayer!.setCollisionByProperty({ collides: true })
@@ -160,6 +160,8 @@ export default class Game extends Phaser.Scene {
 
     this.otherPlayers = this.physics.add.group({ classType: OtherPlayer })
 
+    this.cameras.main.setRoundPixels(true)
+    this.cameras.main.roundPixels = true
     this.cameras.main.zoom = 1.5
     this.cameras.main.startFollow(this.myPlayer, true)
 
