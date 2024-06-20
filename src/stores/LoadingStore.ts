@@ -26,8 +26,8 @@ export const startLoadingAndWait = (): AppThunk => (dispatch) => {
 }
 
 export const stopLoading = (): AppThunk => (dispatch) => {
-    dispatch(setWait(false))
-    dispatch(setIsLoading(false))
+  dispatch(setWait(false))
+  dispatch(setIsLoading(false))
 }
 
 export default loadingSlice.reducer

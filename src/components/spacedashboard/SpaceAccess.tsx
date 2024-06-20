@@ -6,9 +6,9 @@ export default function SpaceAccess({ room, refreshRoom }: SpaceDashboardCompone
   return (
     <>
       <ContentHeader>
-        <div className="space-name">Space Preferences</div>
+        <div className="space-name">Space Access</div>
       </ContentHeader>
-      <ContentBody>
+      <ContentBody style={!room?.active ? { pointerEvents: 'none', opacity: '0.5' } : {}}>
         <SectionHeader>Privacy</SectionHeader>
         <SectionBody>
           <ButtonSetting>
