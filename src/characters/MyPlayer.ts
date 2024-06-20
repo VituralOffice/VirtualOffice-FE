@@ -19,6 +19,8 @@ export default class MyPlayer extends Player {
   private playContainerBody: Phaser.Physics.Arcade.Body
   private chairOnSit?: Chair
   private forceLeaveCurrentChair?: boolean
+  private previousY?: number
+  private previousX?: number
   constructor(
     scene: Phaser.Scene,
     x: number,
@@ -28,6 +30,8 @@ export default class MyPlayer extends Player {
     frame?: string | number
   ) {
     super(scene, x, y, texture, id, frame)
+    this.previousX = x
+    this.previousY = y
     this.playContainerBody = this.playerContainer.body as Phaser.Physics.Arcade.Body
   }
 
@@ -157,11 +161,11 @@ export default class MyPlayer extends Player {
         if (cursors.right?.isDown || cursors.D?.isDown || joystickRight) vx += speed
         if (cursors.up?.isDown || cursors.W?.isDown || joystickUp) {
           vy -= speed
-          this.setDepth(this.y) //change player.depth if player.y changes
+          // this.setDepth(this.y) //change player.depth if player.y changes
         }
         if (cursors.down?.isDown || cursors.S?.isDown || joystickDown) {
           vy += speed
-          this.setDepth(this.y) //change player.depth if player.y changes
+          // this.setDepth(this.y) //change player.depth if player.y changes
         }
         // update character velocity
         this.setVelocity(vx, vy)
@@ -171,7 +175,6 @@ export default class MyPlayer extends Player {
         this.playContainerBody.velocity.setLength(speed)
 
         // update animation according to velocity and send new location and anim to server
-        if (vx !== 0 || vy !== 0) network.updatePlayer(this.x, this.y, this.anims.currentAnim!.key)
         if (vx > 0) {
           this.play(`${this.playerTexture}_run_right`, true)
         } else if (vx < 0) {
@@ -180,6 +183,11 @@ export default class MyPlayer extends Player {
           this.play(`${this.playerTexture}_run_down`, true)
         } else if (vy < 0) {
           this.play(`${this.playerTexture}_run_up`, true)
+        }
+
+        if (vx !== 0 || vy !== 0) network.updatePlayer(this.x, this.y, this.anims.currentAnim!.key)
+        else if (this.x !== this.previousX || this.y !== this.previousY) {
+          network.updatePlayer(this.x, this.y, this.anims.currentAnim!.key)
         } else {
           const parts = this.anims.currentAnim!.key.split('_')
           parts[1] = 'idle'
@@ -190,6 +198,15 @@ export default class MyPlayer extends Player {
             // send new location and anim to server
             network.updatePlayer(this.x, this.y, this.anims.currentAnim!.key)
           }
+        }
+
+        if (this.y !== this.previousY) {
+          this.setDepth(this.y)
+          this.previousY = this.y
+        }
+
+        if (this.x !== this.previousX) {
+          this.previousX = this.x
         }
         break
 

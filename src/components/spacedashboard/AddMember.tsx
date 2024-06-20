@@ -53,7 +53,7 @@ export default function ({ room, refreshRoom }: SpaceDashboardComponentParams) {
       <FieldInput>
         <div>
           <input
-            placeholder="Room name"
+            placeholder="Email"
             value={emailToAdd}
             onChange={(e) => setEmailToAdd(e.currentTarget.value)}
             type="text"

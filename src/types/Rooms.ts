@@ -54,6 +54,7 @@ export interface IRoomMember {
   online: boolean
   user: IUser
   role: string
+  lastJoinedAt: string
 }
 export interface IMessagePayload {
   content: string

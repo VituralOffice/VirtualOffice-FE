@@ -17,8 +17,10 @@ import { JoinRoom } from '../apis/RoomApis'
 import { setRoomData } from '../stores/RoomStore'
 import { isApiSuccess } from '../apis/util'
 import { toast } from 'react-toastify'
-import { startLoadingAndWait, stopLoading } from '../stores/LoadingStore'
+import { setWait, startLoadingAndWait, stopLoading } from '../stores/LoadingStore'
 import Game from '../scenes/Game'
+import { AxiosError } from 'axios'
+import { UNKNOWN_ERROR } from '../constant'
 
 export const OfficeSpace = () => {
   let { roomId } = useParams()
@@ -49,14 +51,14 @@ export const OfficeSpace = () => {
           setJoinPageShow(false)
         } catch (createError) {
           console.log('Error creating room:', createError)
-          dispatch(stopLoading())
-          navigate('/')
+          dispatch(setWait(false))
+          navigate('/app')
         }
         return
       }
       console.log(e)
-      dispatch(stopLoading())
-      navigate('/')
+      dispatch(setWait(false))
+      navigate('/app')
       return
     }
   }
@@ -65,16 +67,17 @@ export const OfficeSpace = () => {
     if (!roomId) return
     try {
       const response = await JoinRoom({ roomId })
-
-      if (!isApiSuccess(response)) {
-        toast('You are not member of this private room!')
-        navigate('/app')
-        return
-      }
+      // if (!isApiSuccess(response)) {
+      //   toast('You are not member of this private room!')
+      //   navigate('/app')
+      //   return
+      // }
       dispatch(setRoomData(response.result))
     } catch (error) {
+      if (error instanceof AxiosError) toast(error.response?.data?.message)
+      else toast(UNKNOWN_ERROR)
+      dispatch(setWait(false))
       navigate('/app')
-      console.error(error)
       return
     }
   }

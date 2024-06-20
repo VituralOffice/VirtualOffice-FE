@@ -15,7 +15,7 @@ export default function SpacePreferences({ room, refreshRoom }: SpaceDashboardCo
       <ContentHeader>
         <div className="space-name">Space Preferences</div>
       </ContentHeader>
-      <ContentBody>
+      <ContentBody style={!room?.active ? { pointerEvents: 'none', opacity: '0.5' } : {}}>
         <SectionHeader>Room name</SectionHeader>
         <SectionBody>
           <SectionMainLabel>Change Room Name</SectionMainLabel>

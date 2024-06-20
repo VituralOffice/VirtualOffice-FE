@@ -85,7 +85,7 @@ export default class Game extends Phaser.Scene {
     // console.log('create character anims')
 
     this.map = this.make.tilemap({ key: 'tilemap' })
-    const FloorAndGround = this.map.addTilesetImage('FloorAndGround', 'tiles_wall')
+    const FloorAndGround = this.map.addTilesetImage('FloorAndGround', 'tiles_wall', 32, 32, 1, 2)
 
     const groundLayer = this.map.createLayer('Ground', FloorAndGround!)
     groundLayer!.setCollisionByProperty({ collides: true })
@@ -149,7 +149,7 @@ export default class Game extends Phaser.Scene {
     }
 
     // import other objects from Tiled map to Phaser
-    this.addGroupFromTiled('Wall', 'tiles_wall', 'FloorAndGround', false)
+    this.addGroupFromTiled('Wall', 'tiles_wall_origin', 'FloorAndGround_origin', false)
     this.addGroupFromTiled('ObjectsOnCollide', 'office', 'Modern_Office_Black_Shadow', true)
     this.addGroupFromTiled('Objects', 'office', 'Modern_Office_Black_Shadow', false)
     this.addGroupFromTiled('GenericObjectsOnCollide', 'generic', 'Generic', true)

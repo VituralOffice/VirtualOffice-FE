@@ -104,7 +104,7 @@ export default class Network {
     // new instance added to the players MapSchema
     this.room.state.players.onAdd = (player: IPlayer, key: string) => {
       if (key === this.mySessionId) return
-      store.dispatch(updateMember({ member: { online: true, role: 'user', user: player } }))
+      store.dispatch(updateMember({ member: { online: true, role: 'user', user: player, lastJoinedAt: '' } }))
       // track changes on every child object inside the players MapSchema
       player.onChange = (changes) => {
         changes.forEach((change) => {
@@ -126,7 +126,7 @@ export default class Network {
       this.webRTC?.deleteVideoStream(key)
       this.webRTC?.deleteOnCalledVideoStream(key)
       // store.dispatch(pushPlayerLeftMessage(player.playerName))
-      store.dispatch(updateMember({ member: { online: false, role: 'user', user: player } }))
+      store.dispatch(updateMember({ member: { online: false, role: 'user', user: player, lastJoinedAt: '' } }))
     }
 
     this.room.state.chairs.onAdd = (chair: IChair, key: string) => {

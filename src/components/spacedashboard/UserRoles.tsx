@@ -16,7 +16,7 @@ export default function UserRoles({ room, refreshRoom }: SpaceDashboardComponent
       <ContentHeader>
         <div className="space-name">User Roles</div>
       </ContentHeader>
-      <ContentBody>
+      <ContentBody style={!room?.active ? { pointerEvents: 'none', opacity: '0.5' } : {}}>
         <SectionHeader>Add Member</SectionHeader>
         <SectionBody>
           <SectionMainLabel>Add Room Member</SectionMainLabel>

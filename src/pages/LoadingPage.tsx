@@ -99,21 +99,18 @@ export default function LoadingPage() {
     }
   }, []) // Run only once when the application starts
 
+  let timeout: NodeJS.Timeout | undefined
   useEffect(() => {
-    dispatch(setIsLoading(true))
+    if (timeout) clearTimeout(timeout)
 
-    const promise = new Promise<void>((resolve) => {
-      setTimeout(resolve, 500)
-    })
-
-    promise.then(() => {
+    timeout = setTimeout(() => {
       dispatch(setIsLoading(false))
-    })
+    }, 500)
 
     return () => {
-      dispatch(setIsLoading(false))
+      clearTimeout(timeout)
     }
-  }, [location])
+  }, [])
   return (
     <>
       {loadingStore.isLoading && (

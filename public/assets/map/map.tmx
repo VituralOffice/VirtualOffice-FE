@@ -3,8 +3,8 @@
  <editorsettings>
   <export target="map.json" format="json"/>
  </editorsettings>
- <tileset firstgid="1" name="FloorAndGround" tilewidth="32" tileheight="32" tilecount="2560" columns="64">
-  <image source="FloorAndGround.png" width="2048" height="1280"/>
+ <tileset firstgid="1" name="FloorAndGround" tilewidth="32" tileheight="32" margin="1" spacing="2" tilecount="2560" columns="64">
+  <image source="FloorAndGround.png" width="2176" height="1360"/>
   <tile id="0">
    <properties>
     <property name="collides" type="bool" value="false"/>

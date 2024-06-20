@@ -2,13 +2,13 @@ import styled from 'styled-components'
 import FiberManualRecordRoundedIcon from '@mui/icons-material/FiberManualRecordRounded'
 import LoginRoundedIcon from '@mui/icons-material/LoginRounded'
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { ButtonProps } from '../interfaces/Interfaces'
 import SpaceOptionPopup from './popups/SpaceOptionPopup'
 import { IRoomData } from '../types/Rooms'
 import { useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
-import { setRoomData } from '../stores/RoomStore'
+import { useAppSelector } from '../hook'
+import { format, isToday, isValid, isYesterday, parse } from 'date-fns'
 
 const Container = styled.div`
   display: flex;
@@ -210,11 +210,25 @@ export const SpaceItem: React.FC<SpaceItemProps> = ({
   refreshRoom,
 }) => {
   const [isEnterSpaceVisible, setEnterSpaceVisible] = useState(false)
+  const userId = useAppSelector((state) => state.user.userId)
   const navigate = useNavigate()
+  const userInRoom = room.members.find((m) => m.user.toString() == userId)
 
   const handleButtonClick = (event) => {
     event.stopPropagation()
     setOptionPopupShow(room._id)
+  }
+
+  const formatLastJoinedAt = (dateStr: string) => {
+    const date = new Date(dateStr)
+    if (!isValid(date)) return ''
+    if (isToday(date)) {
+      return `Today at ${format(date, 'HH:mm')}`
+    } else if (isYesterday(date)) {
+      return `Yesterday at ${format(date, 'HH:mm')}`
+    } else {
+      return `${format(date, 'dd/MM/yyyy')} at ${format(date, 'HH:mm')}`
+    }
   }
 
   return (
@@ -230,24 +244,31 @@ export const SpaceItem: React.FC<SpaceItemProps> = ({
         <SpaceLink>
           <SpaceMapInside preview={room.map.preview} />
         </SpaceLink>
-        <SpaceMapTopDetails>
-          <OnlineUsersDetail>
-            <FiberManualRecordRoundedIcon
-              style={{ width: '18px', height: '18px', marginRight: '4px', color: 'rgb(6,214,160)' }}
-            />
-            <span
-              style={{
-                color: 'rgb(255, 255, 255)',
-                fontFamily: "'DM Sans', sans-serif",
-                fontWeight: 700,
-                fontSize: '14px',
-                lineHeight: '18px',
-              }}
-            >
-              {room.members.filter((m) => m.online).length}
-            </span>
-          </OnlineUsersDetail>
-        </SpaceMapTopDetails>
+        {room.active && (
+          <SpaceMapTopDetails>
+            <OnlineUsersDetail>
+              <FiberManualRecordRoundedIcon
+                style={{
+                  width: '18px',
+                  height: '18px',
+                  marginRight: '4px',
+                  color: 'rgb(6,214,160)',
+                }}
+              />
+              <span
+                style={{
+                  color: 'rgb(255, 255, 255)',
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontWeight: 700,
+                  fontSize: '14px',
+                  lineHeight: '18px',
+                }}
+              >
+                {room.members.filter((m) => m.online).length}
+              </span>
+            </OnlineUsersDetail>
+          </SpaceMapTopDetails>
+        )}
         <EnterSpaceContainer style={{ opacity: isEnterSpaceVisible && room.active ? 1 : 0 }}>
           <EnterSpaceButton>
             <span>
@@ -264,7 +285,9 @@ export const SpaceItem: React.FC<SpaceItemProps> = ({
             alignItems: 'center',
           }}
         >
-          <LastVisitedSpan>yesterday</LastVisitedSpan>
+          <LastVisitedSpan>
+            {userInRoom ? formatLastJoinedAt(userInRoom.lastJoinedAt) : ''}
+          </LastVisitedSpan>
           <div
             style={{
               display: 'flex',
