@@ -49,7 +49,7 @@ const initialState = {
   networkInitialized: false,
   gameCreated: false,
   roomData: defaultRoomState,
-};
+}
 
 export const roomSlice = createSlice({
   name: 'room',

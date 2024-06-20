@@ -1,7 +1,8 @@
 import axios, { AxiosError, AxiosInstance } from 'axios'
-import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from '../utils/util'
+import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, USER_LS_KEY } from '../utils/util'
 import { API_URL } from '../constant'
 import Cookies from 'js-cookie'
+import { removeLocalStorage } from './util'
 
 class ApiService {
   private static instance: ApiService | null = null // Biến static để lưu trữ instance của ApiService
@@ -52,6 +53,7 @@ class ApiService {
               // call refresh token error
               Cookies.remove(REFRESH_TOKEN_KEY)
               Cookies.remove(ACCESS_TOKEN_KEY)
+              removeLocalStorage(USER_LS_KEY)
               // navigate to /signin
               window.location.href = '/signin'
             }

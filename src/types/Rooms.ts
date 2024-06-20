@@ -30,20 +30,20 @@ export interface IRoomData {
   members: IRoomMember[]
 }
 export interface IMapData {
-  _id: string;
-  active: boolean;
-  capacity: number;
-  createdAt: string;
-  default: boolean;
-  icon: string;
-  id: string;
-  json: string;
-  name: string;
-  style: string;
-  totalChair: number;
-  totalMeeting: number;
-  totalWhiteboard: number;
-  preview: string;
+  _id: string
+  active: boolean
+  capacity: number
+  createdAt: string
+  default: boolean
+  icon: string
+  id: string
+  json: string
+  name: string
+  style: string
+  totalChair: number
+  totalMeeting: number
+  totalWhiteboard: number
+  preview: string
 }
 export interface RoomQueryParam {
   active?: boolean
