@@ -20,6 +20,7 @@ export default class MyPlayer extends Player {
   private chairOnSit?: Chair
   private forceLeaveCurrentChair?: boolean
   private previousY?: number
+  private previousX?: number
   constructor(
     scene: Phaser.Scene,
     x: number,
@@ -29,6 +30,7 @@ export default class MyPlayer extends Player {
     frame?: string | number
   ) {
     super(scene, x, y, texture, id, frame)
+    this.previousX = x
     this.previousY = y
     this.playContainerBody = this.playerContainer.body as Phaser.Physics.Arcade.Body
   }
@@ -172,13 +174,7 @@ export default class MyPlayer extends Player {
         this.playContainerBody.setVelocity(vx, vy)
         this.playContainerBody.velocity.setLength(speed)
 
-        if (this.y !== this.previousY) {
-          this.setDepth(this.y)
-          this.previousY = this.y
-        }
-
         // update animation according to velocity and send new location and anim to server
-        if (vx !== 0 || vy !== 0) network.updatePlayer(this.x, this.y, this.anims.currentAnim!.key)
         if (vx > 0) {
           this.play(`${this.playerTexture}_run_right`, true)
         } else if (vx < 0) {
@@ -187,6 +183,11 @@ export default class MyPlayer extends Player {
           this.play(`${this.playerTexture}_run_down`, true)
         } else if (vy < 0) {
           this.play(`${this.playerTexture}_run_up`, true)
+        }
+
+        if (vx !== 0 || vy !== 0) network.updatePlayer(this.x, this.y, this.anims.currentAnim!.key)
+        else if (this.x !== this.previousX || this.y !== this.previousY) {
+          network.updatePlayer(this.x, this.y, this.anims.currentAnim!.key)
         } else {
           const parts = this.anims.currentAnim!.key.split('_')
           parts[1] = 'idle'
@@ -197,6 +198,15 @@ export default class MyPlayer extends Player {
             // send new location and anim to server
             network.updatePlayer(this.x, this.y, this.anims.currentAnim!.key)
           }
+        }
+
+        if (this.y !== this.previousY) {
+          this.setDepth(this.y)
+          this.previousY = this.y
+        }
+
+        if (this.x !== this.previousX) {
+          this.previousX = this.x
         }
         break
 
