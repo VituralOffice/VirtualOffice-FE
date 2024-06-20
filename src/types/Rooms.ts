@@ -54,8 +54,6 @@ export interface IRoomMember {
   online: boolean
   user: IUser
   role: string
-  micStatus: boolean
-  videoStatus: boolean
   lastJoinedAt: string
 }
 export interface IMessagePayload {
