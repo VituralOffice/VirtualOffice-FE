@@ -19,6 +19,7 @@ export default class MyPlayer extends Player {
   private playContainerBody: Phaser.Physics.Arcade.Body
   private chairOnSit?: Chair
   private forceLeaveCurrentChair?: boolean
+  private previousY?: number
   constructor(
     scene: Phaser.Scene,
     x: number,
@@ -28,6 +29,7 @@ export default class MyPlayer extends Player {
     frame?: string | number
   ) {
     super(scene, x, y, texture, id, frame)
+    this.previousY = y
     this.playContainerBody = this.playerContainer.body as Phaser.Physics.Arcade.Body
   }
 
@@ -157,11 +159,11 @@ export default class MyPlayer extends Player {
         if (cursors.right?.isDown || cursors.D?.isDown || joystickRight) vx += speed
         if (cursors.up?.isDown || cursors.W?.isDown || joystickUp) {
           vy -= speed
-          this.setDepth(this.y) //change player.depth if player.y changes
+          // this.setDepth(this.y) //change player.depth if player.y changes
         }
         if (cursors.down?.isDown || cursors.S?.isDown || joystickDown) {
           vy += speed
-          this.setDepth(this.y) //change player.depth if player.y changes
+          // this.setDepth(this.y) //change player.depth if player.y changes
         }
         // update character velocity
         this.setVelocity(vx, vy)
@@ -169,6 +171,11 @@ export default class MyPlayer extends Player {
         // also update playerNameContainer velocity
         this.playContainerBody.setVelocity(vx, vy)
         this.playContainerBody.velocity.setLength(speed)
+
+        if (this.y !== this.previousY) {
+          this.setDepth(this.y)
+          this.previousY = this.y
+        }
 
         // update animation according to velocity and send new location and anim to server
         if (vx !== 0 || vy !== 0) network.updatePlayer(this.x, this.y, this.anims.currentAnim!.key)

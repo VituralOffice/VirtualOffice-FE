@@ -149,7 +149,7 @@ export default class Game extends Phaser.Scene {
     }
 
     // import other objects from Tiled map to Phaser
-    this.addGroupFromTiled('Wall', 'tiles_wall', 'FloorAndGround', false)
+    this.addGroupFromTiled('Wall', 'tiles_wall_origin', 'FloorAndGround_origin', false)
     this.addGroupFromTiled('ObjectsOnCollide', 'office', 'Modern_Office_Black_Shadow', true)
     this.addGroupFromTiled('Objects', 'office', 'Modern_Office_Black_Shadow', false)
     this.addGroupFromTiled('GenericObjectsOnCollide', 'generic', 'Generic', true)
@@ -160,8 +160,6 @@ export default class Game extends Phaser.Scene {
 
     this.otherPlayers = this.physics.add.group({ classType: OtherPlayer })
 
-    this.cameras.main.setRoundPixels(true)
-    this.cameras.main.roundPixels = true
     this.cameras.main.zoom = 1.5
     this.cameras.main.startFollow(this.myPlayer, true)
 

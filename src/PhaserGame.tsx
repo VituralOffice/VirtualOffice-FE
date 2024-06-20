@@ -43,11 +43,10 @@ export const InitPhaserGame = async () => {
   })
 
   const config: Phaser.Types.Core.GameConfig = {
-    type: Phaser.CANVAS,
+    type: Phaser.WEBGL,
     parent: 'phaser-container',
     backgroundColor: '#93cbee',
     pixelArt: true, // Prevent pixel art from becoming blurred when scaled.
-    roundPixels: true,
     scale: {
       mode: Phaser.Scale.ScaleModes.RESIZE,
       width: window.innerWidth,
