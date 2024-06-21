@@ -20,11 +20,19 @@ export default class UserMediaManager {
 
     this.myPeer.on('call', (call) => {
       console.log(`receive call from ${call.peer}`)
+      const sessionId = call.metadata.sessionId;
       if (this.isReady) {
         call.answer()
         call.on('stream', (userVideoStream) => {
           console.log(`UserMediaManager::on stream ${call.peer}`)
-          store.dispatch(addCameraStream({ id: call.peer, sessionId: Network.getInstance()?.mySessionId!, call, stream: userVideoStream }))
+          store.dispatch(
+            addCameraStream({
+              id: call.peer,
+              sessionId: sessionId,
+              call,
+              stream: userVideoStream,
+            })
+          )
         })
       } else {
         // queue the call until ready
@@ -97,7 +105,12 @@ export default class UserMediaManager {
 
     const sanatizedId = this.makeId(userId)
     console.log(`UserMediaManager::onuserJoined call ${sanatizedId}`)
-    this.myPeer.call(sanatizedId, this.myStream)
+    const callOptions = {
+      metadata: {
+        sessionId: Network.getInstance()?.mySessionId,
+      },
+    }
+    this.myPeer.call(sanatizedId, this.myStream, callOptions)
   }
 
   onUserLeft(userId: string) {
@@ -110,9 +123,17 @@ export default class UserMediaManager {
   private processQueuedCalls() {
     this.queuedCalls.forEach((call) => {
       call.answer()
+      const sessionId = call.metadata.sessionId;
       call.on('stream', (userVideoStream) => {
         console.log(`UserMediaManager::on stream ${call.peer}`)
-        store.dispatch(addCameraStream({ id: call.peer, sessionId: Network.getInstance()?.mySessionId!, call, stream: userVideoStream }))
+        store.dispatch(
+          addCameraStream({
+            id: call.peer,
+            sessionId: sessionId,
+            call,
+            stream: userVideoStream,
+          })
+        )
       })
     })
     this.queuedCalls = []

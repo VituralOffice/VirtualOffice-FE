@@ -20,10 +20,11 @@ export default class ShareScreenManager {
 
     this.myPeer.on('call', (call) => {
       console.log("ScreenShareingManager::receive call")
+      const sessionId = call.metadata.sessionId;
       call.answer()
       call.on('stream', (userVideoStream) => {
         console.log(`ScreenShareingManager::on stream ${call.peer}`)
-        store.dispatch(addDisplayStream({ id: call.peer, sessionId: Network.getInstance()?.mySessionId!, call, stream: userVideoStream }))
+        store.dispatch(addDisplayStream({ id: call.peer, sessionId: sessionId, call, stream: userVideoStream }))
       })
       // we handled on close on our own
     })
@@ -99,7 +100,12 @@ export default class ShareScreenManager {
     if (!this.myStream || userId === this.userId) return
 
     const sanatizedId = this.makeId(userId)
-    this.myPeer.call(sanatizedId, this.myStream)
+    const callOptions = {
+      metadata: {
+        sessionId: Network.getInstance()?.mySessionId,
+      },
+    }
+    this.myPeer.call(sanatizedId, this.myStream, callOptions)
   }
 
   onUserLeft(userId: string) {
