@@ -46,7 +46,12 @@ export default class OtherPlayer extends Player {
       myPlayer.getPlayerId()! > this.playerId
     ) {
       // console.log(myPlayer.getPlayerId() + " ------- " + this.playerId)
-      console.log('OtherPlayer::makeCall ' + myPlayer.playerNameText.text + ' connect ' + this.playerNameText.text)
+      console.log(
+        'OtherPlayer::makeCall ' +
+          myPlayer.playerNameText.text +
+          ' connect ' +
+          this.playerNameText.text
+      )
       // console.log(`OtherPlayer::makeCall myplayer id: ${myPlayer.getPlayerId()}, otherPlayerID: ${this.playerId}`)
       webRTC.connectToNewUser(this.playerId, this.playerNameText.text)
       this.connected = true
@@ -142,19 +147,29 @@ export default class OtherPlayer extends Player {
 
     const speed = 200 // speed is in unit of pixels per second
     const delta = (speed / 1000) * dt // minimum distance that a player can move in a frame (dt is in unit of ms)
+    const maxDistance = 200
     let dx = this.targetPosition[0] - this.x
     let dy = this.targetPosition[1] - this.y
 
-    // if the player is close enough to the target position, directly snap the player to that position
-    if (Math.abs(dx) < delta) {
+    if (dx > maxDistance || dy > maxDistance) {
       this.x = this.targetPosition[0]
+      this.y = this.targetPosition[1]
       this.playerContainer.x = this.targetPosition[0]
       dx = 0
-    }
-    if (Math.abs(dy) < delta) {
-      this.y = this.targetPosition[1]
       this.playerContainer.y = this.targetPosition[1] - 30
       dy = 0
+    } else {
+      // if the player is close enough to the target position, directly snap the player to that position
+      if (Math.abs(dx) < delta) {
+        this.x = this.targetPosition[0]
+        this.playerContainer.x = this.targetPosition[0]
+        dx = 0
+      }
+      if (Math.abs(dy) < delta) {
+        this.y = this.targetPosition[1]
+        this.playerContainer.y = this.targetPosition[1] - 30
+        dy = 0
+      }
     }
 
     // if the player is still far from target position, impose a constant velocity towards it
