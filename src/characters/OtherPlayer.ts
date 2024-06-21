@@ -25,6 +25,8 @@ export default class OtherPlayer extends Player {
   ) {
     super(scene, x, y, texture, id, frame)
     this.targetPosition = [x, y]
+    this.x = x
+    this.y = y
 
     this.playerNameText.setText(playerName)
     this.playContainerBody = this.playerContainer.body as Phaser.Physics.Arcade.Body

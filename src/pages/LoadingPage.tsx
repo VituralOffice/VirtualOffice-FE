@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import styled, { keyframes } from 'styled-components'
+// import { useLocation, useNavigate } from 'react-router-dom'
+import styled from 'styled-components'
 import { spinAnimation } from '../anims/CssAnims'
-import { useDispatch } from 'react-redux'
-import { GetUserProfile } from '../apis/UserApis'
-import { getLocalStorage, setLocalStorage } from '../apis/util'
-import { setLoggedIn, setSubcription, setUserInfo } from '../stores/UserStore'
-import { useAppSelector } from '../hook'
-import { USER_LS_KEY, addStopAllTrackBeforeUnloadEvent } from '../utils/util'
-import { setIsLoading } from '../stores/LoadingStore'
-import { GetAllSubscriptions, GetHighestMonthlyPriceSubcription } from '../apis/SubcriptionApis'
+// import { useDispatch } from 'react-redux'
+// import { GetUserProfile } from '../apis/UserApis'
+// import { getLocalStorage, setLocalStorage } from '../apis/util'
+// import { setLoggedIn, setSubcription, setUserInfo } from '../stores/UserStore'
+// import { useAppSelector } from '../hook'
+// import { USER_LS_KEY } from '../utils/util'
+// import { setIsLoading } from '../stores/LoadingStore'
+// import { GetHighestMonthlyPriceSubcription } from '../apis/SubcriptionApis'
 
 const Container = styled.div`
   display: flex;
@@ -53,76 +53,59 @@ const LoadingText = styled.span`
   line-height: 20px;
 `
 
-export default function LoadingPage() {
-  const loadingStore = useAppSelector((store) => store.loading)
-  const location = useLocation()
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
+interface LoadingProps {
+  loading?: boolean
+  setLoading?: React.Dispatch<React.SetStateAction<boolean>>
+}
 
-  const user = useAppSelector((state) => state.user)
+interface LoadingOptions {
+  autoHideLoading?: boolean
+  autoHideTime?: number
+}
 
-  const getUserProfile = async () => {
-    try {
-      const response = await GetUserProfile()
-      if (response.message === `Success` && response.result) {
-        setLocalStorage('userData', response.result)
-        dispatch(setUserInfo(response.result))
-        dispatch(setLoggedIn(true))
+const LoadingPage = <P extends object>(
+  Component: React.ComponentType<P>,
+  options: LoadingOptions = { autoHideLoading: true, autoHideTime: 500 }
+) => {
+  return (props: P) => {
+    const [loading, setLoading] = useState(true)
 
-        const subres = await GetHighestMonthlyPriceSubcription()
-        console.log(`LoadingPage::GetUserProfile load user's subscriptions`, subres.result)
-        if (subres.message === `Success` && subres.result) {
-          dispatch(setSubcription(subres.result))
-        }
-      } else {
-        dispatch(setLoggedIn(false))
-        navigate('/signin')
+    const componentProps = {
+      ...(props as object),
+      loading,
+      setLoading,
+    } as P & LoadingProps
+
+    useEffect(() => {
+      let timeout: any
+
+      if (options.autoHideLoading) {
+        timeout = setTimeout(() => {
+          setLoading(false)
+        }, options.autoHideTime)
       }
-    } catch (error) {
-      dispatch(setLoggedIn(false))
-      navigate('/signin')
-    }
-  }
 
-  useEffect(() => {
-    if (!user.loggedIn) {
-      getUserProfile()
-      return
-    }
-    const userData = getLocalStorage(USER_LS_KEY)
-    if (userData) {
-      dispatch(setUserInfo(userData))
-      dispatch(setLoggedIn(true))
-    } else {
-      dispatch(setLoggedIn(false))
-      navigate('/signin')
-    }
-  }, []) // Run only once when the application starts
+      return () => {
+        if (timeout) {
+          clearTimeout(timeout)
+        }
+      }
+    }, [])
 
-  let timeout: NodeJS.Timeout | undefined
-  useEffect(() => {
-    if (timeout) clearTimeout(timeout)
-
-    timeout = setTimeout(() => {
-      dispatch(setIsLoading(false))
-    }, 500)
-
-    return () => {
-      clearTimeout(timeout)
-    }
-  }, [])
-  return (
-    <>
-      {loadingStore.isLoading && (
-        <Container>
-          <div>
+    return (
+      <>
+        {loading && (
+          <Container>
             <div>
               <Spinner src="/logo_transparent.svg" />
               <LoadingText>Loading ...</LoadingText>
             </div>
-          </div>
-        </Container>
-      )}
-    </>
-  )
+          </Container>
+        )}
+        <Component {...componentProps} />
+      </>
+    )
+  }
 }
+
+export default LoadingPage

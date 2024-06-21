@@ -30,7 +30,7 @@ export const uiSlice = createSlice({
     },
     
     decreaseOpeningCount: (state) => {
-      state.openingUIs--
+      state.openingUIs = state.openingUIs - 1 < 0 ? 0 : state.openingUIs - 1
       console.log("decrease UI count", state.openingUIs)
     },
   },

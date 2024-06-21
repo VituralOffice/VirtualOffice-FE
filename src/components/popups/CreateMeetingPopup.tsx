@@ -1,29 +1,22 @@
 import { useEffect, useRef, useState } from 'react'
 import { FormPopup } from './FormPopup'
-import { PopupProps } from '../../interfaces/Interfaces'
 import { useParams } from 'react-router-dom'
 import { CreateMeetingForm } from '../forms/CreateMeetingForm'
-import { CreateGroupChat } from '../../apis/ChatApis'
-import { CHAT_TYPE } from '../../constants/constant'
 import { useAppSelector } from '../../hook'
-import { isApiSuccess } from '../../apis/util'
 import { useDispatch } from 'react-redux'
-import { setCreateMeetingCallback } from '../../stores/UIStore'
+import {
+  decreaseOpeningCount,
+  increaseOpeningCount,
+  setCreateMeetingCallback,
+} from '../../stores/UIStore'
 
 export const CreateMeetingPopup = ({ onClosePopup }) => {
   let { roomId } = useParams()
   const [title, setTitle] = useState('')
   const [canSubmit, setCanSubmit] = useState(false)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const user = useAppSelector((state) => state.user)
   const ui = useAppSelector((state) => state.ui)
   const dispatch = useDispatch()
-
-  useEffect(() => {
-    if (ui.showCreateMeeting) {
-      setTitle('')
-    }
-  }, [ui.showCreateMeeting])
 
   const checkCanSubmit = () => {
     setCanSubmit(title != '')
@@ -56,7 +49,15 @@ export const CreateMeetingPopup = ({ onClosePopup }) => {
     }
   }, [title])
 
-  return ui.showCreateMeeting ? (
+  useEffect(() => {
+    dispatch(increaseOpeningCount())
+
+    return () => {
+      dispatch(decreaseOpeningCount())
+    }
+  }, [])
+
+  return (
     <FormPopup
       onClose={onClosePopup}
       titles={titles}
@@ -66,7 +67,5 @@ export const CreateMeetingPopup = ({ onClosePopup }) => {
       onSubmit={onSubmit}
       submitText="Create"
     />
-  ) : (
-    <></>
   )
 }

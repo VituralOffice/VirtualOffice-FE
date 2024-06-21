@@ -12,6 +12,7 @@ import React from 'react'
 import { spinAnimation } from '../anims/CssAnims'
 import AutorenewRoundedIcon from '@mui/icons-material/AutorenewRounded'
 import { API_URL } from '../constant'
+import LoadingPage from './LoadingPage'
 
 const Container = styled.div`
   height: 100%;
@@ -274,7 +275,7 @@ const CancelNav = styled.span`
   }
 `
 
-export default function LoginPage() {
+function LoginPage() {
   const [email, setEmail] = useState('')
   const [loadingShow, setLoadingShow] = useState<boolean>(false)
   const [otpShow, setOtpShow] = useState(false)
@@ -286,16 +287,6 @@ export default function LoginPage() {
   useEffect(() => {
     setError('')
   }, [otpShow])
-
-  const handleLoginSuccess = (response: any) => {
-    console.log('Login successful:', response)
-    // Xử lý việc đăng nhập thành công ở đây
-  }
-
-  const handleLoginFailure = (error: any) => {
-    console.error('Login failed:', error)
-    // Xử lý việc đăng nhập thất bại ở đây
-  }
 
   const isEmailValid = (email) => {
     // Biểu thức chính quy để kiểm tra tính hợp lệ của email
@@ -560,3 +551,5 @@ export default function LoginPage() {
     </div>
   )
 }
+
+export default LoadingPage(LoginPage)
