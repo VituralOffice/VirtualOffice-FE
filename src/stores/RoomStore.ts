@@ -77,6 +77,12 @@ export const roomSlice = createSlice({
         member,
       ]
     },
+    updateMemberOnlineStatus: (state, action: PayloadAction<{ memberId: string, online: boolean }>) => {
+      const { memberId, online } = action.payload;
+      state.roomData.members = state.roomData.members.map(member =>
+        member.user._id === memberId ? { ...member, online } : member
+      );
+    },
     resetRoomStore: () => initialState,
   },
 })
@@ -89,6 +95,7 @@ export const {
   setNetworkInitialized,
   setGameCreated,
   updateMember,
+  updateMemberOnlineStatus,
   setRoomData,
   resetRoomStore,
 } = roomSlice.actions
