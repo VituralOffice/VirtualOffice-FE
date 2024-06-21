@@ -1,9 +1,12 @@
 import { Client, Room } from 'colyseus.js'
 import store from '../stores'
+import { setSessionId } from '../stores/UserStore'
 import {
-  setSessionId,
-} from '../stores/UserStore'
-import { setNetworkConstructed, setNetworkInitialized, updateMember } from '../stores/RoomStore'
+  setNetworkConstructed,
+  setNetworkInitialized,
+  updateMember,
+  updateMemberOnlineStatus,
+} from '../stores/RoomStore'
 import { IChair, IMeeting, IOfficeState, IPlayer, IWhiteboard } from '../types/ISpaceState'
 import WebRTC from '../web/WebRTC'
 import { GameEvent, phaserEvents } from '../events/EventCenter'
@@ -101,10 +104,12 @@ export default class Network {
 
     this.webRTC.checkPreviousPermission()
 
+    //temp: update user online status to true
+    store.dispatch(updateMemberOnlineStatus({ memberId: store.getState().user.userId, online: true }))
     // new instance added to the players MapSchema
     this.room.state.players.onAdd = (player: IPlayer, key: string) => {
       if (key === this.mySessionId) return
-      store.dispatch(updateMember({ member: { online: true, role: 'user', user: player, lastJoinedAt: '' } }))
+      store.dispatch(updateMemberOnlineStatus({ memberId: player._id, online: true }))
       // track changes on every child object inside the players MapSchema
       player.onChange = (changes) => {
         changes.forEach((change) => {
@@ -125,8 +130,9 @@ export default class Network {
       phaserEvents.emit(GameEvent.PLAYER_LEFT, key)
       this.webRTC?.deleteVideoStream(key)
       this.webRTC?.deleteOnCalledVideoStream(key)
+      store.dispatch(updateMemberOnlineStatus({ memberId: player._id, online: false }))
       // store.dispatch(pushPlayerLeftMessage(player.playerName))
-      store.dispatch(updateMember({ member: { online: false, role: 'user', user: player, lastJoinedAt: '' } }))
+      // store.dispatch(updateMember({ member: { online: false, role: 'user', user: player, lastJoinedAt: '' } }))
     }
 
     this.room.state.chairs.onAdd = (chair: IChair, key: string) => {

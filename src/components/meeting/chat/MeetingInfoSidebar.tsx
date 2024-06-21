@@ -73,7 +73,7 @@ export const MeetingInfoSidebar = () => {
         role: meeting.adminUser === sessionId ? 'admin' : 'user',
       }
     })
-    allMem = allMem.filter((m) => m?.online || false)
+    // allMem = allMem.filter((m) => m?.online || false)
     setConnectedUser(allMem)
   }, [meeting.connectedUser])
 

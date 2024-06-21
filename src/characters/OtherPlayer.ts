@@ -4,7 +4,6 @@ import MyPlayer from './MyPlayer'
 import { sittingShiftData } from './Player'
 import WebRTC from '../web/WebRTC'
 import { GameEvent, phaserEvents } from '../events/EventCenter'
-import Game from '../scenes/Game'
 
 export default class OtherPlayer extends Player {
   private targetPosition: [number, number]
@@ -147,7 +146,7 @@ export default class OtherPlayer extends Player {
 
     const speed = 200 // speed is in unit of pixels per second
     const delta = (speed / 1000) * dt // minimum distance that a player can move in a frame (dt is in unit of ms)
-    const maxDistance = 200
+    const maxDistance = 100 // prevent user is too far from target position
     let dx = this.targetPosition[0] - this.x
     let dy = this.targetPosition[1] - this.y
 
