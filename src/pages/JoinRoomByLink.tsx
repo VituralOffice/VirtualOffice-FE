@@ -3,7 +3,8 @@ import { useAppSelector } from '../hook'
 import queryString from 'query-string'
 import ApiService from '../apis/ApiService'
 import { useEffect } from 'react'
-export const JoinRoomByLink = () => {
+import LoadingPage from './LoadingPage'
+function JoinRoomByLink () {
   let { roomId } = useParams()
   const navigate = useNavigate()
   const user = useAppSelector((state) => state.user)
@@ -23,3 +24,5 @@ export const JoinRoomByLink = () => {
   }, [])
   return <div></div>
 }
+
+export default LoadingPage(JoinRoomByLink)

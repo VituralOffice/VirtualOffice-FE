@@ -7,7 +7,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import './index.scss'
 // import './PhaserGame'
 import muiTheme from './MuiTheme'
-import App from './App'
+import MainApp from './MainApp'
 import store from './stores'
 import ApiService from './apis/ApiService'
 import * as Sentry from '@sentry/react'
@@ -27,7 +27,7 @@ root.render(
   // <React.StrictMode>
   <Provider store={store}>
     <ThemeProvider theme={muiTheme}>
-      <App />
+      <MainApp />
     </ThemeProvider>
     <ToastContainer />
   </Provider>

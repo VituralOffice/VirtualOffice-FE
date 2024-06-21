@@ -2,6 +2,7 @@ import styled from 'styled-components'
 import { useState } from 'react'
 import PlansAndBilling from '../components/usersettings/PlansAndBilling'
 import UserSetttingSidebar from '../components/sidebars/UserSettingSidebar'
+import LoadingPage from './LoadingPage'
 
 const PageContainer = styled.div`
   display: flex;
@@ -20,7 +21,7 @@ const PageContent = styled.div`
   max-width: 832px;
 `
 
-export default function UserSettingPage() {
+function UserSettingPage() {
   const [menuId, setMenuId] = useState(0)
 
   const contents = [<PlansAndBilling />]
@@ -34,3 +35,5 @@ export default function UserSettingPage() {
     </PageContainer>
   )
 }
+
+export default LoadingPage(UserSettingPage)

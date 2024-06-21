@@ -8,6 +8,7 @@ import { isApiSuccess } from '../apis/util'
 import { SpaceItem } from '../components/SpaceItem'
 import { RoomQueryParam } from '../types/Rooms'
 import { debounce } from '../utils/helpers'
+import LoadingPage from './LoadingPage'
 
 const TopBar = styled.div`
   display: flex;
@@ -167,7 +168,7 @@ const SpacesGrid = styled.div`
   margin: 20px;
 `
 
-export default function SpacePage() {
+function SpacePage() {
   const [activeSpaceItemId, setActiveSpaceItemId] = useState('')
   const [spaces, setSpaces] = useState<any[]>([])
   const [param, setParam] = useState<RoomQueryParam>({})
@@ -238,3 +239,5 @@ export default function SpacePage() {
     </>
   )
 }
+
+export default LoadingPage(SpacePage)

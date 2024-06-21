@@ -9,6 +9,7 @@ import { useParams } from 'react-router-dom'
 import { GetRoomById } from '../apis/RoomApis'
 import { isApiSuccess } from '../apis/util'
 import { IRoomData } from '../types/Rooms'
+import LoadingPage from './LoadingPage'
 
 const PageContainer = styled.div`
   display: flex;
@@ -27,7 +28,7 @@ const PageContent = styled.div`
   max-width: 832px;
 `
 
-export default function SpaceDashboardPage() {
+function SpaceDashboardPage() {
   const { roomId } = useParams()
   const [menuId, setMenuId] = useState(0)
   const [room, setRoom] = useState<IRoomData>()
@@ -60,3 +61,5 @@ export default function SpaceDashboardPage() {
     </PageContainer>
   )
 }
+
+export default LoadingPage(SpaceDashboardPage)

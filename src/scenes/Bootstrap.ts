@@ -39,6 +39,7 @@ export default class Bootstrap extends Phaser.Scene {
         const mapJson = store.getState().room.roomData.map.json
         console.log(`Bootstrap::preload load map json : ${mapJson}`)
         this.load.tilemapTiledJSON('tilemap', mapJson)
+        // this.load.tilemapTiledJSON('tilemap', '/assets/map/Summer_30.json')
         this.load.spritesheet('tiles_wall_origin', '/assets/map/FloorAndGround_origin.png', {
             frameWidth: 32,
             frameHeight: 32,

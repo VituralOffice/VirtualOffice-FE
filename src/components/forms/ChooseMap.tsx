@@ -6,6 +6,7 @@ import DiscreteSlider from '../sliders/DiscreteSlider'
 import { useAppSelector } from '../../hook'
 import { toast } from 'react-toastify'
 import { IMap } from '../../interfaces/map'
+import { getResourceUrl } from '../../utils/util'
 
 const Container = styled.div`
 display: grid;
@@ -158,7 +159,6 @@ export const ChooseMap = ({ setMapId, mapSize }: Props) => {
     if (!maps) return
     const map = maps.find((m) => m.capacity === localSize)
     if (!map) return
-    console.log(map)
     setMapId(map._id)
     setCurrentMap(map)
   }, [style, localSize])
@@ -172,7 +172,7 @@ export const ChooseMap = ({ setMapId, mapSize }: Props) => {
       {styledMap && (
         <Container>
           <RoomPreview>
-            <img src={currentMap?.preview} />
+            <img src={getResourceUrl(currentMap?.preview!)} />
           </RoomPreview>
           <LeftContent>
             <MapSize>

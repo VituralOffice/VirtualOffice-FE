@@ -11,7 +11,7 @@ export default function ShutDownOrDelete({ room, refreshRoom }: SpaceDashboardCo
       </ContentHeader>
       <ContentBody>
         <SectionHeader>Shut down</SectionHeader>
-        <SectionBody style={!room?.active ? { pointerEvents: 'none', opacity: '0.5' } : {}}>
+        <SectionBody>
           <ButtonSetting>
             <div className="info">
               <div className="main-label">

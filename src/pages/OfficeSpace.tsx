@@ -15,20 +15,25 @@ import WhiteboardDialog from '../components/whiteboards/WhiteboardDialog'
 import Network from '../services/Network'
 import { JoinRoom } from '../apis/RoomApis'
 import { setRoomData } from '../stores/RoomStore'
-import { isApiSuccess } from '../apis/util'
 import { toast } from 'react-toastify'
-import { setWait, startLoadingAndWait, stopLoading } from '../stores/LoadingStore'
+// import { setWait, startLoadingAndWait, stopLoading } from '../stores/LoadingStore'
 import Game from '../scenes/Game'
 import { AxiosError } from 'axios'
 import { UNKNOWN_ERROR } from '../constant'
+import LoadingPage from './LoadingPage'
 
-export const OfficeSpace = () => {
+interface OfficeSpaceProps {
+  loading?: boolean;
+  setLoading?: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const OfficeSpace: React.FC<OfficeSpaceProps> = ({ loading, setLoading }) => {
   let { roomId } = useParams()
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
   const [joinPageShow, setJoinPageShow] = useState(true)
-  // const [room, setRoom] = useState<IRoomData | null>()
+  const ui = useAppSelector((state) => state.ui)
   const roomStore = useAppSelector((state) => state.room)
   const UICount = useAppSelector((state) => state.ui.openingUIs)
   const whiteboardDialogOpen = useAppSelector((state) => state.whiteboard.whiteboardDialogOpen)
@@ -36,7 +41,7 @@ export const OfficeSpace = () => {
   const [gameInittialized, setGameInitialized] = useState(false)
 
   const handleJoinRoom = async () => {
-    dispatch(startLoadingAndWait())
+    setLoading?.(true)
     try {
       await Network.getInstance()?.joinCustomById(roomStore.roomData!._id)
       setJoinPageShow(false)
@@ -51,13 +56,11 @@ export const OfficeSpace = () => {
           setJoinPageShow(false)
         } catch (createError) {
           console.log('Error creating room:', createError)
-          dispatch(setWait(false))
           navigate('/app')
         }
         return
       }
       console.log(e)
-      dispatch(setWait(false))
       navigate('/app')
       return
     }
@@ -76,7 +79,6 @@ export const OfficeSpace = () => {
     } catch (error) {
       if (error instanceof AxiosError) toast(error.response?.data?.message)
       else toast(UNKNOWN_ERROR)
-      dispatch(setWait(false))
       navigate('/app')
       return
     }
@@ -87,7 +89,6 @@ export const OfficeSpace = () => {
       navigate('/app')
       return
     }
-    dispatch(startLoadingAndWait())
     loadRoom()
     return () => {
       Bootstrap.getInstance()?.network?.disconnectFromMeeting(meeting.activeMeetingId!)
@@ -114,13 +115,13 @@ export const OfficeSpace = () => {
 
   useEffect(() => {
     if (roomStore.gameCreated && roomStore.networkConstructed) {
-      dispatch(stopLoading())
+      setLoading?.(false)
     }
   }, [roomStore.gameCreated, roomStore.networkConstructed])
 
   useEffect(() => {
     if (roomStore.gameCreated && roomStore.networkConstructed && roomStore.networkInitialized) {
-      dispatch(stopLoading())
+      setLoading?.(false)
     }
   }, [roomStore.networkInitialized])
 
@@ -141,11 +142,15 @@ export const OfficeSpace = () => {
       {!joinPageShow && <OfficeToolbar></OfficeToolbar>}
       {whiteboardDialogOpen && <WhiteboardDialog />}
       {meeting.meetingDialogOpen && <MeetingDialog />}
-      <CreateMeetingPopup
-        onClosePopup={() => {
-          dispatch(setShowCreateMeeting(false))
-        }}
-      />
+      {ui.showCreateMeeting && (
+        <CreateMeetingPopup
+          onClosePopup={() => {
+            dispatch(setShowCreateMeeting(false))
+          }}
+        />
+      )}
     </>
   )
 }
+
+export default LoadingPage(OfficeSpace, { autoHideLoading: false })

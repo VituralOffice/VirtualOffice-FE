@@ -71,3 +71,13 @@ export function castObject<A extends object, B extends object>(source: A): B {
   })
   return result
 }
+
+const AWS_S3_ENDPOINT = 'https://storage.voffice.space/voffice'
+export function getResourceUrl(url?: string): string {
+  if (!url) return ''
+  if (url.startsWith(AWS_S3_ENDPOINT!)) {
+    return url
+  } else {
+    return `${AWS_S3_ENDPOINT}/${url}`
+  }
+}
