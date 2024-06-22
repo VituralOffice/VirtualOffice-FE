@@ -105,7 +105,9 @@ export default class Network {
     this.webRTC.checkPreviousPermission()
 
     //temp: update user online status to true
-    store.dispatch(updateMemberOnlineStatus({ memberId: store.getState().user.userId, online: true }))
+    store.dispatch(
+      updateMemberOnlineStatus({ memberId: store.getState().user.userId, online: true })
+    )
     // new instance added to the players MapSchema
     this.room.state.players.onAdd = (player: IPlayer, key: string) => {
       if (key === this.mySessionId) return
@@ -270,7 +272,12 @@ export default class Network {
         )
       }
     )
-
+    this.room.onMessage(Message.ROOM_DISPOSE, async (msg: { message: string }) => {
+      toast(msg.message)
+      setTimeout(() => {
+        window.location.href = `/app`
+      }, 5000)
+    })
     // // receive meeting state when join
     // this.room.onMessage(
     //   Message.MEETING_RECEIVE,
