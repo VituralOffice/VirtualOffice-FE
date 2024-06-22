@@ -166,6 +166,7 @@ export const meetingSlice = createSlice({
         call: action.payload.call,
         stream: action.payload.stream,
       })
+      console.log(`MeetingStore::addCameraStream receive camera from ${action.payload.id}`)
     },
     removeCameraStream: (state, action: PayloadAction<string>) => {
       state.peerCameraStreams.delete(sanitizeId(action.payload))
