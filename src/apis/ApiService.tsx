@@ -46,8 +46,8 @@ class ApiService {
               this.requestQueue.forEach((req) => req())
               this.isRefreshingToken = false
               this.requestQueue = []
-              Cookies.set(REFRESH_TOKEN_KEY, refreshToken)
-              Cookies.set(ACCESS_TOKEN_KEY, accessToken)
+              // Cookies.set(REFRESH_TOKEN_KEY, refreshToken)
+              // Cookies.set(ACCESS_TOKEN_KEY, accessToken)
               return this.axiosInstance.request(originalRequest)
             } catch (error) {
               // call refresh token error
