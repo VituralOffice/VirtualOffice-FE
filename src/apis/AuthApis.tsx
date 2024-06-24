@@ -40,6 +40,8 @@ export const useSignOut = () => {
 
   const signOut = async () => {
     await ApiService.getInstance().post('/auth/logout', {})
+    Cookies.remove(REFRESH_TOKEN_KEY)
+    Cookies.remove(ACCESS_TOKEN_KEY)
     localStorage.removeItem('userData')
     dispatch(resetUserState())
     navigate('/')
