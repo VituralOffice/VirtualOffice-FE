@@ -6,8 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { isApiSuccess } from '../apis/util'
 import { setLoggedIn, setUserInfo } from '../stores/UserStore'
 import { useAppDispatch } from '../hook'
-import CircularIndeterminate, {
-} from '../components/loadings/LoadingIcon'
+import CircularIndeterminate from '../components/loadings/LoadingIcon'
 import React from 'react'
 import { spinAnimation } from '../anims/CssAnims'
 import AutorenewRoundedIcon from '@mui/icons-material/AutorenewRounded'
@@ -402,7 +401,7 @@ function LoginPage() {
       } catch (error) {
         setLoadingShow(false)
         console.log(error)
-        setError('That code is invalid or has expired, please try again.2')
+        setError('That code is invalid or has expired, please try again.')
       }
     } else {
       // Xử lý khi địa chỉ email không hợp lệ
