@@ -3,7 +3,8 @@ import Player from './Player'
 import MyPlayer from './MyPlayer'
 import { sittingShiftData } from './Player'
 import WebRTC from '../web/WebRTC'
-import { GameEvent, phaserEvents } from '../events/EventCenter'
+import { GameEvent } from '../events/EventCenter'
+import { phaserEvents } from '../PhaserGame'
 
 export default class OtherPlayer extends Player {
   private targetPosition: [number, number]
@@ -192,15 +193,15 @@ export default class OtherPlayer extends Player {
     if (this.connected) {
       if (!this.body!.embedded && this.body!.touching.none && this.connectionBufferTime >= 750) {
         // if (this.x < 610 && this.y > 515 && this.myPlayer!.x < 610 && this.myPlayer!.y > 515) return
-        phaserEvents.emit(GameEvent.PLAYER_DISCONNECTED, this.playerId)
+        phaserEvents?.emit(GameEvent.PLAYER_DISCONNECTED, this.playerId)
         this.connectionBufferTime = 0
         this.connected = false
       } else if (!this.mediaConnected && this.connectionBufferTime >= 750) {
-        phaserEvents.emit(GameEvent.PLAYER_DISCONNECTED, this.playerId)
+        phaserEvents?.emit(GameEvent.PLAYER_DISCONNECTED, this.playerId)
         this.connectionBufferTime = 0
         this.connected = false
       } else if (this.isInMeeting) {
-        phaserEvents.emit(GameEvent.PLAYER_DISCONNECTED, this.playerId)
+        phaserEvents?.emit(GameEvent.PLAYER_DISCONNECTED, this.playerId)
         this.connectionBufferTime = 0
         this.connected = false
       }

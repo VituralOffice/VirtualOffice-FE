@@ -5,7 +5,7 @@ import Player from './Player'
 import Network from '../services/Network'
 import Chair from '../items/Chair'
 
-import { phaserEvents, GameEvent } from '../events/EventCenter'
+import { GameEvent } from '../events/EventCenter'
 import store from '../stores'
 import { NavKeys } from '../types/KeyboardState'
 import { ItemType } from '../types/Items'
@@ -14,6 +14,7 @@ import { PlayerBehavior } from '../types/PlayerBehaviour'
 import Game from '../scenes/Game'
 import { Meeting } from '../web/meeting/Meeting'
 import Whiteboard from '../items/WhiteBoard'
+import { phaserEvents } from '../PhaserGame'
 
 export default class MyPlayer extends Player {
   private playContainerBody: Phaser.Physics.Arcade.Body
@@ -42,14 +43,14 @@ export default class MyPlayer extends Player {
 
   setPlayerName(name: string) {
     this.playerNameText.setText(name)
-    phaserEvents.emit(GameEvent.MY_PLAYER_NAME_CHANGE, name)
+    phaserEvents?.emit(GameEvent.MY_PLAYER_NAME_CHANGE, name)
     // store.dispatch(pushPlayerJoinedMessage(name))
   }
 
   setPlayerTexture(texture: string) {
     this.playerTexture = texture.toLowerCase()
     this.anims.play(`${this.playerTexture}_idle_down`, true)
-    phaserEvents.emit(
+    phaserEvents?.emit(
       GameEvent.MY_PLAYER_TEXTURE_CHANGE,
       this.x,
       this.y,
@@ -59,11 +60,11 @@ export default class MyPlayer extends Player {
 
   setCharacter(id: string) {
     this.characterId = id
-    phaserEvents.emit(GameEvent.MY_PLAYER_CHARACTER_ID_CHANGE, id)
+    phaserEvents?.emit(GameEvent.MY_PLAYER_CHARACTER_ID_CHANGE, id)
   }
 
   setPlayerIsInMeeting(isInMeeting: boolean) {
-    phaserEvents.emit(GameEvent.MY_PLAYER_MEETING_STATUS_CHANGE, isInMeeting)
+    phaserEvents?.emit(GameEvent.MY_PLAYER_MEETING_STATUS_CHANGE, isInMeeting)
   }
 
   isPlayerInMeeting() {
