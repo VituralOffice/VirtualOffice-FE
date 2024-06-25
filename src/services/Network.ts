@@ -2,10 +2,11 @@ import { Client, Room } from 'colyseus.js'
 import store from '../stores'
 import { setSessionId } from '../stores/UserStore'
 import {
+  removeMember,
   setNetworkConstructed,
   setNetworkInitialized,
-  updateMember,
   updateMemberOnlineStatus,
+  updateMemberOnlineStatusThunk,
 } from '../stores/RoomStore'
 import { IChair, IMeeting, IOfficeState, IPlayer, IWhiteboard } from '../types/ISpaceState'
 import WebRTC from '../web/WebRTC'
@@ -105,13 +106,11 @@ export default class Network {
     this.webRTC.checkPreviousPermission()
 
     //temp: update user online status to true
-    store.dispatch(
-      updateMemberOnlineStatus({ memberId: store.getState().user.userId, online: true })
-    )
+    store.dispatch(updateMemberOnlineStatusThunk(store.getState().user.userId, true))
     // new instance added to the players MapSchema
     this.room.state.players.onAdd = (player: IPlayer, key: string) => {
       if (key === this.mySessionId) return
-      store.dispatch(updateMemberOnlineStatus({ memberId: player._id, online: true }))
+      store.dispatch(updateMemberOnlineStatusThunk(player._id, true))
       // track changes on every child object inside the players MapSchema
       player.onChange = (changes) => {
         changes.forEach((change) => {
@@ -240,14 +239,19 @@ export default class Network {
       meetingState.shareScreenManager?.onUserLeft(clientId)
     })
 
-    this.room.onMessage(Message.ADD_CHAT, async (message: { chat: IChat }) => {
-      console.log(`Network::onMessgae ADD_CHAT ${message.chat._id}`)
+    // when a meeting user stops sharing screen
+    this.room.onMessage(Message.MEMBER_LEAVE, (message: { userId: string }) => {
+      store.dispatch(removeMember(message.userId))
+    })
+
+    this.room.onMessage(Message.ADD_CHAT, async (chat: IChat) => {
+      console.log(`Network::onMessgae ADD_CHAT ${chat._id}`)
       const msgResponse = await GetMsgByChatId({
         roomId: store.getState().room.roomData._id,
-        chatId: message.chat._id,
+        chatId: chat._id,
       })
       if (isApiSuccess(msgResponse)) {
-        store.dispatch(addChat({ chat: message.chat, mapMessage: msgResponse.result }))
+        store.dispatch(addChat({ chat: chat, mapMessage: msgResponse.result }))
       }
     })
 
