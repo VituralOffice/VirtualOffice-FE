@@ -29,6 +29,8 @@ const loadBackgroundScene = async () => {
 
 let PhaserGame: Phaser.Game | null = null
 let bootstrapCreatedResolver: (() => void) | null = null
+// export const phaserEvents = new Phaser.Events.EventEmitter()
+export let phaserEvents: Phaser.Events.EventEmitter | null
 
 export const InitPhaserGame = async () => {
   console.log('PhaserGame::InitGame Init Phaser Game')
@@ -68,6 +70,7 @@ export const InitPhaserGame = async () => {
   }
 
   PhaserGame = new Phaser.Game(config)
+  phaserEvents = new Phaser.Events.EventEmitter()
   ;(window as any).game = PhaserGame
 
   // Wait for Bootstrap scene to be created before continuing
@@ -85,7 +88,11 @@ export const DestroyGame = () => {
     Network.getInstance()?.disconnectMeeting()
     Network.getInstance()?.disconnectWebRTC()
     Network.getInstance()?.disconnectNetwork()
-    if (PhaserGame) PhaserGame.destroy(true)
+    if (PhaserGame) {
+      PhaserGame.destroy(true)
+      PhaserGame = null
+      phaserEvents = null
+    }
     store.dispatch(setNetworkInitialized(false))
     store.dispatch(setNetworkConstructed(false))
     store.dispatch(setGameCreated(false))

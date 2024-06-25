@@ -10,7 +10,7 @@ import {
 } from '../stores/RoomStore'
 import { IChair, IMeeting, IOfficeState, IPlayer, IWhiteboard } from '../types/ISpaceState'
 import WebRTC from '../web/WebRTC'
-import { GameEvent, phaserEvents } from '../events/EventCenter'
+import { GameEvent } from '../events/EventCenter'
 import { IRoomData, RoomType, IMessagePayload, ICreateCustomRoomParams } from '../types/Rooms'
 import { addChat, loadMapChatMessage, pushChatMessage } from '../stores/ChatStore'
 import { ItemType } from '../types/Items'
@@ -24,6 +24,7 @@ import { isApiSuccess } from '../apis/util'
 import { setWhiteboardUrls } from '../stores/WhiteboardStore'
 import { toast } from 'react-toastify'
 import { IChat } from '../interfaces/chat'
+import { phaserEvents } from '../PhaserGame'
 
 export default class Network {
   private static instance: Network | null = null // Biến static instance
@@ -43,11 +44,11 @@ export default class Network {
     this.client = new Client(endpoint)
     this.client.auth.token = Cookies.get(ACCESS_TOKEN_KEY) as string
 
-    phaserEvents.on(GameEvent.MY_PLAYER_NAME_CHANGE, this.updatePlayerName, this)
-    phaserEvents.on(GameEvent.MY_PLAYER_MEETING_STATUS_CHANGE, this.updatePlayerMeetingStatus, this)
-    phaserEvents.on(GameEvent.MY_PLAYER_TEXTURE_CHANGE, this.updatePlayer, this)
-    phaserEvents.on(GameEvent.MY_PLAYER_CHARACTER_ID_CHANGE, this.updatePlayerCharacterId, this)
-    phaserEvents.on(GameEvent.PLAYER_DISCONNECTED, this.playerStreamDisconnect, this)
+    phaserEvents?.on(GameEvent.MY_PLAYER_NAME_CHANGE, this.updatePlayerName, this)
+    phaserEvents?.on(GameEvent.MY_PLAYER_MEETING_STATUS_CHANGE, this.updatePlayerMeetingStatus, this)
+    phaserEvents?.on(GameEvent.MY_PLAYER_TEXTURE_CHANGE, this.updatePlayer, this)
+    phaserEvents?.on(GameEvent.MY_PLAYER_CHARACTER_ID_CHANGE, this.updatePlayerCharacterId, this)
+    phaserEvents?.on(GameEvent.PLAYER_DISCONNECTED, this.playerStreamDisconnect, this)
 
     store.dispatch(setNetworkConstructed(true))
   }
@@ -115,11 +116,11 @@ export default class Network {
       player.onChange = (changes) => {
         changes.forEach((change) => {
           const { field, value } = change
-          phaserEvents.emit(GameEvent.PLAYER_UPDATED, field, value, key)
+          phaserEvents?.emit(GameEvent.PLAYER_UPDATED, field, value, key)
 
           // when a new player finished setting up player name
           if (field === 'playerName' && value !== '') {
-            phaserEvents.emit(GameEvent.PLAYER_JOINED, player, key)
+            phaserEvents?.emit(GameEvent.PLAYER_JOINED, player, key)
             // store.dispatch(pushPlayerJoinedMessage(value))
           }
         })
@@ -128,7 +129,7 @@ export default class Network {
 
     // an instance removed from the players MapSchema
     this.room.state.players.onRemove = (player: IPlayer, key: string) => {
-      phaserEvents.emit(GameEvent.PLAYER_LEFT, key)
+      phaserEvents?.emit(GameEvent.PLAYER_LEFT, key)
       this.webRTC?.deleteVideoStream(key)
       this.webRTC?.deleteOnCalledVideoStream(key)
       store.dispatch(updateMemberOnlineStatus({ memberId: player._id, online: false }))
@@ -141,7 +142,7 @@ export default class Network {
         changes.forEach((change) => {
           const { field, value } = change
           if (field === 'connectedUser') {
-            phaserEvents.emit(GameEvent.CHAIR_CONNECT_USER_CHANGE, value, key, ItemType.CHAIR)
+            phaserEvents?.emit(GameEvent.CHAIR_CONNECT_USER_CHANGE, value, key, ItemType.CHAIR)
           }
         })
       }
@@ -151,33 +152,33 @@ export default class Network {
     this.room.state.meetings.onAdd = (meeting: IMeeting, key: string) => {
       // track changes on every child object's connectedUser
       meeting.connectedUser.onAdd = (item, index) => {
-        phaserEvents.emit(GameEvent.ITEM_USER_ADDED, item, key, ItemType.MEETING)
+        phaserEvents?.emit(GameEvent.ITEM_USER_ADDED, item, key, ItemType.MEETING)
       }
       meeting.connectedUser.onRemove = (item, index) => {
-        phaserEvents.emit(GameEvent.ITEM_USER_REMOVED, item, key, ItemType.MEETING)
+        phaserEvents?.emit(GameEvent.ITEM_USER_REMOVED, item, key, ItemType.MEETING)
       }
       meeting.onChange = (changes) => {
         changes.forEach((c) => {
           if (c.field === 'isOpen') {
-            phaserEvents.emit(GameEvent.MEETING_STATE_CHANGE, c.value, key, ItemType.MEETING)
+            phaserEvents?.emit(GameEvent.MEETING_STATE_CHANGE, c.value, key, ItemType.MEETING)
           }
           if (c.field === 'title') {
-            phaserEvents.emit(GameEvent.MEETING_TITLE_CHANGE, c.value, key, ItemType.MEETING)
+            phaserEvents?.emit(GameEvent.MEETING_TITLE_CHANGE, c.value, key, ItemType.MEETING)
           }
           if (c.field === 'chatId') {
             // console.log('Network:: GameEvent.MEETING_CHATID_CHANGE', c.value)
-            phaserEvents.emit(GameEvent.MEETING_CHATID_CHANGE, c.value, key, ItemType.MEETING)
+            phaserEvents?.emit(GameEvent.MEETING_CHATID_CHANGE, c.value, key, ItemType.MEETING)
           }
           if (c.field === 'isLocked') {
             if (meeting.connectedUser.has(this.mySessionId)) {
               if (c.value === true) toast(`The meeting is locked`)
               else toast(`The meeting is locked`)
             }
-            phaserEvents.emit(GameEvent.MEETING_ISLOCK_CHANGE, c.value, key, ItemType.MEETING)
+            phaserEvents?.emit(GameEvent.MEETING_ISLOCK_CHANGE, c.value, key, ItemType.MEETING)
           }
           if (c.field === 'adminUser') {
             if (c.value === this.mySessionId) toast(`You're now admin of the meeting`)
-            phaserEvents.emit(GameEvent.MEETING_ADMIN_CHANGE, c.value, key, ItemType.MEETING)
+            phaserEvents?.emit(GameEvent.MEETING_ADMIN_CHANGE, c.value, key, ItemType.MEETING)
           }
         })
       }
@@ -193,10 +194,10 @@ export default class Network {
       )
       // track changes on every child object's connectedUser
       whiteboard.connectedUser.onAdd = (item, index) => {
-        phaserEvents.emit(GameEvent.ITEM_USER_ADDED, item, key, ItemType.WHITEBOARD)
+        phaserEvents?.emit(GameEvent.ITEM_USER_ADDED, item, key, ItemType.WHITEBOARD)
       }
       whiteboard.connectedUser.onRemove = (item, index) => {
-        phaserEvents.emit(GameEvent.ITEM_USER_REMOVED, item, key, ItemType.WHITEBOARD)
+        phaserEvents?.emit(GameEvent.ITEM_USER_REMOVED, item, key, ItemType.WHITEBOARD)
       }
     }
 
@@ -219,7 +220,7 @@ export default class Network {
           message,
         })
       )
-      phaserEvents.emit(GameEvent.UPDATE_DIALOG_BUBBLE, clientId, message.message.text)
+      phaserEvents?.emit(GameEvent.UPDATE_DIALOG_BUBBLE, clientId, message.message.text)
     })
 
     // when a peer disconnects with myPeer
@@ -305,14 +306,14 @@ export default class Network {
 
   // method to register event listener and call back function when a item user added
   onChatMessageAdded(callback: (playerId: string, content: string) => void, context?: any) {
-    phaserEvents.on(GameEvent.UPDATE_DIALOG_BUBBLE, callback, context)
+    phaserEvents?.on(GameEvent.UPDATE_DIALOG_BUBBLE, callback, context)
   }
 
   onChairConnectedUserChange(
     callback: (playerId: string, key: string, itemType: ItemType) => void,
     context?: any
   ) {
-    phaserEvents.on(GameEvent.CHAIR_CONNECT_USER_CHANGE, callback, context)
+    phaserEvents?.on(GameEvent.CHAIR_CONNECT_USER_CHANGE, callback, context)
   }
 
   // method to register event listener and call back function when a item user added
@@ -320,42 +321,42 @@ export default class Network {
     callback: (playerId: string, key: string, itemType: ItemType) => void,
     context?: any
   ) {
-    phaserEvents.on(GameEvent.ITEM_USER_ADDED, callback, context)
+    phaserEvents?.on(GameEvent.ITEM_USER_ADDED, callback, context)
   }
 
   onSetMeetingState(
     callback: (isOpen: boolean, itemId: string, itemType: ItemType) => void,
     context?: any
   ) {
-    phaserEvents.on(GameEvent.MEETING_STATE_CHANGE, callback, context)
+    phaserEvents?.on(GameEvent.MEETING_STATE_CHANGE, callback, context)
   }
 
   onSetMeetingTitle(
     callback: (title: string, itemId: string, itemType: ItemType) => void,
     context?: any
   ) {
-    phaserEvents.on(GameEvent.MEETING_TITLE_CHANGE, callback, context)
+    phaserEvents?.on(GameEvent.MEETING_TITLE_CHANGE, callback, context)
   }
 
   onSetMeetingChatId(
     callback: (chatId: string, itemId: string, itemType: ItemType) => void,
     context?: any
   ) {
-    phaserEvents.on(GameEvent.MEETING_CHATID_CHANGE, callback, context)
+    phaserEvents?.on(GameEvent.MEETING_CHATID_CHANGE, callback, context)
   }
 
   onSetMeetingAdmin(
     callback: (adminId: string, itemId: string, itemType: ItemType) => void,
     context?: any
   ) {
-    phaserEvents.on(GameEvent.MEETING_ADMIN_CHANGE, callback, context)
+    phaserEvents?.on(GameEvent.MEETING_ADMIN_CHANGE, callback, context)
   }
 
   onSetMeetingIsLock(
     callback: (isLock: boolean, itemId: string, itemType: ItemType) => void,
     context?: any
   ) {
-    phaserEvents.on(GameEvent.MEETING_ISLOCK_CHANGE, callback, context)
+    phaserEvents?.on(GameEvent.MEETING_ISLOCK_CHANGE, callback, context)
   }
 
   // method to register event listener and call back function when a item user removed
@@ -363,27 +364,27 @@ export default class Network {
     callback: (playerId: string, key: string, itemType: ItemType) => void,
     context?: any
   ) {
-    phaserEvents.on(GameEvent.ITEM_USER_REMOVED, callback, context)
+    phaserEvents?.on(GameEvent.ITEM_USER_REMOVED, callback, context)
   }
 
   // method to register event listener and call back function when a player joined
   onPlayerJoined(callback: (Player: IPlayer, key: string) => void, context?: any) {
-    phaserEvents.on(GameEvent.PLAYER_JOINED, callback, context)
+    phaserEvents?.on(GameEvent.PLAYER_JOINED, callback, context)
   }
 
   // method to register event listener and call back function when a player left
   onPlayerLeft(callback: (key: string) => void, context?: any) {
-    phaserEvents.on(GameEvent.PLAYER_LEFT, callback, context)
+    phaserEvents?.on(GameEvent.PLAYER_LEFT, callback, context)
   }
 
   // method to register event listener and call back function when myPlayer is ready to connect
   onMyPlayerReady(callback: (ready: boolean) => void, context?: any) {
-    phaserEvents.on(GameEvent.MY_PLAYER_READY, callback, context)
+    phaserEvents?.on(GameEvent.MY_PLAYER_READY, callback, context)
   }
 
   // method to register event listener and call back function when my video is connected
   onMyPlayerMediaConnected(callback: (connected: boolean) => void, context?: any) {
-    phaserEvents.on(GameEvent.MY_PLAYER_VIDEO_CONNECTED, callback, context)
+    phaserEvents?.on(GameEvent.MY_PLAYER_VIDEO_CONNECTED, callback, context)
   }
 
   // method to register event listener and call back function when a player updated
@@ -391,7 +392,7 @@ export default class Network {
     callback: (field: string, value: number | string, key: string) => void,
     context?: any
   ) {
-    phaserEvents.on(GameEvent.PLAYER_UPDATED, callback, context)
+    phaserEvents?.on(GameEvent.PLAYER_UPDATED, callback, context)
   }
   // #endregion on events
 
@@ -418,13 +419,13 @@ export default class Network {
   // method to send ready-to-connect signal to Colyseus server
   readyToConnect(ready: boolean) {
     this.room?.send(Message.READY_TO_CONNECT, { ready })
-    phaserEvents.emit(GameEvent.MY_PLAYER_READY, ready)
+    phaserEvents?.emit(GameEvent.MY_PLAYER_READY, ready)
   }
 
   // method to send ready-to-connect signal to Colyseus server
   mediaConnected(connected: boolean) {
     this.room?.send(Message.MEDIA_CONNECTED, { connected })
-    phaserEvents.emit(GameEvent.MY_PLAYER_VIDEO_CONNECTED, connected)
+    phaserEvents?.emit(GameEvent.MY_PLAYER_VIDEO_CONNECTED, connected)
   }
 
   // method to send stream-disconnection signal to Colyseus server
