@@ -84,7 +84,7 @@ export const roomSlice = createSlice({
     ) => {
       const { memberId, online } = action.payload
       const memberIndex = state.roomData.members.findIndex((m) => m.user._id == memberId)
-      if (memberIndex > 0) state.roomData.members[memberIndex].online = online
+      if (memberIndex >= 0) state.roomData.members[memberIndex].online = online
       // state.roomData.members = state.roomData.members.map(member =>
       //   member.user._id === memberId ? { ...member, online } : member
       // );
