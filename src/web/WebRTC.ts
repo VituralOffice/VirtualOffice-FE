@@ -73,6 +73,11 @@ export default class WebRTC {
         this.onCalledPeers.set(call.peer, { call, uiBlock, video })
 
         call.on('stream', (userVideoStream) => {
+          console.log({
+            getAudioTracks: userVideoStream.getAudioTracks().length,
+            getVideoTracks: userVideoStream.getVideoTracks().length,
+            userVideoStream,
+          })
           this.addVideoStream(uiBlock, video, userVideoStream, false)
         })
       }
