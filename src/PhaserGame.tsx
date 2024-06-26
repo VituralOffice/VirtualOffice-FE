@@ -64,7 +64,7 @@ export const InitPhaserGame = async () => {
     autoFocus: true,
     scene: [Bootstrap, Background, Game],
     fps: {
-      target: 30,
+      target: 45,
       forceSetTimeOut: true,
     },
   }
