@@ -5,6 +5,7 @@ import { sittingShiftData } from './Player'
 import WebRTC from '../web/WebRTC'
 import { GameEvent } from '../events/EventCenter'
 import { phaserEvents } from '../PhaserGame'
+import Game from '../scenes/Game'
 
 export default class OtherPlayer extends Player {
   private targetPosition: [number, number]
@@ -33,26 +34,32 @@ export default class OtherPlayer extends Player {
   }
 
   setConnected(connected: boolean) {
+    console.log(`set connected of player ${this.playerId} to ${connected}`)
     this.connected = connected
+    if (!this.connected) this.connectionBufferTime = 0
+  }
+
+  resetConnectionBufferTime() {
+    this.connectionBufferTime = 0
   }
 
   makeCall(myPlayer: MyPlayer, webRTC: WebRTC) {
     this.myPlayer = myPlayer
-  //   console.log('Checking conditions:', {
-  //     connected: this.connected,
-  //     connectionBufferTime: this.connectionBufferTime,
-  //     myPlayerReadyToConnect: myPlayer.readyToConnect,
-  //     thisReadyToConnect: this.readyToConnect,
-  //     myPlayerMediaConnected: myPlayer.mediaConnected,
-  //     thisMediaConnected: this.mediaConnected,
-  //     myPlayerIsPlayerInMeeting: myPlayer.isPlayerInMeeting(),
-  //     thisIsInMeeting: this.isInMeeting,
-  //     myPlayerId: myPlayer.getPlayerId(),
-  //     thisPlayerId: this.playerId
-  // });
+    //   console.log('Checking conditions:', {
+    //     connected: this.connected,
+    //     connectionBufferTime: this.connectionBufferTime,
+    //     myPlayerReadyToConnect: myPlayer.readyToConnect,
+    //     thisReadyToConnect: this.readyToConnect,
+    //     myPlayerMediaConnected: myPlayer.mediaConnected,
+    //     thisMediaConnected: this.mediaConnected,
+    //     myPlayerIsPlayerInMeeting: myPlayer.isPlayerInMeeting(),
+    //     thisIsInMeeting: this.isInMeeting,
+    //     myPlayerId: myPlayer.getPlayerId(),
+    //     thisPlayerId: this.playerId
+    // });
     if (
       !this.connected &&
-      this.connectionBufferTime >= 750 &&
+      this.connectionBufferTime >= 1250 &&
       myPlayer.readyToConnect &&
       this.readyToConnect &&
       myPlayer.mediaConnected &&
@@ -108,11 +115,19 @@ export default class OtherPlayer extends Player {
         break
 
       case 'changeMediaStream':
-        if (typeof value === 'number') {
-          console.log(`player ${this.playerId} change media stream`)
+        console.log(`player ${this.playerId} change media stream1`)
+        const check = WebRTC.getInstance()?.removeIfUserIsInPeers(this.playerId)
+        WebRTC.getInstance()?.removeIfUserIsInOnCalledPeers(this.playerId)
+        console.log(check)
+        if (typeof value === 'number' && check) {
           this.connected = false
-          WebRTC.getInstance()?.deleteVideoStream(this.playerId)
-          WebRTC.getInstance()?.deleteOnCalledVideoStream(this.playerId)
+          this.connectionBufferTime = 0
+          console.log(`player ${this.playerId} change media stream2`)
+          // WebRTC.getInstance()?.deleteVideoStream(this.playerId)
+          // WebRTC.getInstance()?.deleteOnCalledVideoStream(this.playerId)
+        }
+        if (WebRTC.getInstance()?.getPeers.length == 0) {
+          Game.getInstance()?.resetAllOtherPlayerWaitBuffer()
         }
         break
 
@@ -122,6 +137,9 @@ export default class OtherPlayer extends Player {
             `OtherPlayer::updateOtherPlayer user ${this.playerId} change mediaConnected to ${value}`
           )
           this.mediaConnected = value
+          if (this.mediaConnected) {
+            this.connectionBufferTime = 0
+          }
           if (!this.mediaConnected) {
             if (this.connected) this.connected = false
             WebRTC.getInstance()?.deleteVideoStream(this.playerId)
@@ -153,7 +171,7 @@ export default class OtherPlayer extends Player {
 
     // if Phaser has not updated the canvas (when the game tab is not active) for more than 1 sec
     // directly snap player to their current locations
-    if (this.lastUpdateTimestamp && t - this.lastUpdateTimestamp > 750) {
+    if (this.lastUpdateTimestamp && t - this.lastUpdateTimestamp > 1250) {
       this.lastUpdateTimestamp = t
       this.x = this.targetPosition[0]
       this.y = this.targetPosition[1]
@@ -219,14 +237,14 @@ export default class OtherPlayer extends Player {
 
     // while currently connected with myPlayer
     // if myPlayer and the otherPlayer stop overlapping, delete video stream
-    if (this.connectionBufferTime < 750) this.connectionBufferTime += dt
+    if (this.connectionBufferTime < 1250) this.connectionBufferTime += dt
     if (this.connected) {
-      if (!this.body!.embedded && this.body!.touching.none && this.connectionBufferTime >= 750) {
+      if (!this.body!.embedded && this.body!.touching.none && this.connectionBufferTime >= 1250) {
         // if (this.x < 610 && this.y > 515 && this.myPlayer!.x < 610 && this.myPlayer!.y > 515) return
         phaserEvents?.emit(GameEvent.PLAYER_DISCONNECTED, this.playerId)
         this.connectionBufferTime = 0
         this.connected = false
-        // } else if (!this.mediaConnected && this.connectionBufferTime >= 750) {
+        // } else if (!this.mediaConnected && this.connectionBufferTime >= 1250) {
         //   phaserEvents?.emit(GameEvent.PLAYER_DISCONNECTED, this.playerId)
         //   this.connectionBufferTime = 0
         //   this.connected = false

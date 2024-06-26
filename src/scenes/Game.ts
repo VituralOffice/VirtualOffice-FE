@@ -205,6 +205,12 @@ export default class Game extends Phaser.Scene {
     this.otherPlayerMap.get(id)?.setConnected(connected)
   }
 
+  resetAllOtherPlayerWaitBuffer() {
+    this.otherPlayerMap.forEach((op) => {
+      op.resetConnectionBufferTime()
+    })
+  }
+
   private handleItemSelectorOverlap(playerSelector, selectionItem) {
     const currentItem = playerSelector.selectedItem as Item
     // currentItem is undefined if nothing was perviously selected
