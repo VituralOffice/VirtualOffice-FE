@@ -15,6 +15,8 @@ import { UploadChatImage } from '../../../apis/ChatApis'
 import { isApiSuccess } from '../../../apis/util'
 import { useParams } from 'react-router-dom'
 import AttachFileIcon from '@mui/icons-material/AttachFile'
+import CloseIcon from '@mui/icons-material/Close'
+import { formatFileName } from '../../../utils/util'
 
 const Backdrop = styled.div`
   position: fixed;
@@ -77,7 +79,7 @@ const InputWrapper = styled.form`
   border: 1px solid rgb(88 97 159);
   border-radius: 0px 0px 10px 10px;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   background: linear-gradient(rgb(26 29 45), rgb(34 38 57));
 `
 
@@ -235,40 +237,107 @@ export default function MeetingChatSidebar() {
         )}
       </ChatBox>
       <InputWrapper onSubmit={handleSubmit}>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            cursor: 'pointer',
-          }}
-          onClick={handleFileClick}
-        >
-          <input
-            type="file"
-            ref={fileInputRef}
-            style={{ display: 'none' }}
-            onChange={handleFileChange}
+        {images.length > 0 && (
+          <div style={{ width: '100%', display: 'flex' }}>
+            {images.map((image, idx) => (
+              <div
+                key={idx}
+                style={{
+                  width: '100px',
+                  height: '100px',
+                  margin: '10px',
+                  background: 'rgb(255, 255, 255, 0.2)',
+                  borderRadius: '5px',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  position: 'relative',
+                }}
+              >
+                <img
+                  src={image.preview}
+                  alt="Preview"
+                  style={{ maxHeight: '100%', maxWidth: '100%' }}
+                />
+                <IconButton
+                  aria-label="close dialog"
+                  className="close"
+                  onClick={() => setImages(images.filter((_, i) => i !== idx))}
+                  size="small"
+                  style={{ position: 'absolute', right: '0', top: '0' }}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </div>
+            ))}
+          </div>
+        )}
+        {files.length > 0 && (
+          <div style={{ width: '100%', display: 'flex' }}>
+            {files.map((file, idx) => (
+              <div
+                key={idx}
+                style={{
+                  width: '100px',
+                  height: '100px',
+                  margin: '10px',
+                  position: 'relative',
+                  background: 'rgb(255, 255, 255, 0.2)',
+                  borderRadius: '5px',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <p style={{ color: 'white' }}>{formatFileName(file.name)}</p>
+                <IconButton
+                  aria-label="close dialog"
+                  className="close"
+                  onClick={() => setFiles(files.filter((_, i) => i !== idx))}
+                  size="small"
+                  style={{ position: 'absolute', right: '0', top: '0' }}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </div>
+            ))}
+          </div>
+        )}
+        <div style={{ display: 'flex', width: '100%' }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              cursor: 'pointer',
+            }}
+            onClick={handleFileClick}
+          >
+            <input
+              type="file"
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              onChange={handleFileChange}
+            />
+            <AttachFileIcon style={{ color: 'white' }}> </AttachFileIcon>
+          </div>
+          <InputTextField
+            inputRef={inputRef}
+            fullWidth
+            placeholder="Press Enter to chat"
+            value={inputValue}
+            // onKeyDown={handleKeyDown}
+            onChange={handleChange}
+            onFocus={() => {
+              setReadyToSubmit(true)
+            }}
+            onBlur={() => {
+              setReadyToSubmit(false)
+            }}
           />
-          <AttachFileIcon style={{ color: 'white' }}> </AttachFileIcon>
+          <IconButton aria-label="emoji" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
+            <InsertEmoticonIcon />
+          </IconButton>
         </div>
-        <InputTextField
-          inputRef={inputRef}
-          fullWidth
-          placeholder="Press Enter to chat"
-          value={inputValue}
-          // onKeyDown={handleKeyDown}
-          onChange={handleChange}
-          onFocus={() => {
-            setReadyToSubmit(true)
-          }}
-          onBlur={() => {
-            setReadyToSubmit(false)
-          }}
-        />
-        <IconButton aria-label="emoji" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
-          <InsertEmoticonIcon />
-        </IconButton>
       </InputWrapper>
     </Wrapper>
   )
