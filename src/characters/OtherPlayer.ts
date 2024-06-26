@@ -97,6 +97,11 @@ export default class OtherPlayer extends Player {
             `OtherPlayer::updateOtherPlayer user ${this.playerId} change mediaConnected to ${value}`
           )
           this.mediaConnected = value
+          if (!this.mediaConnected) {
+            if (this.connected) this.connected = false
+            WebRTC.getInstance()?.deleteVideoStream(this.playerId)
+            WebRTC.getInstance()?.deleteOnCalledVideoStream(this.playerId)
+          }
         }
         break
       case 'isInMeeting':
@@ -196,10 +201,10 @@ export default class OtherPlayer extends Player {
         phaserEvents?.emit(GameEvent.PLAYER_DISCONNECTED, this.playerId)
         this.connectionBufferTime = 0
         this.connected = false
-      } else if (!this.mediaConnected && this.connectionBufferTime >= 750) {
-        phaserEvents?.emit(GameEvent.PLAYER_DISCONNECTED, this.playerId)
-        this.connectionBufferTime = 0
-        this.connected = false
+        // } else if (!this.mediaConnected && this.connectionBufferTime >= 750) {
+        //   phaserEvents?.emit(GameEvent.PLAYER_DISCONNECTED, this.playerId)
+        //   this.connectionBufferTime = 0
+        //   this.connected = false
       } else if (this.isInMeeting) {
         phaserEvents?.emit(GameEvent.PLAYER_DISCONNECTED, this.playerId)
         this.connectionBufferTime = 0
