@@ -90,13 +90,13 @@ export const chatSlice = createSlice({
       action.payload.forEach((c) => {
         switch (c.type) {
           case CHAT_TYPE.PRIVATE:
-            state.privateChats.push(c)
+            state.privateChats.unshift(c)
             break
           case CHAT_TYPE.GROUP:
-            state.groupChats.push(c)
+            state.groupChats.unshift(c)
             break
           case CHAT_TYPE.PUBLIC:
-            state.publicChats.push(c)
+            state.publicChats.unshift(c)
             break
           default:
             break
@@ -123,30 +123,38 @@ export const chatSlice = createSlice({
     },
     addChat: (state, action: PayloadAction<{ chat: IChat; mapMessage: IMapMessage }>) => {
       //add chat
-      const { _id } = action.payload.chat
+      const { chat } = action.payload
       let index = -1
-      switch (action.payload.chat.type) {
+      switch (chat.type) {
         case CHAT_TYPE.PRIVATE:
-          index = state.privateChats.findIndex((c) => c._id === _id)
+          index = state.privateChats.findIndex((c) => c._id === chat._id)
           if (index >= 0) {
-            state.privateChats[index] = action.payload.chat
-          } else state.privateChats.unshift(action.payload.chat)
+            state.privateChats[index] = chat
+          } else state.privateChats.unshift(chat)
           break
         case CHAT_TYPE.GROUP:
-          index = state.groupChats.findIndex((c) => c._id === _id)
+          index = state.groupChats.findIndex((c) => c._id === chat._id)
           if (index >= 0) {
-            state.groupChats[index] = action.payload.chat
-          } else state.groupChats.unshift(action.payload.chat)
+            state.groupChats[index] = chat
+          } else state.groupChats.unshift(chat)
           break
         case CHAT_TYPE.PUBLIC:
-          index = state.publicChats.findIndex((c) => c._id === _id)
+          index = state.publicChats.findIndex((c) => c._id === chat._id)
           if (index >= 0) {
-            state.publicChats[index] = action.payload.chat
-          } else state.publicChats.unshift(action.payload.chat)
+            state.publicChats[index] = chat
+          } else state.publicChats.unshift(chat)
           break
         default:
           break
       }
+
+      if (state.chatType == chat.type)
+        state.listChats =
+          chat.type == CHAT_TYPE.PRIVATE
+            ? state.privateChats
+            : chat.type == CHAT_TYPE.GROUP
+            ? state.groupChats
+            : state.publicChats
 
       //add map messages
       state.mapMessages.set(action.payload.mapMessage._id, action.payload.mapMessage)

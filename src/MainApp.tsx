@@ -66,6 +66,19 @@ function App() {
     }
   }, []) // Run only once when the application starts
 
+  // useEffect(() => {
+  //   const handlePopState = () => {
+  //     window.location.reload();
+  //   };
+
+  //   window.addEventListener('popstate', handlePopState);
+
+  //   // Cleanup the event listener on component unmount
+  //   return () => {
+  //     window.removeEventListener('popstate', handlePopState);
+  //   };
+  // }, []);
+
   return (
     <Backdrop>
       {/* <LoadingPage /> */}
