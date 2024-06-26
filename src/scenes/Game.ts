@@ -201,6 +201,10 @@ export default class Game extends Phaser.Scene {
     console.log('Game::create Game created')
   }
 
+  setOtherPlayerConnected(id: string, connected: boolean) {
+    this.otherPlayerMap.get(id)?.setConnected(connected)
+  }
+
   private handleItemSelectorOverlap(playerSelector, selectionItem) {
     const currentItem = playerSelector.selectedItem as Item
     // currentItem is undefined if nothing was perviously selected

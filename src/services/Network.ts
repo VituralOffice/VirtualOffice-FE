@@ -407,6 +407,11 @@ export default class Network {
     this.room?.send(Message.UPDATE_PLAYER_NAME, { name: currentName })
   }
 
+  // method to send player name to Colyseus server
+  resetMyMediaStream(clientId: string) {
+    this.room?.send(Message.MEDIA_STREAM_CHANGE, { clientId })
+  }
+
   updatePlayerCharacterId(id: string) {
     this.room?.send(Message.UPDATE_PLAYER_CHARACTER_ID, { id })
   }

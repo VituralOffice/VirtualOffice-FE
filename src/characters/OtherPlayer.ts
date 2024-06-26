@@ -32,8 +32,24 @@ export default class OtherPlayer extends Player {
     this.playContainerBody = this.playerContainer.body as Phaser.Physics.Arcade.Body
   }
 
+  setConnected(connected: boolean) {
+    this.connected = connected
+  }
+
   makeCall(myPlayer: MyPlayer, webRTC: WebRTC) {
     this.myPlayer = myPlayer
+  //   console.log('Checking conditions:', {
+  //     connected: this.connected,
+  //     connectionBufferTime: this.connectionBufferTime,
+  //     myPlayerReadyToConnect: myPlayer.readyToConnect,
+  //     thisReadyToConnect: this.readyToConnect,
+  //     myPlayerMediaConnected: myPlayer.mediaConnected,
+  //     thisMediaConnected: this.mediaConnected,
+  //     myPlayerIsPlayerInMeeting: myPlayer.isPlayerInMeeting(),
+  //     thisIsInMeeting: this.isInMeeting,
+  //     myPlayerId: myPlayer.getPlayerId(),
+  //     thisPlayerId: this.playerId
+  // });
     if (
       !this.connected &&
       this.connectionBufferTime >= 750 &&
@@ -48,9 +64,9 @@ export default class OtherPlayer extends Player {
       // console.log(myPlayer.getPlayerId() + " ------- " + this.playerId)
       console.log(
         'OtherPlayer::makeCall ' +
-          myPlayer.playerNameText.text +
-          ' connect ' +
-          this.playerNameText.text
+        myPlayer.playerNameText.text +
+        ' connect ' +
+        this.playerNameText.text
       )
       // console.log(`OtherPlayer::makeCall myplayer id: ${myPlayer.getPlayerId()}, otherPlayerID: ${this.playerId}`)
       webRTC.connectToNewUser(this.playerId, this.playerNameText.text)
@@ -88,6 +104,15 @@ export default class OtherPlayer extends Player {
       case 'readyToConnect':
         if (typeof value === 'boolean') {
           this.readyToConnect = value
+        }
+        break
+
+      case 'changeMediaStream':
+        if (typeof value === 'number') {
+          console.log(`player ${this.playerId} change media stream`)
+          this.connected = false
+          WebRTC.getInstance()?.deleteVideoStream(this.playerId)
+          WebRTC.getInstance()?.deleteOnCalledVideoStream(this.playerId)
         }
         break
 
