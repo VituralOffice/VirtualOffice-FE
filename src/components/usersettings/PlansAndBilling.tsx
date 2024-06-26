@@ -62,6 +62,7 @@ const SubcriptionOrder = styled.div`
     }
   }
   .subcription-body {
+    font-weight: 500;
     display: flex;
     flex-direction: column;
     padding: 24px;
@@ -110,6 +111,22 @@ const PriceBlock = styled.div`
     line-height: 20px;
   }
 `
+
+const styles = {
+  mainFeatureText: {
+    color: 'rgb(51, 58, 100)',
+    fontSize: '15px',
+    lineHeight: '20px',
+    fontWeight: 700
+  },
+  subFeatureText: {
+    color: 'rgb(51, 58, 100)',
+    fontWeight: '500',
+    fontSize: '15px',
+    lineHeight: '20px',
+    opacity: 0.8
+  }
+}
 
 const BillOptionsBlock = styled.div`
   display: flex;
@@ -271,7 +288,7 @@ export default function PlansAndBilling() {
         </div> */}
       </ContentHeader>
 
-      <ContentBody>
+      <ContentBody style={{ marginTop: 20 }}>
         {subscriptions.map((subscription) => (
           <SubcriptionOrder key={subscription._id}>
             <div className="subcription-header">
@@ -394,13 +411,16 @@ export default function PlansAndBilling() {
                       Monthly
                     </div>
                   </BillOptionsBlock>
-                  <div>
-                    <p className="price-text">Max room: {p.maxRoom}</p>
-                    <p className="price-text">Max people in room: {p.maxRoomCapacity}</p>
-                  </div>
+                  {/* <div>
+                    
+                  </div> */}
                   <DetailsBlock>
+                    <p style={styles.mainFeatureText}>Max room: {p.maxRoom}</p>
+                    <p style={styles.mainFeatureText}>Max people in room: {p.maxRoomCapacity}</p>
                     {p.features.map((f, i) => (
-                      <p key={i}>{f}</p>
+                      <p style={styles.subFeatureText} key={i}>
+                        {f}
+                      </p>
                     ))}
                   </DetailsBlock>
                   <ButtonSelect onClick={() => handleCheckout(p)}>Purchase</ButtonSelect>

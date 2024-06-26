@@ -162,9 +162,11 @@ export default function MeetingDialog() {
   useEffect(() => {
     if (peerDisplayStreams.size == 0 && myPeerDisplayStream == null) {
       setShareScreenAvailable(false)
+      setActiveMeetingView(0)
     } else {
       setShareScreenAvailable(true)
     }
+    // console.log(peerDisplayStreams.size, myPeerDisplayStream != null)
   }, [peerDisplayStreams, myPeerDisplayStream])
 
   useEffect(() => {
@@ -248,10 +250,10 @@ export default function MeetingDialog() {
                 onClick={async () => {
                   if (shareScreenManager?.myStream) {
                     shareScreenManager?.stopScreenShare();
-                    setActiveMeetingView(0);
+                    // setActiveMeetingView(0);
                   } else {
                     let success = await shareScreenManager?.startScreenShare()
-                    console.log(success)
+                    // console.log(success)
                     if (success) setActiveMeetingView(1);
                   }
                 }}
