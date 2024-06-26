@@ -20,7 +20,7 @@ export default class UserMediaManager {
 
     this.myPeer.on('call', (call) => {
       console.log(`receive call from ${call.peer}`)
-      const sessionId = call.metadata.sessionId;
+      const sessionId = call.metadata.sessionId
       if (this.isReady) {
         call.answer()
         call.on('stream', (userVideoStream) => {
@@ -60,11 +60,9 @@ export default class UserMediaManager {
     return `${id.replace(/[^0-9a-z]/gi, 'G')}-um`
   }
 
-  startCameraShare(video: boolean, microphone: boolean, meetingId: string): boolean {
+  async startCameraShare(video: boolean, microphone: boolean, meetingId: string): Promise<boolean> {
     if (!video && !microphone) return false
-    console.log(`UserMediaManager::startCameraShare`)
-    // @ts-ignore
-    navigator.mediaDevices
+    const result = await navigator.mediaDevices
       ?.getUserMedia({
         video: video,
         audio: microphone,
@@ -84,11 +82,12 @@ export default class UserMediaManager {
             this.onUserJoined(userId)
           }
         }
+        return true
       })
       .catch((e) => {
         return false
       })
-    return true
+    return result
   }
 
   // TODO(daxchen): Fix this trash hack, if we call store.dispatch here when calling
@@ -123,7 +122,7 @@ export default class UserMediaManager {
   private processQueuedCalls() {
     this.queuedCalls.forEach((call) => {
       call.answer()
-      const sessionId = call.metadata.sessionId;
+      const sessionId = call.metadata.sessionId
       call.on('stream', (userVideoStream) => {
         console.log(`UserMediaManager::on stream ${call.peer}`)
         store.dispatch(

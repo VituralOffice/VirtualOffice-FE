@@ -430,6 +430,7 @@ export default class Network {
 
   // method to send stream-disconnection signal to Colyseus server
   playerStreamDisconnect(id: string) {
+    console.log(`Player ${id} disconnect stream`)
     this.room?.send(Message.DISCONNECT_STREAM, { clientId: id })
     this.webRTC?.deleteVideoStream(id)
   }

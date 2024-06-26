@@ -106,16 +106,13 @@ const OfficeToolbar = () => {
   const [isToolbarExpanded, setIsToolbarExpanded] = useState(true);
   const showChat = useAppSelector((state) => state.chat.showChat)
   const navigate = useNavigate()
-  const dispatch = useDispatch()
 
   const toggetMic = () => {
-    const nextState = !user.microphoneON;
-    WebRTC.getInstance()?.turnMic(nextState)
+    WebRTC.getInstance()?.toggleMic()
   }
 
   const toggetCam = () => {
-    const nextState = !user.cameraON;
-    WebRTC.getInstance()?.turnCam(nextState)
+    WebRTC.getInstance()?.toggleCam()
   }
 
   return (

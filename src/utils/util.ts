@@ -48,18 +48,44 @@ export async function addStopAllTrackBeforeUnloadEvent() {
   }
   window.addEventListener('unload', func)
 }
+// const colorArr = [
+//   '#7bf1a8',
+//   '#ff7e50',
+//   '#9acd32',
+//   '#daa520',
+//   '#ff69b4',
+//   '#c085f6',
+//   '#1e90ff',
+//   '#5f9da0',
+// ]
+// export function getColorByString(string: string) {
+//   return colorArr[Math.floor(string.charCodeAt(0) % colorArr.length)]
+// }
+
 const colorArr = [
-  '#7bf1a8',
-  '#ff7e50',
-  '#9acd32',
-  '#daa520',
-  '#ff69b4',
-  '#c085f6',
-  '#1e90ff',
-  '#5f9da0',
-]
+  '#FF5733', '#33FF57', '#5733FF', '#FF33A8', '#A833FF', '#33FFA8',
+  '#FFA833', '#33A8FF', '#A8FF33', '#FF3333', '#33FF33', '#3333FF',
+  '#FF33FF', '#33FFFF', '#FFFF33', '#FF8C33', '#8CFF33', '#338CFF',
+  '#8C33FF', '#FF338C', '#33FF8C', '#FF33B5', '#B533FF', '#33B5FF',
+  '#B5FF33', '#FFB533'
+];
+
+const colorCache = new Map<string, string>();
+
 export function getColorByString(string: string) {
-  return colorArr[Math.floor(string.charCodeAt(0) % colorArr.length)]
+  if (colorCache.has(string)) {
+    return colorCache.get(string);
+  }
+
+  let sum = 0;
+  for (let i = 0; i < string.length; i++) {
+    sum += string.charCodeAt(i);
+  }
+
+  const color = colorArr[sum % colorArr.length];
+  colorCache.set(string, color);
+
+  return color;
 }
 
 export function castObject<A extends object, B extends object>(source: A): B {

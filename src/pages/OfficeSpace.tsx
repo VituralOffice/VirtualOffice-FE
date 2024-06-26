@@ -134,6 +134,10 @@ const OfficeSpace: React.FC<OfficeSpaceProps> = ({ loading, setLoading }) => {
     }
   }, [UICount])
 
+  // useEffect(() => {
+  //   console.log(`cam: ${meeting.cameraON}, mic: ${meeting.microphoneON}`)
+  // }, [meeting.cameraON, meeting.microphoneON])
+
   return (
     <>
       {joinPageShow && roomStore.roomData && (
