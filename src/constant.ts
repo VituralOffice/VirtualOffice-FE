@@ -14,28 +14,31 @@ export const PEER_CONNECT_OPTIONS = {
     // ],
     iceServers: [
       {
-        urls: 'stun:stun.relay.metered.ca:80',
+        urls: 'stun:14.225.253.168:3478',
       },
-      {
-        urls: 'turn:asia-east.relay.metered.ca:80',
-        username: 'ea5efd3c89635bc876b80bff',
-        credential: 'ObPpozbgAaGWMDPG',
-      },
-      {
-        urls: 'turn:asia-east.relay.metered.ca:80?transport=tcp',
-        username: 'ea5efd3c89635bc876b80bff',
-        credential: 'ObPpozbgAaGWMDPG',
-      },
-      {
-        urls: 'turn:asia-east.relay.metered.ca:443',
-        username: 'ea5efd3c89635bc876b80bff',
-        credential: 'ObPpozbgAaGWMDPG',
-      },
-      {
-        urls: 'turns:asia-east.relay.metered.ca:443?transport=tcp',
-        username: 'ea5efd3c89635bc876b80bff',
-        credential: 'ObPpozbgAaGWMDPG',
-      },
+      // {
+      //   urls: 'stun:stun.relay.metered.ca:80',
+      // },
+      // {
+      //   urls: 'turn:asia-east.relay.metered.ca:80',
+      //   username: 'ea5efd3c89635bc876b80bff',
+      //   credential: 'ObPpozbgAaGWMDPG',
+      // },
+      // {
+      //   urls: 'turn:asia-east.relay.metered.ca:80?transport=tcp',
+      //   username: 'ea5efd3c89635bc876b80bff',
+      //   credential: 'ObPpozbgAaGWMDPG',
+      // },
+      // {
+      //   urls: 'turn:asia-east.relay.metered.ca:443',
+      //   username: 'ea5efd3c89635bc876b80bff',
+      //   credential: 'ObPpozbgAaGWMDPG',
+      // },
+      // {
+      //   urls: 'turns:asia-east.relay.metered.ca:443?transport=tcp',
+      //   username: 'ea5efd3c89635bc876b80bff',
+      //   credential: 'ObPpozbgAaGWMDPG',
+      // },
     ],
   },
 }
