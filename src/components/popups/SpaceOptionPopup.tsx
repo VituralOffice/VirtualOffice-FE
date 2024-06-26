@@ -79,6 +79,7 @@ export default function SpaceOptionPopup({
         const response = await LeaveRoom(room._id)
         if (isApiSuccess(response)) {
           toast('Leave room success!')
+          navigate("/app")
         }
       }
     } catch (error) {

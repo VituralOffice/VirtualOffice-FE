@@ -9,6 +9,7 @@ import { SpaceItem } from '../components/SpaceItem'
 import { RoomQueryParam } from '../types/Rooms'
 import { debounce } from '../utils/helpers'
 import LoadingPage from './LoadingPage'
+import { useLocation } from 'react-router-dom'
 
 const TopBar = styled.div`
   display: flex;
@@ -173,6 +174,7 @@ function SpacePage() {
   const [spaces, setSpaces] = useState<any[]>([])
   const [param, setParam] = useState<RoomQueryParam>({})
   const [keyword, setKeyword] = useState('')
+  const location = useLocation();
   const handleOptionPopupShow = (itemId: SetStateAction<string>) => {
     if (activeSpaceItemId === itemId) {
       setActiveSpaceItemId('')
@@ -204,7 +206,7 @@ function SpacePage() {
   }
   useEffect(() => {
     GetRoomsData()
-  }, [])
+  }, [location.key])
   useEffect(() => {
     GetRoomsData()
   }, [param])

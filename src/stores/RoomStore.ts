@@ -1,8 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 // import { RoomAvailable } from 'colyseus.js'
 import { IRoomData, IRoomMember } from '../types/Rooms'
-import { RootState } from '.'
+import { AppThunk, RootState } from '.'
 import { IMapData } from '../types/Rooms'
+import { GetRoomById } from '../apis/RoomApis'
 
 // interface RoomInterface extends RoomAvailable {
 //   name?: string
@@ -77,15 +78,49 @@ export const roomSlice = createSlice({
         member,
       ]
     },
-    updateMemberOnlineStatus: (state, action: PayloadAction<{ memberId: string, online: boolean }>) => {
-      const { memberId, online } = action.payload;
-      state.roomData.members = state.roomData.members.map(member =>
-        member.user._id === memberId ? { ...member, online } : member
-      );
+    updateMemberOnlineStatus: (
+      state,
+      action: PayloadAction<{ memberId: string; online: boolean }>
+    ) => {
+      const { memberId, online } = action.payload
+      const memberIndex = state.roomData.members.findIndex((m) => m.user._id == memberId)
+      if (memberIndex >= 0) state.roomData.members[memberIndex].online = online
+      // state.roomData.members = state.roomData.members.map(member =>
+      //   member.user._id === memberId ? { ...member, online } : member
+      // );
+      // else {
+      // }
+    },
+    removeMember: (state, action: PayloadAction<string>) => {
+      state.roomData.members = state.roomData.members.filter(
+        (m) => m.user._id != action.payload
+      )
     },
     resetRoomStore: () => initialState,
   },
 })
+
+// Define the thunk for updating member online status
+export const updateMemberOnlineStatusThunk =
+  (memberId: string, online: boolean): AppThunk =>
+  async (dispatch, getState) => {
+    const state = getState()
+    const memberIndex = state.room.roomData.members.findIndex((m) => m.user._id === memberId)
+
+    if (memberIndex >= 0) {
+      // Member found, update the online status
+      dispatch(roomSlice.actions.updateMemberOnlineStatus({ memberId, online }))
+    } else {
+      // Member not found, fetch room data from API
+      try {
+        const response = await GetRoomById({ _id: state.room.roomData._id }) // Replace with your API endpoint
+        const roomData = response.result
+        dispatch(roomSlice.actions.setRoomData(roomData))
+      } catch (error) {
+        console.error('Failed to fetch room data:', error)
+      }
+    }
+  }
 
 export const selectRoomId = (state: RootState) => state.room.roomData._id
 
@@ -98,6 +133,7 @@ export const {
   updateMemberOnlineStatus,
   setRoomData,
   resetRoomStore,
+  removeMember,
 } = roomSlice.actions
 
 export default roomSlice.reducer
