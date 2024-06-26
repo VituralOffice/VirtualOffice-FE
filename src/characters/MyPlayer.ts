@@ -15,6 +15,7 @@ import Game from '../scenes/Game'
 import { Meeting } from '../web/meeting/Meeting'
 import Whiteboard from '../items/WhiteBoard'
 import { phaserEvents } from '../PhaserGame'
+import { toast } from 'react-toastify'
 
 export default class MyPlayer extends Player {
   private playContainerBody: Phaser.Physics.Arcade.Body
@@ -232,7 +233,10 @@ export default class MyPlayer extends Player {
           this.chairOnSit.groupId !== '-1'
         ) {
           const meeting = Game.getInstance()?.meetingMap.get(this.chairOnSit.groupId!) as Meeting
-          if (meeting.isLocked) break
+          if (meeting.isLocked) {
+            toast("This meeting is being locked!")
+            break
+          }
           if (meeting.isOpen) {
             meeting.openDialog(network)
           } else {

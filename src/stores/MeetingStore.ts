@@ -1,16 +1,10 @@
-import Peer, { MediaConnection } from 'peerjs'
+import { MediaConnection } from 'peerjs'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import Game from '../scenes/Game'
 import { sanitizeId } from '../utils/util'
 import ShareScreenManager from '../web/meeting/ScreenSharingManager'
 import UserMediaManager from '../web/meeting/UserMediaManager'
-import WebRTC from '../web/WebRTC'
 import Network from '../services/Network'
-import { toast } from 'react-toastify'
-import { selectRoomId } from './RoomStore'
-import { selectUserId } from './UserStore'
-import { AppThunk } from '.'
-import { Meeting } from '../web/meeting/Meeting'
 
 interface MeetingState {
   meetingDialogOpen: boolean
