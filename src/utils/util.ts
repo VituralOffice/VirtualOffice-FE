@@ -63,29 +63,50 @@ export async function addStopAllTrackBeforeUnloadEvent() {
 // }
 
 const colorArr = [
-  '#FF5733', '#33FF57', '#5733FF', '#FF33A8', '#A833FF', '#33FFA8',
-  '#FFA833', '#33A8FF', '#A8FF33', '#FF3333', '#33FF33', '#3333FF',
-  '#FF33FF', '#33FFFF', '#FFFF33', '#FF8C33', '#8CFF33', '#338CFF',
-  '#8C33FF', '#FF338C', '#33FF8C', '#FF33B5', '#B533FF', '#33B5FF',
-  '#B5FF33', '#FFB533'
-];
+  '#FF5733',
+  '#33FF57',
+  '#5733FF',
+  '#FF33A8',
+  '#A833FF',
+  '#33FFA8',
+  '#FFA833',
+  '#33A8FF',
+  '#A8FF33',
+  '#FF3333',
+  '#33FF33',
+  '#3333FF',
+  '#FF33FF',
+  '#33FFFF',
+  '#FFFF33',
+  '#FF8C33',
+  '#8CFF33',
+  '#338CFF',
+  '#8C33FF',
+  '#FF338C',
+  '#33FF8C',
+  '#FF33B5',
+  '#B533FF',
+  '#33B5FF',
+  '#B5FF33',
+  '#FFB533',
+]
 
-const colorCache = new Map<string, string>();
+const colorCache = new Map<string, string>()
 
 export function getColorByString(string: string) {
   if (colorCache.has(string)) {
-    return colorCache.get(string);
+    return colorCache.get(string)
   }
 
-  let sum = 0;
+  let sum = 0
   for (let i = 0; i < string.length; i++) {
-    sum += string.charCodeAt(i);
+    sum += string.charCodeAt(i)
   }
 
-  const color = colorArr[sum % colorArr.length];
-  colorCache.set(string, color);
+  const color = colorArr[sum % colorArr.length]
+  colorCache.set(string, color)
 
-  return color;
+  return color
 }
 
 export function castObject<A extends object, B extends object>(source: A): B {
@@ -106,4 +127,10 @@ export function getResourceUrl(url?: string): string {
   } else {
     return `${AWS_S3_ENDPOINT}/${url}`
   }
+}
+export const formatFileName = (name: string) => {
+  if (!name) return ``
+  if (name.length < 20) return name
+  const [fileName, ext] = name.split(`.`)
+  return `${fileName.slice(0, 20)}...${ext}`
 }

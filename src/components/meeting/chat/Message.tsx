@@ -72,7 +72,7 @@ export const Message = ({ chatMessage }: MessageProps) => {
             <div
               style={{
                 width: '100px',
-                height: '60px',
+                height: 'auto',
                 margin: '10px',
                 position: 'relative',
               }}
@@ -88,7 +88,7 @@ export const Message = ({ chatMessage }: MessageProps) => {
           ) : chatMessage.message?.type === 'file' ? (
             <div
               style={{
-                height: '30px',
+                height: 'auto',
                 margin: '10px',
                 position: 'relative',
               }}
