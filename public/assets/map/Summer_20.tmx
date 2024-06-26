@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="46" height="36" tilewidth="32" tileheight="32" infinite="0" nextlayerid="27" nextobjectid="3482">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="46" height="36" tilewidth="32" tileheight="32" infinite="0" nextlayerid="27" nextobjectid="3484">
  <editorsettings>
   <export target="Summer_20.json" format="json"/>
  </editorsettings>
@@ -13625,6 +13625,8 @@
   <object id="3479" gid="5520" x="480" y="768" width="32" height="32"/>
   <object id="3480" gid="5520" x="480" y="416" width="32" height="32"/>
   <object id="3481" gid="5523" x="640" y="544" width="32" height="32"/>
+  <object id="3482" gid="6681" x="992" y="544" width="32" height="32"/>
+  <object id="3483" gid="6679" x="1088" y="544" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="6" name="Objects">
   <object id="2511" gid="3006" x="1056" y="704" width="32" height="32"/>

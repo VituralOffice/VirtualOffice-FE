@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { useAppDispatch, useAppSelector } from '../../hook'
-import { closeMeetingDialog, setCameraON, setMicrophoneON } from '../../stores/MeetingStore'
+import { closeMeetingDialog, setCameraONThunk, setMicrophoneONThunk } from '../../stores/MeetingStore'
 import { CustomToggleButton } from '../buttons/CustomToggleButton'
 import MicRoundedIcon from '@mui/icons-material/MicRounded'
 import MicOffRoundedIcon from '@mui/icons-material/MicOffRounded'
@@ -151,12 +151,10 @@ export default function MeetingDialog() {
   }
 
   const toggetMic = () => {
-    const nextState = !meeting.microphoneON
-    dispatch(setMicrophoneON(nextState))
+    dispatch(setMicrophoneONThunk())
   }
   const toggetCam = () => {
-    const nextState = !meeting.cameraON
-    dispatch(setCameraON(nextState))
+    dispatch(setCameraONThunk())
   }
 
   useEffect(() => {

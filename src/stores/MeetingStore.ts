@@ -5,6 +5,7 @@ import { sanitizeId } from '../utils/util'
 import ShareScreenManager from '../web/meeting/ScreenSharingManager'
 import UserMediaManager from '../web/meeting/UserMediaManager'
 import Network from '../services/Network'
+import { AppThunk } from '.'
 
 interface MeetingState {
   meetingDialogOpen: boolean
@@ -79,7 +80,7 @@ export const meetingSlice = createSlice({
       }
       Game.getInstance()?.myPlayer.setPlayerIsInMeeting(true)
       Game.getInstance()?.disableKeys()
-      const meeting = Game.getInstance()?.meetingMap.get(action.payload.meetingId);
+      const meeting = Game.getInstance()?.meetingMap.get(action.payload.meetingId)
       state.shareScreenManager.onOpen()
       state.userMediaManager.onOpen()
       state.meetingDialogOpen = true
@@ -94,12 +95,16 @@ export const meetingSlice = createSlice({
       state.initSuccess = true
 
       // Ensure that UserMediaManager is initialized before starting camera share
-      const { microphoneON, cameraON, meetingId } = action.payload;
-      const userMediaManager = state.userMediaManager;
+      const { microphoneON, cameraON, meetingId } = action.payload
+      const userMediaManager = state.userMediaManager
 
-      setTimeout(() => {
-        userMediaManager.startCameraShare(cameraON, microphoneON, meetingId);
-      }, 1000);
+      setTimeout(async () => {
+        const result = userMediaManager.startCameraShare(cameraON, microphoneON, meetingId)
+        if (!result) {
+          state.microphoneON = false
+          state.cameraON = false
+        }
+      }, 1000)
       console.log(
         `MeetingStore::openMeetingDialog set activeMeetingId : ${action.payload.meetingId}`
       )
@@ -137,7 +142,12 @@ export const meetingSlice = createSlice({
     },
     addDisplayStream: (
       state,
-      action: PayloadAction<{ id: string; sessionId: string; call: MediaConnection; stream: MediaStream }>
+      action: PayloadAction<{
+        id: string
+        sessionId: string
+        call: MediaConnection
+        stream: MediaStream
+      }>
     ) => {
       state.peerDisplayStreams.set(sanitizeId(action.payload.id), {
         sessionId: action.payload.sessionId,
@@ -153,7 +163,12 @@ export const meetingSlice = createSlice({
     },
     addCameraStream: (
       state,
-      action: PayloadAction<{ id: string; sessionId: string; call: MediaConnection; stream: MediaStream }>
+      action: PayloadAction<{
+        id: string
+        sessionId: string
+        call: MediaConnection
+        stream: MediaStream
+      }>
     ) => {
       state.peerCameraStreams.set(sanitizeId(action.payload.id), {
         sessionId: action.payload.sessionId,
@@ -225,50 +240,125 @@ export const meetingSlice = createSlice({
     setTitle: (state, action: PayloadAction<{ meetingId: string; title: string }>) => {
       if (state.activeMeetingId === action.payload.meetingId) state.title = action.payload.title
     },
-    setMicrophoneON: (
-      state,
-      action: PayloadAction<boolean>
-    ) => {
-      if (
-        state.initSuccess &&
-        action.payload != state.microphoneON
-      ) {
-        if (!state.cameraON && !action.payload) {
-          state.microphoneON = action.payload
-          state.userMediaManager?.stopCameraShare()
-          Network.getInstance()?.onStopCameraShare(state.activeMeetingId!)
-          state.myCameraStream = null
-        } else if (
-          state.userMediaManager?.startCameraShare(state.cameraON, action.payload, state.activeMeetingId!)
-        ) {
-          state.microphoneON = action.payload
-        } else {
-          state.microphoneON = false;
-        }
-      }
+    setMicrophoneON: (state, action: PayloadAction<boolean>) => {
+      state.microphoneON = action.payload
     },
     setCameraON: (state, action: PayloadAction<boolean>) => {
-      if (
-        state.initSuccess &&
-        action.payload != state.cameraON
-      ) {
-        if (!state.microphoneON && !action.payload) {
-          state.cameraON = action.payload
-          state.userMediaManager?.stopCameraShare()
-          Network.getInstance()?.onStopCameraShare(state.activeMeetingId!)
-          state.myCameraStream = null
-        } else if (
-          state.userMediaManager?.startCameraShare(action.payload, state.microphoneON, state.activeMeetingId!)
-        ) {
-          state.cameraON = action.payload
-        } else {
-          state.cameraON = false;
-        }
-      }
+      state.cameraON = action.payload
     },
+    // setMicrophoneON: (state) => {
+    //   const nextState = !state.microphoneON
+    //   console.log(`MeetingStore::setMicrophoneON nextState: ${nextState}`)
+    //   if (state.initSuccess && nextState != state.microphoneON) {
+    //     if (!state.cameraON && !nextState) {
+    //       state.microphoneON = nextState
+    //       state.userMediaManager?.stopCameraShare()
+    //       Network.getInstance()?.onStopCameraShare(state.activeMeetingId!)
+    //       state.myCameraStream = null
+    //     } else {
+    //       if (
+    //         state.userMediaManager?.startCameraShare(
+    //           state.cameraON,
+    //           nextState,
+    //           state.activeMeetingId!
+    //         )
+    //       ) {
+    //         state.microphoneON = nextState
+    //         console.log(
+    //           `MeetingStore::setMicrophoneON state.microphoneON = nextState = ${nextState}`
+    //         )
+    //       } else {
+    //         state.microphoneON = false
+    //         console.log(`MeetingStore::setMicrophoneON state.microphoneON = ${nextState}`)
+    //       }
+    //     }
+    //   }
+    // },
+    // setCameraON: (state) => {
+    //   const nextState = !state.cameraON
+    //   if (state.initSuccess && nextState != state.cameraON) {
+    //     if (!state.microphoneON && !nextState) {
+    //       state.cameraON = nextState
+    //       state.userMediaManager?.stopCameraShare()
+    //       Network.getInstance()?.onStopCameraShare(state.activeMeetingId!)
+    //       state.myCameraStream = null
+    //     } else {
+    //       if (
+    //         state.userMediaManager?.startCameraShare(
+    //           nextState,
+    //           state.microphoneON,
+    //           state.activeMeetingId!
+    //         )
+    //       ) {
+    //         state.cameraON = nextState
+    //       } else {
+    //         state.cameraON = false
+    //       }
+    //     }
+    //   }
+    // },
     resetMeetingStore: () => initialState,
   },
 })
+
+// Thunk to set microphone ON or OFF
+export const setMicrophoneONThunk = (): AppThunk => async (dispatch, getState) => {
+  const state = getState()
+  const nextState = !state.meeting.microphoneON
+  // console.log(`MeetingStore::setMicrophoneON nextState: ${nextState}`)
+
+  if (state.meeting.initSuccess && nextState !== state.meeting.microphoneON) {
+    if (!state.meeting.cameraON && !nextState) {
+      dispatch(setMicrophoneON(nextState))
+      state.meeting.userMediaManager?.stopCameraShare()
+      Network.getInstance()?.onStopCameraShare(state.meeting.activeMeetingId!)
+      dispatch(setMyCameraStream(null))
+    } else {
+      const result = await state.meeting.userMediaManager?.startCameraShare(
+        state.meeting.cameraON,
+        nextState,
+        state.meeting.activeMeetingId!
+      )
+
+      if (result) {
+        dispatch(setMicrophoneON(nextState))
+        console.log(
+          // `MeetingStore::setMicrophoneON state.meeting.microphoneON = nextState = ${nextState}`
+        )
+      } else {
+        dispatch(setMicrophoneON(false))
+        // console.log(`MeetingStore::setMicrophoneON state.microphoneON = ${nextState}`)
+      }
+    }
+  }
+}
+
+// Thunk to set camera ON or OFF
+export const setCameraONThunk = (): AppThunk => async (dispatch, getState) => {
+  const state = getState()
+  const nextState = !state.meeting.cameraON
+
+  if (state.meeting.initSuccess && nextState !== state.meeting.cameraON) {
+    if (!state.meeting.microphoneON && !nextState) {
+      dispatch(setCameraON(nextState))
+      state.meeting.userMediaManager?.stopCameraShare()
+      Network.getInstance()?.onStopCameraShare(state.meeting.activeMeetingId!)
+      dispatch(setMyCameraStream(null))
+    } else {
+      const result = await state.meeting.userMediaManager?.startCameraShare(
+        nextState,
+        state.meeting.microphoneON,
+        state.meeting.activeMeetingId!
+      )
+
+      if (result) {
+        dispatch(setCameraON(nextState))
+      } else {
+        dispatch(setCameraON(false))
+      }
+    }
+  }
+}
 
 export const {
   closeMeetingDialog,
