@@ -46,6 +46,7 @@ const Spinner = styled.img`
 `
 
 const LoadingText = styled.span`
+  margin-left: 10px;
   color: rgb(224, 224, 224);
   font-family: 'DM Sans', sans-serif;
   font-weight: 700;
