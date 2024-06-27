@@ -23,7 +23,7 @@ export default class WebRTC {
   private myVideo
   private myStream?: MediaStream
   private network: Network
-  private isActive: boolean
+  // private isActive: boolean
 
   constructor(userId: string, network: Network) {
     console.log('WebRTC::constructor Construct WebRTC')
@@ -40,7 +40,7 @@ export default class WebRTC {
 
     // config peerJS
     this.initialize()
-    this.isActive = true
+    // this.isActive = true
   }
 
   static getInstance(): WebRTC | null {
@@ -55,13 +55,15 @@ export default class WebRTC {
 
   initialize() {
     this.myPeer.on('call', (call) => {
-      if (!this.isActive) return
+      // if (!this.isActive) return
+      // console.log(`user mic: ${store.getState().user.microphoneON}, user cam: ${store.getState().user.cameraON}`)
+      // console.log(`receive call mic: ${this.myStream?.getAudioTracks().length} video: ${this.myStream?.getVideoTracks().length}`)
       if (!this.onCalledPeers.has(call.peer)) {
-        console.log('WebRTC::initialize answer call from ', call.metadata?.fullname)
+        // console.log('WebRTC::initialize answer call from ', call.metadata?.sender.fullname)
         call.answer(this.myStream)
 
         // Access fullname from call metadata
-        const fullname = call.metadata?.fullname || 'Unknown User'
+        const fullname = call.metadata?.sender.fullname || 'Unknown User'
 
         // Create elements
         const uiBlock = document.createElement('div')
@@ -73,6 +75,7 @@ export default class WebRTC {
         this.onCalledPeers.set(call.peer, { call, uiBlock, video })
 
         call.on('stream', (userVideoStream) => {
+          // console.log(`receive call mic: ${userVideoStream.getAudioTracks().length} video: ${userVideoStream.getVideoTracks().length}`)
           this.addVideoStream(uiBlock, video, userVideoStream, false)
         })
       }
@@ -80,8 +83,12 @@ export default class WebRTC {
     })
   }
 
+  getPeers() {
+    return this.peers
+  }
+
   disconnect() {
-    this.cleanupStream()
+    this.cleanupMyStream()
 
     this.peers.forEach((peer) => {
       peer.call.close()
@@ -97,17 +104,16 @@ export default class WebRTC {
     })
     this.onCalledPeers.clear()
 
-    if (this.myVideo) this.myVideo.remove()
-    this.isActive = false
+    if (this.myVideo) {
+      this.myVideo.remove()
+      this.myVideo = undefined
+    }
+    // this.isActive = false
   }
 
   // check if permission has been granted before
   checkPreviousPermission() {
-    this.isActive = true
-    // const permissionName = 'microphone' as PermissionName
-    // navigator.permissions?.query({ name: permissionName }).then((result) => {
-    //   if (result.state === 'granted') this.getUserMedia(false)
-    // })
+    // this.isActive = true
     this.getUserMedia(store.getState().user.cameraON, store.getState().user.microphoneON, false)
   }
 
@@ -119,19 +125,30 @@ export default class WebRTC {
         audio: audio,
       })
       .then((stream) => {
-        // const hasCam = stream.getVideoTracks().length > 0
-        // const hasMic = stream.getAudioTracks().length > 0
-        // console.log(`has cam: ${hasCam}, has mic: ${hasMic}`)
-        console.log(
-          `WebRTC:: success get user media, video: ${video} ${
-            stream.getVideoTracks().length
-          }, audio: ${audio}`
-        )
         store.dispatch(setMicrophoneON(audio))
         store.dispatch(setCameraON(video))
         store.dispatch(setMediaConnected(true))
         this.network.mediaConnected(true)
-        this.cleanupStream()
+
+        Network.getInstance()?.resetMyMediaStream(Network.getInstance()?.mySessionId!)
+        Game.getInstance()?.resetAllOtherPlayerWaitBuffer()
+        this.peers.forEach((peer) => {
+          // console.log(`disconnect peer in this.peers: fullname: ${peer.call.metadata.receiver.fullname}, playerId: ${peer.call.metadata.receiver.playerId}`)
+          Game.getInstance()?.setOtherPlayerConnected(peer.call.metadata.receiver.playerId, false)
+          // Network.getInstance()?.resetMyMediaStream(p.call.metadata.playerId)
+          peer.call.close()
+          peer?.uiBlock.remove()
+        })
+        this.peers.clear()
+        this.onCalledPeers.forEach((peer) => {
+          // console.log(`disconnect peer in this.onCalledPeers: ${peer.call.metadata.sender.fullname}`)
+          // Game.getInstance()?.setOtherPlayerConnected(peer.call.metadata.sender.playerId, false)
+          peer.call.close()
+          peer?.uiBlock.remove()
+        })
+        this.onCalledPeers.clear()
+
+        this.cleanupMyStream()
         this.myStream = stream
 
         // mute your own video stream (you don't want to hear yourself)
@@ -144,26 +161,88 @@ export default class WebRTC {
         this.addVideoStream(this.myVideo, this.myVideo, this.myStream, true)
       })
       .catch((error) => {
+        if (video || audio) {
+          return
+        }
         console.log(`WebRTC:: failed get user media, video: ${video}, audio: ${audio}`)
-        this.cleanupStream()
+        // this.cleanupMyStream()
+        store.dispatch(setMediaConnected(false))
+        this.network.mediaConnected(false)
+        store.dispatch(setCameraON(false))
+        store.dispatch(setMicrophoneON(false))
+
+        Network.getInstance()?.resetMyMediaStream(Network.getInstance()?.mySessionId!)
+        Game.getInstance()?.resetAllOtherPlayerWaitBuffer()
+        this.peers.forEach((peer) => {
+          // console.log(`disconnect peer in this.peers: ${peer.call.metadata.receiver.fullname}`)
+          Game.getInstance()?.setOtherPlayerConnected(peer.call.metadata.receiver.playerId, false)
+          // Network.getInstance()?.resetMyMediaStream(p.call.metadata.playerId)
+          peer.call.close()
+          peer?.uiBlock.remove()
+        })
+        this.peers.clear()
+        this.onCalledPeers.forEach((peer) => {
+          // console.log(`disconnect peer in this.onCalledPeers: ${peer.call.metadata.sender.fullname}`)
+          // Game.getInstance()?.setOtherPlayerConnected(peer.call.metadata.sender.playerId, false)
+          peer.call.close()
+          peer?.uiBlock.remove()
+        })
+        this.onCalledPeers.clear()
+
+        this.cleanupMyStream()
+
         if (this.myVideo) {
           this.myVideo.remove()
           this.myVideo = undefined
         }
-        store.dispatch(setMediaConnected(false))
-        this.network.mediaConnected(false)
-        // if (video && store.getState().user.cameraON) {
-        store.dispatch(setCameraON(false))
-        // }
-        // if (audio && store.getState().user.microphoneON) {
-        store.dispatch(setMicrophoneON(false))
-        // }
-        // if (!video && !audio) {
-        //   store.dispatch(setCameraON(false))
-        //   store.dispatch(setMicrophoneON(false))
-        // }
+
         if (alertOnError) window.alert('No webcam or microphone found, or permission is blocked')
       })
+  }
+
+  removeIfUserIsInPeers(playerId: string) {
+    // console.log(playerId)
+    const sanitizedId = this.replaceInvalidId(playerId)
+    // console.log(this.peers.size)
+    if (this.peers.has(sanitizedId)) {
+      const peer = this.peers.get(sanitizedId)
+      peer?.call.close()
+      peer?.uiBlock.remove()
+      this.peers.delete(sanitizedId)
+      return true
+    }
+    // for (let p of this.peers.values()) {
+      // console.log(`player ${p.call.metadata.receiver.playerId}---- ${p.call.metadata.receiver.fullname}`)
+      //   if (p.call.metadata.receiver.playerId == playerId) {
+      //     p.call.close();
+      //     p.uiBlock.remove();
+      //     return true
+      //   }
+    // }
+    return false
+  }
+
+  removeIfUserIsInOnCalledPeers(playerId: string) {
+    // console.log(playerId)
+    const sanitizedId = this.replaceInvalidId(playerId)
+    // console.log(this.onCalledPeers.size)
+    if (this.onCalledPeers.has(sanitizedId)) {
+      const peer = this.onCalledPeers.get(sanitizedId)
+      peer?.call.close()
+      peer?.uiBlock.remove()
+      this.onCalledPeers.delete(sanitizedId)
+      return true
+    }
+    // for (let p of this.onCalledPeers.values()) {
+    //   console.log(`player ${p.call.metadata.sender.playerId}---- ${p.call.metadata.sender.fullname}`)
+      // if (p.call.metadata.sender.playerId == playerId) {
+      //   p.call.close();
+      //   p.uiBlock.remove();
+      //   this.onCalledPeers.delete()
+      //   return true
+      // }
+    // }
+    return false
   }
 
   removeUserVideo() {
@@ -172,9 +251,9 @@ export default class WebRTC {
     this.myVideo = undefined
     this.myStream = undefined
   }
-  cleanupStream() {
+  cleanupMyStream() {
     if (this.myStream) {
-      console.log('WebRTC::cleanupStream')
+      // console.log('WebRTC::cleanupStream')
       this.myStream.getTracks().forEach((track) => track.stop())
     }
   }
@@ -186,7 +265,7 @@ export default class WebRTC {
       if (!this.peers.has(sanitizedId)) {
         console.log('WebRTC::connectToNewUser calling', fullname)
         const call = this.myPeer.call(sanitizedId, this.myStream, {
-          metadata: { fullname: store.getState().user.playerName },
+          metadata: { sender: { fullname: store.getState().user.playerName, playerId: this.network.mySessionId }, receiver: { fullname, playerId: userId } },
         })
         // Create elements
         const uiBlock = document.createElement('div')
@@ -198,6 +277,7 @@ export default class WebRTC {
         this.peers.set(sanitizedId, { call, uiBlock, video })
 
         call.on('stream', (userVideoStream) => {
+          // console.log(`receive call mic: ${userVideoStream.getAudioTracks().length} video: ${userVideoStream.getVideoTracks().length}`)
           this.addVideoStream(uiBlock, video, userVideoStream, false)
         })
 
@@ -221,6 +301,7 @@ export default class WebRTC {
   deleteVideoStream(userId: string) {
     const sanitizedId = this.replaceInvalidId(userId)
     if (this.peers.has(sanitizedId)) {
+      console.log(`peers has id ${sanitizedId}, delete it`)
       const peer = this.peers.get(sanitizedId)
       peer?.call.close()
       // peer?.video.remove()
@@ -241,44 +322,10 @@ export default class WebRTC {
     }
   }
 
-  public turnMic(isOn: boolean) {
-    this.getUserMedia(store.getState().user.cameraON, isOn, false)
+  public toggleMic() {
+    this.getUserMedia(store.getState().user.cameraON, !store.getState().user.microphoneON, false)
   }
-  public turnCam(isOn: boolean) {
-    this.getUserMedia(isOn, store.getState().user.microphoneON, false)
+  public toggleCam() {
+    this.getUserMedia(!store.getState().user.cameraON, store.getState().user.microphoneON, false)
   }
-
-  // // method to set up mute/unmute and video on/off buttons
-  // setUpButtons() {
-  //   const audioButton = document.createElement('button')
-  //   audioButton.innerText = 'Mute'
-  //   audioButton.addEventListener('click', () => {
-  //     if (this.myStream) {
-  //       const audioTrack = this.myStream.getAudioTracks()[0]
-  //       if (audioTrack.enabled) {
-  //         audioTrack.enabled = false
-  //         audioButton.innerText = 'Unmute'
-  //       } else {
-  //         audioTrack.enabled = true
-  //         audioButton.innerText = 'Mute'
-  //       }
-  //     }
-  //   })
-  //   const videoButton = document.createElement('button')
-  //   videoButton.innerText = 'Video off'
-  //   videoButton.addEventListener('click', () => {
-  //     if (this.myStream) {
-  //       const audioTrack = this.myStream.getVideoTracks()[0]
-  //       if (audioTrack.enabled) {
-  //         audioTrack.enabled = false
-  //         videoButton.innerText = 'Video on'
-  //       } else {
-  //         audioTrack.enabled = true
-  //         videoButton.innerText = 'Video off'
-  //       }
-  //     }
-  //   })
-  //   this.buttonGrid?.append(audioButton)
-  //   this.buttonGrid?.append(videoButton)
-  // }
 }

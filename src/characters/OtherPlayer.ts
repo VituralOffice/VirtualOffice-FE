@@ -5,6 +5,7 @@ import { sittingShiftData } from './Player'
 import WebRTC from '../web/WebRTC'
 import { GameEvent } from '../events/EventCenter'
 import { phaserEvents } from '../PhaserGame'
+import Game from '../scenes/Game'
 
 export default class OtherPlayer extends Player {
   private targetPosition: [number, number]
@@ -32,8 +33,30 @@ export default class OtherPlayer extends Player {
     this.playContainerBody = this.playerContainer.body as Phaser.Physics.Arcade.Body
   }
 
+  setConnected(connected: boolean) {
+    console.log(`set connected of player ${this.playerId} to ${connected}`)
+    this.connected = connected
+    if (!this.connected) this.connectionBufferTime = 0
+  }
+
+  resetConnectionBufferTime() {
+    this.connectionBufferTime = 0
+  }
+
   makeCall(myPlayer: MyPlayer, webRTC: WebRTC) {
     this.myPlayer = myPlayer
+    //   console.log('Checking conditions:', {
+    //     connected: this.connected,
+    //     connectionBufferTime: this.connectionBufferTime,
+    //     myPlayerReadyToConnect: myPlayer.readyToConnect,
+    //     thisReadyToConnect: this.readyToConnect,
+    //     myPlayerMediaConnected: myPlayer.mediaConnected,
+    //     thisMediaConnected: this.mediaConnected,
+    //     myPlayerIsPlayerInMeeting: myPlayer.isPlayerInMeeting(),
+    //     thisIsInMeeting: this.isInMeeting,
+    //     myPlayerId: myPlayer.getPlayerId(),
+    //     thisPlayerId: this.playerId
+    // });
     if (
       !this.connected &&
       this.connectionBufferTime >= 750 &&
@@ -48,9 +71,9 @@ export default class OtherPlayer extends Player {
       // console.log(myPlayer.getPlayerId() + " ------- " + this.playerId)
       console.log(
         'OtherPlayer::makeCall ' +
-          myPlayer.playerNameText.text +
-          ' connect ' +
-          this.playerNameText.text
+        myPlayer.playerNameText.text +
+        ' connect ' +
+        this.playerNameText.text
       )
       // console.log(`OtherPlayer::makeCall myplayer id: ${myPlayer.getPlayerId()}, otherPlayerID: ${this.playerId}`)
       webRTC.connectToNewUser(this.playerId, this.playerNameText.text)
@@ -91,12 +114,37 @@ export default class OtherPlayer extends Player {
         }
         break
 
+      case 'changeMediaStream':
+        // console.log(`player ${this.playerId} change media stream1`)
+        const check = WebRTC.getInstance()?.removeIfUserIsInPeers(this.playerId)
+        WebRTC.getInstance()?.removeIfUserIsInOnCalledPeers(this.playerId)
+        // console.log(check)
+        if (typeof value === 'number' && check) {
+          this.connected = false
+          this.connectionBufferTime = 0
+          // console.log(`player ${this.playerId} change media stream2`)
+          // WebRTC.getInstance()?.deleteVideoStream(this.playerId)
+          // WebRTC.getInstance()?.deleteOnCalledVideoStream(this.playerId)
+        }
+        if (WebRTC.getInstance()?.getPeers.length == 0) {
+          Game.getInstance()?.resetAllOtherPlayerWaitBuffer()
+        }
+        break
+
       case 'mediaConnected':
         if (typeof value === 'boolean') {
           console.log(
             `OtherPlayer::updateOtherPlayer user ${this.playerId} change mediaConnected to ${value}`
           )
           this.mediaConnected = value
+          if (this.mediaConnected) {
+            this.connectionBufferTime = 0
+          }
+          if (!this.mediaConnected) {
+            if (this.connected) this.connected = false
+            WebRTC.getInstance()?.deleteVideoStream(this.playerId)
+            WebRTC.getInstance()?.deleteOnCalledVideoStream(this.playerId)
+          }
         }
         break
       case 'isInMeeting':
@@ -196,10 +244,10 @@ export default class OtherPlayer extends Player {
         phaserEvents?.emit(GameEvent.PLAYER_DISCONNECTED, this.playerId)
         this.connectionBufferTime = 0
         this.connected = false
-      } else if (!this.mediaConnected && this.connectionBufferTime >= 750) {
-        phaserEvents?.emit(GameEvent.PLAYER_DISCONNECTED, this.playerId)
-        this.connectionBufferTime = 0
-        this.connected = false
+        // } else if (!this.mediaConnected && this.connectionBufferTime >= 750) {
+        //   phaserEvents?.emit(GameEvent.PLAYER_DISCONNECTED, this.playerId)
+        //   this.connectionBufferTime = 0
+        //   this.connected = false
       } else if (this.isInMeeting) {
         phaserEvents?.emit(GameEvent.PLAYER_DISCONNECTED, this.playerId)
         this.connectionBufferTime = 0
